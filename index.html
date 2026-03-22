@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Darnoppler's Forecast</title>
+  <link rel="icon" type="image/x-icon" href="darnoppler2.jpg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <div class="search-section">
+      <div class="search-wrapper">
+        <input
+          type="text"
+          id="city-input"
+          placeholder="Search city..."
+          autocomplete="off"
+        >
+        <div class="suggestions-dropdown" id="suggestions-dropdown"></div>
+      </div>
+      <button id="search-btn">Search</button>
+    </div>
+
+    <p class="error-message" id="error-message"></p>
+
+    <div class="screenshot-panel" id="screenshot-panel" hidden>
+
+      <div class="weather-card">
+
+        <div class="weather-date-bar" id="weather-date-bar">--</div>
+
+        <div class="holiday-bar" id="holiday-bar" hidden></div>
+
+        <div class="weather-body">
+
+          <div class="weather-scene" id="weather-scene"></div>
+
+          <div class="weather-main">
+            <div class="weather-header">
+              <div>
+                <h1 id="city-name">--</h1>
+                <p id="weather-desc">--</p>
+              </div>
+              <div id="weather-icon" class="weather-icon"></div>
+            </div>
+            <div class="temp-section">
+              <span id="temperature" class="temp">--</span>
+              <span class="temp-unit">°F</span>
+            </div>
+          </div>
+
+          <div class="weather-details">
+            <div class="details-grid">
+              <div class="detail-item">
+                <span class="detail-label">Feels Like</span>
+                <span class="detail-value" id="feels-like">--</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Humidity</span>
+                <span class="detail-value" id="humidity">--</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">UV Index</span>
+                <span class="detail-value" id="uv-index">--</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Wind</span>
+                <span class="detail-value" id="wind">--</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Visibility</span>
+                <span class="detail-value" id="visibility">--</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Dew Point</span>
+                <span class="detail-value" id="dew-point">--</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="forecast-grid" id="forecast-grid"></div>
+
+      <div class="brand-footer">
+        <div class="brand-text">
+            <div class="brand-name-display">WEATHER BY</div>
+        </div>
+        <img
+          src="darnoppler2.jpg"
+          class="mascot"
+          alt="Darnoppler"
+          onerror="this.style.display='none'"
+        >
+      </div>
+
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
