@@ -26,9 +26,13 @@
 
     <p class="error-message" id="error-message"></p>
 
+    <!-- SCREENSHOT PANEL -->
     <div class="screenshot-panel" id="screenshot-panel" hidden>
 
-      <div class="weather-card">
+      <!-- WEATHER CARD -->
+      <div class="weather-card expandable" id="weather-card">
+
+        <div class="expand-hint">▼ TAP FOR MORE</div>
 
         <div class="weather-date-bar" id="weather-date-bar">--</div>
 
@@ -78,18 +82,74 @@
                 <span class="detail-label">Dew Point</span>
                 <span class="detail-value" id="dew-point">--</span>
               </div>
+              <div class="detail-item">
+                <span class="detail-label">Today's High</span>
+                <span class="detail-value" id="today-high">--</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Today's Low</span>
+                <span class="detail-value" id="today-low">--</span>
+              </div>
             </div>
           </div>
 
         </div>
+        <!-- end .weather-body -->
 
       </div>
+      <!-- end .weather-card -->
 
+      <!-- EXPAND PANEL -->
+      <div class="expand-panel" id="expand-panel">
+        <div class="expand-inner">
+
+          <div class="expand-section">
+            <div class="expand-section-title">TEMPERATURES THROUGHOUT THE DAY</div>
+            <div class="expand-temp-row">
+              <div class="expand-temp-item">
+                <span class="expand-temp-label">Morning</span>
+                <span class="expand-temp-value" id="temp-morn">--</span>
+              </div>
+              <div class="expand-temp-item">
+                <span class="expand-temp-label">Evening</span>
+                <span class="expand-temp-value" id="temp-eve">--</span>
+              </div>
+              <div class="expand-temp-item">
+                <span class="expand-temp-label">Night</span>
+                <span class="expand-temp-value" id="temp-night">--</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="expand-section">
+            <div class="expand-section-title">WIND & PRECIPITATION</div>
+            <div class="expand-detail-row">
+              <div class="expand-detail-item">
+                <span class="expand-temp-label">Wind Gust</span>
+                <span class="expand-temp-value" id="wind-gust">--</span>
+              </div>
+              <div class="expand-detail-item">
+                <span class="expand-temp-label">Rain Volume</span>
+                <span class="expand-temp-value" id="rain-vol">--</span>
+              </div>
+              <div class="expand-detail-item">
+                <span class="expand-temp-label">Snow Volume</span>
+                <span class="expand-temp-value" id="snow-vol">--</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- end .expand-panel -->
+
+      <!-- 6-DAY FORECAST GRID -->
       <div class="forecast-grid" id="forecast-grid"></div>
 
+      <!-- BRAND FOOTER -->
       <div class="brand-footer">
         <div class="brand-text">
-            <div class="brand-name-display">WEATHER BY</div>
+          <div class="brand-name-display">WEATHER BY</div>
         </div>
         <img
           src="darnoppler2.jpg"
@@ -100,7 +160,10 @@
       </div>
 
     </div>
+    <!-- end .screenshot-panel -->
+
   </div>
+  <!-- end .app -->
 
   <script src="config.js"></script>
   <script src="app.js"></script>

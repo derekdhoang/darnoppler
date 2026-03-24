@@ -1,9 +1,12 @@
+/* ── 1. RESET ─────────────────────────────────────────────────────── */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+
+/* ── 2. VARIABLES ─────────────────────────────────────────────────── */
 :root {
   --navy:         #1a2e4a;
   --blue:         #3b82f6;
@@ -16,7 +19,9 @@
   --precip-color: #67e8f9;
   --holiday-bg:   rgba(255, 255, 255, 0.18);
 }
- 
+
+
+/* ── 3. BODY ──────────────────────────────────────────────────────── */
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: linear-gradient(135deg, #1a2e4a 0%, #2d5a8e 100%);
@@ -26,7 +31,9 @@ body {
   justify-content: center;
   padding: 20px;
 }
- 
+
+
+/* ── 4. APP CONTAINER ─────────────────────────────────────────────── */
 .app {
   width: 100%;
   max-width: 960px;
@@ -35,11 +42,13 @@ body {
   gap: 16px;
 }
 
+
+/* ── 5. SEARCH ────────────────────────────────────────────────────── */
 .search-section {
   display: flex;
   gap: 10px;
 }
- 
+
 #city-input {
   flex: 1;
   padding: 14px 18px;
@@ -52,10 +61,10 @@ body {
   outline: none;
   transition: background-color 0.2s ease;
 }
- 
+
 #city-input::placeholder { color: rgba(255, 255, 255, 0.5); }
 #city-input:focus        { background-color: rgba(255, 255, 255, 0.25); }
- 
+
 #search-btn {
   padding: 14px 20px;
   font-size: 0.95rem;
@@ -67,9 +76,9 @@ body {
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
- 
+
 #search-btn:hover { background-color: var(--blue-light); }
- 
+
 .error-message {
   text-align: center;
   color: rgba(255, 255, 255, 0.7);
@@ -78,57 +87,91 @@ body {
 }
 
 .search-wrapper {
-    position: relative;
-    flex: 1;
+  position: relative;
+  flex: 1;
 }
 
 .search-wrapper #city-input { width: 100%; }
 
 .suggestions-dropdown {
-    position: absolute;
-    top: calc(100% + 6px);
-    left: 0;
-    right: 0;
-    background-color: #1e3a5f;
-    border-radius: 12px;
-    overflow: hidden;
-    z-index: 100;
-    display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background-color: #1e3a5f;
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 100;
+  display: none;
 }
 
 .suggestions-dropdown.open { display: block; }
 
 .suggestion-item {
-    padding: 14px 18px;
-    font-size: 0.95rem;
-    color: var(--white);
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  color: var(--white);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .suggestion-item:last-child { border-bottom: none; }
-.suggestion-item:hover { background-color: rgba(255, 255, 255, 0.10); }
-.suggestion-item.active { background-color: rgba(255, 255, 255, 0.15); }
+.suggestion-item:hover      { background-color: rgba(255, 255, 255, 0.10); }
+.suggestion-item.active     { background-color: rgba(255, 255, 255, 0.15); }
 
+
+/* ── 6. SCREENSHOT PANEL ──────────────────────────────────────────── */
 .screenshot-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
+
+/* ── 7. WEATHER CARD ──────────────────────────────────────────────── */
 .weather-card {
-    background-color: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 24px;
-    overflow: hidden;
-    color: var(--white);
-    display: grid;
-    grid-template-rows: auto 1fr;
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  overflow: hidden;
+  color: var(--white);
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
 }
 
+
+/* ── 8. EXPAND HINT ───────────────────────────────────────────────── */
+.expand-hint {
+  text-align: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: color 0.2s;
+}
+
+.expandable {
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.expandable:hover { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2); }
+.expandable:hover .expand-hint { color: rgba(255, 255, 255, 0.6); }
+.expandable.expanded .expand-hint { font-size: 0; }
+
+.expandable.expanded .expand-hint::before {
+  content: '▲ TAP TO CLOSE';
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+
+/* ── 9. DATE BAR ──────────────────────────────────────────────────── */
 .weather-date-bar {
   padding: 10px 28px;
   font-size: 0.72rem;
@@ -140,6 +183,8 @@ body {
   background: rgba(0, 0, 0, 0.1);
 }
 
+
+/* ── 10. HOLIDAY BAR ──────────────────────────────────────────────── */
 .holiday-bar {
   padding: 8px 28px;
   font-size: 0.8rem;
@@ -151,6 +196,8 @@ body {
   color: var(--white);
 }
 
+
+/* ── 11. WEATHER BODY ─────────────────────────────────────────────── */
 .weather-body {
   display: grid;
   grid-template-columns: 220px 1fr 1fr;
@@ -158,6 +205,8 @@ body {
   min-height: 200px;
 }
 
+
+/* ── 12. WEATHER SCENE (left column) ─────────────────────────────── */
 .weather-scene {
   display: flex;
   align-items: center;
@@ -169,10 +218,10 @@ body {
 .weather-scene img {
   width: 120px;
   height: 120px;
-  filter: hue-rotate(40deg) saturate(1.2) brightness(1.15)
-          drop-shadow(0 4px 16px rgba(0, 0, 0, 0.4));
 }
 
+
+/* ── 13. WEATHER MAIN (center column) ────────────────────────────── */
 .weather-main {
   display: flex;
   flex-direction: column;
@@ -204,8 +253,6 @@ body {
 .weather-icon img {
   width: 64px;
   height: 64px;
-  filter: hue-rotate(40deg) saturate(1.2) brightness(1.15)
-          drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
 .temp-section {
@@ -229,6 +276,8 @@ body {
   opacity: 0.65;
 }
 
+
+/* ── 14. WEATHER DETAILS (right column) ──────────────────────────── */
 .weather-details {
   padding: 24px 24px 24px 16px;
   border-left: 1px solid rgba(255, 255, 255, 0.1);
@@ -243,7 +292,7 @@ body {
   width: 100%;
 }
 
-.detail-item { display: flex; flex-direction: column; gap: 3px; }
+.detail-item  { display: flex; flex-direction: column; gap: 3px; }
 
 .detail-label {
   font-size: 0.7rem;
@@ -259,12 +308,86 @@ body {
   color: var(--white);
 }
 
+
+/* ── 15. EXPAND PANEL ─────────────────────────────────────────────── */
+.expand-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.expand-panel.open {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.expand-inner {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.expand-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.expand-section-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 6px;
+}
+
+.expand-temp-row,
+.expand-detail-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.expand-temp-item,
+.expand-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.expand-temp-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.expand-temp-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--white);
+}
+
+
+/* ── 16. FORECAST GRID ────────────────────────────────────────────── */
 .forecast-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 10px;
 }
 
+
+/* ── 17. FORECAST CARD ────────────────────────────────────────────── */
 .forecast-card {
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
@@ -301,18 +424,6 @@ body {
 .forecast-icon {
   width: 56px;
   height: 56px;
-  filter: hue-rotate(40deg) saturate(1.2) brightness(1.15)
-          drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
-}
-
-.forecast-icon.snow-icon {
-  filter: brightness(4) saturate(0.3)
-          drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
-}
-
-.forecast-icon.night-icon {
-  filter: brightness(4) saturate(0.2)
-          drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
 }
 
 .forecast-description {
@@ -332,11 +443,14 @@ body {
 }
 
 .forecast-high { font-size: 1.2rem; font-weight: 700; color: var(--temp-high); }
-.forecast-sep { font-size: 0.9rem; color: rgba(255, 255, 255, 0.3); }
-.forecast-low { font-size: 0.95rem; font-weight: 500; color: var(--temp-low); }
-.forecast-precip { font-size: 0.75rem; color: var(--precip-color); margin-top: 2px; }
-.forecast-precip-empty {height: 1.1em; }
+.forecast-sep  { font-size: 0.9rem; color: rgba(255, 255, 255, 0.3); }
+.forecast-low  { font-size: 0.95rem; font-weight: 500; color: var(--temp-low); }
 
+.forecast-precip       { font-size: 0.75rem; color: var(--precip-color); margin-top: 2px; }
+.forecast-precip-empty { height: 1.1em; }
+
+
+/* ── 18. HOLIDAY BADGE ────────────────────────────────────────────── */
 .holiday-badge {
   background: var(--holiday-bg);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -351,6 +465,8 @@ body {
   width: 100%;
 }
 
+
+/* ── 19. BRAND FOOTER ─────────────────────────────────────────────── */
 .brand-footer {
   display: flex;
   align-items: center;
@@ -363,7 +479,6 @@ body {
   height: 80px;
   width: auto;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
-  
 }
 
 .brand-text {
@@ -389,8 +504,9 @@ body {
   text-transform: uppercase;
 }
 
+
+/* ── 20. CARD ENTRANCE ANIMATION ──────────────────────────────────── */
 @keyframes cardEnter {
   from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-  
+  to   { opacity: 1; transform: translateY(0); }
 }
