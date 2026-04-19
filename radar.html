@@ -788,6 +788,265 @@
       text-align: right;
     }
 
+     /* ── FUTURE RADAR ─────────────────────────────────────── */
+    .future-radar-info {
+      padding: 8px 10px;
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+ 
+    .forecast-time {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #93c5fd;
+      letter-spacing: 0.02em;
+    }
+ 
+    .forecast-source {
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.45);
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+ 
+    /* Control buttons row (prev, play, next, hour label) */
+    .forecast-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+ 
+    .forecast-play-btn,
+    .forecast-nav-btn {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      border-radius: 6px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      color: rgba(255,255,255,0.7);
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+ 
+    .forecast-play-btn:hover,
+    .forecast-nav-btn:hover {
+      background: rgba(59,130,246,0.25);
+      color: #93c5fd;
+    }
+ 
+    .forecast-nav-btn {
+      width: 28px;
+    }
+ 
+    .forecast-nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+ 
+    .forecast-play-btn.playing {
+      background: rgba(34,197,94,0.25);
+      border-color: rgba(34,197,94,0.5);
+      color: #86efac;
+    }
+ 
+    .forecast-hour {
+      margin-left: auto;      /* pushes to right edge of row */
+      color: #93c5fd;
+      font-weight: 700;
+    }
+ 
+    /* Slider block (its own row below buttons) */
+    .forecast-slider-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 0 4px;
+      margin-bottom: 10px;
+    }
+ 
+    .forecast-slider-track {
+      position: relative;
+    }
+ 
+    .forecast-slider {
+      width: 100%;
+      appearance: none;
+      height: 6px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 3px;
+      outline: none;
+      margin: 0;
+      position: relative;
+      z-index: 2;
+    }
+ 
+    .forecast-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #3b82f6;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+ 
+    .forecast-slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #3b82f6;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+ 
+    /* Tick line — positioned absolutely over the slider track */
+    .forecast-tick-line {
+      position: absolute;
+      top: 0;
+      left: 8px;            /* match the slider thumb half-width */
+      right: 8px;
+      height: 6px;
+      pointer-events: none;
+      z-index: 1;
+    }
+ 
+    .forecast-tick {
+      position: absolute;
+      top: -2px;
+      width: 1px;
+      height: 10px;
+      background: rgba(255,255,255,0.3);
+    }
+ 
+    /* Make every third tick a bit taller/brighter */
+    .forecast-tick.major {
+      top: -3px;
+      height: 12px;
+      background: rgba(255,255,255,0.55);
+    }
+ 
+    /* Tick label row (Now, +6h, +12h, +18h below slider) */
+    .forecast-tick-labels {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 4px;
+      font-size: 0.55rem;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.02em;
+      user-select: none;
+      pointer-events: none;
+    }
+ 
+    /* Status badge (fresh / stale indicator) */
+    .forecast-status-badge {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+ 
+    .forecast-status-badge.fresh {
+      background: rgba(34,197,94,0.2);
+      color: #86efac;
+    }
+ 
+    .forecast-status-badge.stale {
+      background: rgba(251,191,36,0.2);
+      color: #fcd34d;
+    }
+ 
+    .forecast-status-badge.very-stale {
+      background: rgba(239,68,68,0.2);
+      color: #fca5a5;
+    }
+ 
+    /* Loading indicator */
+    .forecast-loading {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      margin-top: 8px;
+      background: rgba(59,130,246,0.08);
+      border-radius: 4px;
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.6);
+    }
+ 
+    .forecast-loading-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #3b82f6;
+      animation: pulseDot 1.2s ease-in-out infinite;
+    }
+ 
+    @keyframes pulseDot {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50%      { opacity: 1;   transform: scale(1.2); }
+    }
+ 
+    /* Error state */
+    .forecast-error {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      margin-top: 8px;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      color: #fca5a5;
+    }
+ 
+    .forecast-retry-btn {
+      padding: 4px 10px;
+      border: 1px solid rgba(239,68,68,0.4);
+      border-radius: 4px;
+      background: rgba(239,68,68,0.15);
+      color: #fca5a5;
+      font-size: 0.65rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+ 
+    .forecast-retry-btn:hover {
+      background: rgba(239,68,68,0.3);
+      color: #fff;
+    }
+ 
+    /* Smooth opacity transition when toggling radar modes */
+    .leaflet-tile-pane .leaflet-layer {
+      transition: opacity 0.25s ease;
+    }
+
+    /* ── FUTURE RADAR HIDDEN OVERRIDE ─────────────────────── */
+    /* The native [hidden] attribute is overridden by our display:flex 
+       and display:block rules above, so we force it back here. */
+    .forecast-controls[hidden],
+    .forecast-slider-block[hidden],
+    .forecast-loading[hidden],
+    .forecast-error[hidden],
+    .future-radar-info[hidden],
+    .forecast-status-badge[hidden] {
+      display: none !important;
+    }
+
     /* ── BROADCAST OVERLAY FRAMES ─────────────────────────────────────── */
     .broadcast-overlay-frame {
       position: absolute;
@@ -3415,6 +3674,65 @@
               <div class="opacity-slider-row">
                 <input type="range" class="opacity-slider" id="radar-opacity-slider" min="0" max="100" value="100">
                 <span class="opacity-value" id="radar-opacity-value">100%</span>
+              </div>
+            </div>
+
+            <div class="panel-section">
+              <div class="panel-section-title">Future Radar</div>
+ 
+              <!-- Toggle -->
+              <div class="filter-row">
+                <span class="filter-label">Show Forecast</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="future-radar-toggle">
+                  <div class="toggle-track"></div>
+                  <div class="toggle-thumb"></div>
+                </label>
+              </div>
+ 
+              <!-- Forecast time + source info -->
+              <div class="future-radar-info" id="future-radar-info" hidden>
+                <div class="forecast-time" id="forecast-time-label">+0h • Loading…</div>
+                <div class="forecast-source">
+                  <span id="forecast-source-label">HRRR · —</span>
+                  <span class="forecast-status-badge" id="forecast-status-badge" hidden></span>
+                </div>
+              </div>
+ 
+              <!-- Control buttons row -->
+              <div class="forecast-controls" id="forecast-controls" hidden>
+                <button class="forecast-nav-btn" id="forecast-prev-btn" title="Previous hour" type="button">⏮</button>
+                <button class="forecast-play-btn" id="forecast-play-btn" title="Play/Pause" type="button">▶</button>
+                <button class="forecast-nav-btn" id="forecast-next-btn" title="Next hour" type="button">⏭</button>
+                <span class="opacity-value forecast-hour" id="forecast-hour-label">+0h</span>
+              </div>
+ 
+              <!-- Slider with visible tick marks (separate row) -->
+              <div class="forecast-slider-block" id="forecast-slider-block" hidden>
+                <div class="forecast-slider-track">
+                  <input type="range" class="forecast-slider" id="forecast-slider" min="0" max="18" value="0" step="1">
+                  <div class="forecast-tick-line">
+                    <!-- Tick marks auto-generated by JS into this div -->
+                  </div>
+                </div>
+                <div class="forecast-tick-labels">
+                  <span>Now</span>
+                  <span>+6h</span>
+                  <span>+12h</span>
+                  <span>+18h</span>
+                </div>
+              </div>
+ 
+              <!-- Loading indicator -->
+              <div class="forecast-loading" id="forecast-loading" hidden>
+                <span class="forecast-loading-dot"></span>
+                <span>Loading tiles…</span>
+              </div>
+ 
+              <!-- Error + retry -->
+              <div class="forecast-error" id="forecast-error" hidden>
+                <span>⚠️ Forecast data unavailable</span>
+                <button class="forecast-retry-btn" id="forecast-retry-btn" type="button">Retry</button>
               </div>
             </div>
 
@@ -7123,6 +7441,9 @@
       if (radarLayer) {
         radarLayer.setOpacity(opacity / 100);
       }
+      if (futureRadarLayer) {
+        futureRadarLayer.setOpacity(opacity / 100);
+      }
       opacitySlider.value = opacity;
       opacityValue.textContent = opacity + '%';
       
@@ -7131,6 +7452,298 @@
         btn.classList.toggle('active', parseInt(btn.dataset.opacity) === opacity);
       });
     }
+
+    opacityPresets.forEach(btn => {
+      btn.addEventListener('click', () => {
+        setRadarOpacity(parseInt(btn.dataset.opacity));
+      });
+    });
+
+  // ── FUTURE RADAR ──────────────────────────────────────────────
+    const TILE_PROXY_URL = 'https://tile-proxy.derekdhoang.workers.dev';
+ 
+    // State
+    let futureRadarLayer = null;
+    let futureRadarActive = false;
+    let latestRun = null;
+    let currentForecastHour = 0;
+    let playInterval = null;
+    let sliderDebounce = null;
+    let loadingTimeout = null;
+ 
+    // DOM references
+    const futureToggle = document.getElementById('future-radar-toggle');
+    const futureInfo = document.getElementById('future-radar-info');
+    const futureControls = document.getElementById('forecast-controls');
+    const sliderBlock = document.getElementById('forecast-slider-block');
+    const tickLineEl = document.querySelector('.forecast-tick-line');
+    const timeLabel = document.getElementById('forecast-time-label');
+    const sourceLabel = document.getElementById('forecast-source-label');
+    const statusBadge = document.getElementById('forecast-status-badge');
+    const hourLabel = document.getElementById('forecast-hour-label');
+    const slider = document.getElementById('forecast-slider');
+    const playBtn = document.getElementById('forecast-play-btn');
+    const prevBtn = document.getElementById('forecast-prev-btn');
+    const nextBtn = document.getElementById('forecast-next-btn');
+    const loadingEl = document.getElementById('forecast-loading');
+    const errorEl = document.getElementById('forecast-error');
+    const retryBtn = document.getElementById('forecast-retry-btn');
+    // Start with error hidden (will only show if fetch fails AND no existing data)
+    errorEl.hidden = true;
+    loadingEl.hidden = true;
+ 
+    // Render tick marks once (19 of them, every 6th is a major tick)
+    function renderTicks() {
+      if (!tickLineEl) return;
+      tickLineEl.innerHTML = '';
+      const maxHour = 18;
+      for (let i = 0; i <= maxHour; i++) {
+        const tick = document.createElement('span');
+        tick.className = 'forecast-tick';
+        if (i % 6 === 0) tick.classList.add('major');
+        tick.style.left = `${(i / maxHour) * 100}%`;
+        tickLineEl.appendChild(tick);
+      }
+    }
+    renderTicks();
+ 
+    // Fetch the latest available HRRR run from the tile proxy
+    async function fetchLatestRun() {
+      try {
+        const res = await fetch(`${TILE_PROXY_URL}/latest`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!data.date || !data.run || !data.forecastHours) {
+          throw new Error('Malformed /latest response');
+        }
+        latestRun = data;
+        slider.max = Math.max(...data.forecastHours);
+        errorEl.hidden = true;
+        updateStatusBadge();
+        return data;
+      } catch (err) {
+        console.error('Failed to load latest HRRR run:', err);
+        sourceLabel.textContent = 'HRRR · unavailable';
+        if (!latestRun) {
+          errorEl.hidden = false;
+        }
+        return null;
+      }
+    }
+ 
+    // Compute how old the run is and update the status badge
+    function updateStatusBadge() {
+      if (!latestRun) {
+        statusBadge.hidden = true;
+        return;
+      }
+      const year = parseInt(latestRun.date.slice(0, 4));
+      const month = parseInt(latestRun.date.slice(4, 6)) - 1;
+      const day = parseInt(latestRun.date.slice(6, 8));
+      const runHour = parseInt(latestRun.run.replace('z', ''));
+      const runTime = new Date(Date.UTC(year, month, day, runHour));
+      const ageHours = (Date.now() - runTime.getTime()) / (1000 * 60 * 60);
+ 
+      statusBadge.hidden = false;
+      statusBadge.classList.remove('fresh', 'stale', 'very-stale');
+ 
+      if (ageHours < 2) {
+        statusBadge.textContent = 'Fresh';
+        statusBadge.classList.add('fresh');
+      } else if (ageHours < 12) {
+        statusBadge.textContent = `${Math.round(ageHours)}h old`;
+        statusBadge.classList.add('stale');
+      } else {
+        statusBadge.textContent = `⚠️ ${Math.round(ageHours)}h old`;
+        statusBadge.classList.add('very-stale');
+      }
+    }
+ 
+    function buildTileUrl(forecastHour) {
+      if (!latestRun) return null;
+      const fh = String(forecastHour).padStart(2, '0');
+      return `${TILE_PROXY_URL}/${latestRun.date}/${latestRun.run}/f${fh}/{z}/{x}/{y}.png`;
+    }
+ 
+    function formatForecastLabel(forecastHour) {
+      if (forecastHour === 0) return 'Now';
+      const year = parseInt(latestRun.date.slice(0, 4));
+      const month = parseInt(latestRun.date.slice(4, 6)) - 1;
+      const day = parseInt(latestRun.date.slice(6, 8));
+      const runHour = parseInt(latestRun.run.replace('z', ''));
+      const targetUtc = new Date(Date.UTC(year, month, day, runHour + forecastHour));
+      const localTime = targetUtc.toLocaleTimeString('en-US', {
+        hour: 'numeric', minute: '2-digit', timeZoneName: 'short'
+      });
+      return `+${forecastHour}h • ${localTime}`;
+    }
+ 
+    function showLoading() {
+      loadingEl.hidden = false;
+      clearTimeout(loadingTimeout);
+      loadingTimeout = setTimeout(() => {
+        loadingEl.hidden = true;
+      }, 5000);
+    }
+ 
+    function hideLoading() {
+      loadingEl.hidden = true;
+      clearTimeout(loadingTimeout);
+    }
+ 
+    function showFutureRadar(forecastHour) {
+      if (!latestRun || !map) return;
+ 
+      currentForecastHour = forecastHour;
+ 
+      if (futureRadarLayer) {
+        map.removeLayer(futureRadarLayer);
+        futureRadarLayer = null;
+      }
+ 
+      const url = buildTileUrl(forecastHour);
+      if (!url) return;
+ 
+      futureRadarLayer = L.tileLayer(url, {
+        opacity: opacityLevel,
+        attribution: 'HRRR · NOAA',
+        zIndex: 200,
+      });
+ 
+      showLoading();
+      futureRadarLayer.on('load', hideLoading);
+ 
+      futureRadarLayer.addTo(map);
+ 
+      timeLabel.textContent = formatForecastLabel(forecastHour);
+      hourLabel.textContent = `+${forecastHour}h`;
+      sourceLabel.textContent = `HRRR · ${latestRun.run.toUpperCase()} run`;
+ 
+      const maxHour = Math.max(...latestRun.forecastHours);
+      prevBtn.disabled = forecastHour <= 0;
+      nextBtn.disabled = forecastHour >= maxHour;
+    }
+ 
+    async function toggleFutureRadar(enabled) {
+      futureRadarActive = enabled;
+ 
+      if (enabled) {
+        if (!latestRun) {
+          await fetchLatestRun();
+          if (!latestRun) {
+            futureToggle.checked = false;
+            futureRadarActive = false;
+            return;
+          }
+        }
+ 
+        if (radarLayer) map.removeLayer(radarLayer);
+        showFutureRadar(currentForecastHour);
+ 
+        futureInfo.hidden = false;
+        futureControls.hidden = false;
+        sliderBlock.hidden = false;
+        document.getElementById('radar-timestamp').textContent = '🔮 HRRR Forecast';
+      } else {
+        stopPlayback();
+ 
+        if (futureRadarLayer) {
+          map.removeLayer(futureRadarLayer);
+          futureRadarLayer = null;
+        }
+        if (radarLayer) radarLayer.addTo(map);
+ 
+        futureInfo.hidden = true;
+        futureControls.hidden = true;
+        sliderBlock.hidden = true;
+        loadingEl.hidden = true;
+ 
+        loadRadar();
+      }
+    }
+ 
+    function startPlayback() {
+      if (playInterval) return;
+      playBtn.textContent = '⏸';
+      playBtn.classList.add('playing');
+ 
+      playInterval = setInterval(() => {
+        const maxHour = Math.max(...latestRun.forecastHours);
+        let nextHour = currentForecastHour + 1;
+        if (nextHour > maxHour) nextHour = 0;
+ 
+        slider.value = nextHour;
+        showFutureRadar(nextHour);
+      }, 800);
+    }
+ 
+    function stopPlayback() {
+      if (playInterval) {
+        clearInterval(playInterval);
+        playInterval = null;
+      }
+      playBtn.textContent = '▶';
+      playBtn.classList.remove('playing');
+    }
+ 
+    function togglePlayback() {
+      if (!futureRadarActive) return;
+      if (playInterval) stopPlayback();
+      else startPlayback();
+    }
+ 
+    function stepForecast(delta) {
+      if (!futureRadarActive) return;
+      stopPlayback();
+      const maxHour = Math.max(...latestRun.forecastHours);
+      let newHour = currentForecastHour + delta;
+      if (newHour < 0) newHour = 0;
+      if (newHour > maxHour) newHour = maxHour;
+      slider.value = newHour;
+      showFutureRadar(newHour);
+    }
+ 
+    // Event listeners
+    futureToggle.addEventListener('change', (e) => {
+      toggleFutureRadar(e.target.checked);
+    });
+ 
+    slider.addEventListener('input', (e) => {
+      const fh = parseInt(e.target.value);
+      hourLabel.textContent = `+${fh}h`;
+ 
+      clearTimeout(sliderDebounce);
+      sliderDebounce = setTimeout(() => {
+        if (futureRadarActive) showFutureRadar(fh);
+      }, 150);
+    });
+ 
+    playBtn.addEventListener('click', togglePlayback);
+    prevBtn.addEventListener('click', () => stepForecast(-1));
+    nextBtn.addEventListener('click', () => stepForecast(+1));
+    retryBtn.addEventListener('click', async () => {
+      errorEl.hidden = true;
+      loadingEl.hidden = true;
+      await fetchLatestRun();
+    });
+ 
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (!futureRadarActive) return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+ 
+      if (e.key === 'ArrowLeft') { e.preventDefault(); stepForecast(-1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); stepForecast(+1); }
+      else if (e.key === ' ') { e.preventDefault(); togglePlayback(); }
+    });
+ 
+    // Periodic freshness update
+    setInterval(() => {
+      if (latestRun) updateStatusBadge();
+    }, 60 * 1000);
+ 
+    // Initial load
+    fetchLatestRun();
 
     opacitySlider.addEventListener('input', (e) => {
       const val = parseInt(e.target.value);
