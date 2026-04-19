@@ -24,7 +24,10 @@
 /* ── 3. BODY ──────────────────────────────────────────────────────── */
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: linear-gradient(135deg, #1a2e4a 0%, #2d5a8e 100%);
+  background: 
+    linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.4) 100%),
+    url('img/darnoppler_bg.png') center center / cover no-repeat fixed;
+  background-color: #030a14;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -116,6 +119,36 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* --- NEW STYLES FOR THE '✕' BUTTON --- */
+.remove-single-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.9rem;
+  cursor: pointer;
+  
+  /* Make it a perfect circle */
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  
+  /* Center the '✕' perfectly inside the circle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Smooth transition for the hover effect */
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.remove-single-btn:hover {
+  /* This creates the gray/frosted circle */
+  background-color: rgba(255, 255, 255, 0.2); 
+  
+  /* Optional: Brighten the '✕' slightly on hover so it pops */
+  color: var(--white); 
+}
+
 .suggestion-item:last-child { border-bottom: none; }
 .suggestion-item:hover      { background-color: rgba(255, 255, 255, 0.10); }
 .suggestion-item.active     { background-color: rgba(255, 255, 255, 0.15); }
@@ -140,34 +173,6 @@ body {
   color: var(--white);
   display: grid;
   grid-template-rows: auto auto auto 1fr;
-}
-
-
-/* ── 8. EXPAND HINT ───────────────────────────────────────────────── */
-.expand-hint {
-  text-align: center;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: rgba(255, 255, 255, 0.3);
-  padding: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  transition: color 0.2s;
-}
-
-.expandable {
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-
-.expandable:hover { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2); }
-.expandable:hover .expand-hint { color: rgba(255, 255, 255, 0.6); }
-.expandable.expanded .expand-hint { font-size: 0; }
-
-.expandable.expanded .expand-hint::before {
-  content: '▲ TAP TO CLOSE';
-  font-size: 0.62rem;
-  color: rgba(255, 255, 255, 0.6);
 }
 
 
@@ -269,11 +274,43 @@ body {
   line-height: 1;
 }
 
+.temp-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 4px;
+  padding-bottom: 10px;
+}
+
 .temp-unit {
-  font-size: 2rem;
+  font-size: 1.1rem;
   font-weight: 300;
-  margin-top: 10px;
   opacity: 0.65;
+}
+
+/* ── PRECIP HINT ABOVE TEMPERATURE ───────────────────────────────── */
+.temp-precip-hint {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.temp-display {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.temp-precip-hint img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.85;
 }
 
 
@@ -311,14 +348,8 @@ body {
 
 /* ── 15. EXPAND PANEL ─────────────────────────────────────────────── */
 .expand-panel {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease, opacity 0.3s ease;
-  opacity: 0;
-}
-
-.expand-panel.open {
-  max-height: 400px;
+  max-height: 800px;
+  overflow: visible;
   opacity: 1;
 }
 
@@ -328,10 +359,10 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
-  padding: 24px 28px;
+  padding: 20px 24px 16px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
 .expand-section {
@@ -381,32 +412,98 @@ body {
 
 /* ── 16. FORECAST GRID ────────────────────────────────────────────── */
 .forecast-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
+}
+
+.forecast-card {
+  flex: 0 1 calc(14.28% - 10px); /* ~7 cards per row */
+  min-width: 100px;
+  max-width: 140px;
 }
 
 
 /* ── 17. FORECAST CARD ────────────────────────────────────────────── */
 .forecast-card {
+  flex: 0 1 calc(14.28% - 10px);
+  min-width: 100px;
+  max-width: 140px;
+  height: 220px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.forecast-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.forecast-card.flipped .forecast-card-inner {
+  transform: rotateY(180deg);
+}
+
+.forecast-card-front,
+.forecast-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   border-radius: 16px;
-  padding: 14px 8px 16px;
+  padding: 14px 8px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   color: var(--white);
-  transition: background-color 0.2s, transform 0.2s;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.forecast-card:hover .forecast-card-front,
+.forecast-card:hover .forecast-card-back {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 
+    0 0 15px rgba(59, 130, 246, 0.3),
+    0 0 30px rgba(59, 130, 246, 0.15),
+    inset 0 0 15px rgba(59, 130, 246, 0.05);
+}
+
+.forecast-card-front {
   animation: cardEnter 0.4s ease both;
 }
 
-.forecast-card:hover {
-  background-color: rgba(255, 255, 255, 0.18);
-  transform: translateY(-3px);
+.forecast-card-back {
+  transform: rotateY(180deg);
+  justify-content: center;
+  gap: 8px;
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.forecast-back-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+}
+
+.forecast-back-label {
+  color: rgba(255,255,255,0.5);
+}
+
+.forecast-back-value {
+  color: rgba(255,255,255,0.9);
+  font-weight: 600;
 }
 
 .forecast-day {
@@ -421,18 +518,43 @@ body {
   color: rgba(255, 255, 255, 0.45);
 }
 
+.forecast-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .forecast-icon {
   width: 56px;
   height: 56px;
 }
 
+.forecast-night-indicator {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: rgba(30, 41, 59, 0.85);
+  border-radius: 50%;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
 .forecast-description {
-  font-size: 0.67rem;
+  font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.6);
   text-align: center;
-  text-transform: capitalize;
-  line-height: 1.3;
-  min-height: 2em;
+  line-height: 1.35;
+  min-height: 1.4em;
+  max-height: 2.7em;
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  padding: 0 4px;
 }
 
 .forecast-temps {
@@ -448,6 +570,25 @@ body {
 
 .forecast-precip       { font-size: 0.75rem; color: var(--precip-color); margin-top: 2px; }
 .forecast-precip-empty { height: 1.1em; }
+
+/* Two-icon condition row */
+.forecast-icon-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 56px;
+}
+
+.forecast-icon-sm {
+  width: 38px;
+  height: 38px;
+}
+
+.forecast-icon-arrow {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+}
 
 
 /* ── 18. HOLIDAY BADGE ────────────────────────────────────────────── */
@@ -504,9 +645,729 @@ body {
   text-transform: uppercase;
 }
 
+/* ── SPC SEVERE WEATHER PANEL ─────────────────────────────────────── */
+.spc-panel {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.spc-inner {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.spc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.spc-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.spc-source {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.05em;
+}
+
+.spc-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/*
+  The badge color is set dynamically by JS using
+  inline style background color — one of the SPC
+  official risk colors defined in the JS below.
+*/
+.spc-badge {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--white);
+  /* background set by JS */
+}
+
+.spc-description {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+.spc-link {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+
+.spc-link:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── COVERAGE MAP PANEL ───────────────────────────────────────────── */
+.map-panel {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.map-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.map-city-label {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.06em;
+}
+
+/*
+  The map div needs an explicit height — Leaflet won't render
+  without it. 280px gives a good broadcast-style landscape ratio.
+*/
+#coverage-map {
+  height: 280px;
+  width: 100%;
+}
+
+/*
+  Override Leaflet's default popup and zoom control styles
+  to match our dark aesthetic.
+*/
+.leaflet-control-zoom a {
+  background: rgba(20, 30, 48, 0.9) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(59, 130, 246, 0.8) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(12, 26, 46, 0.95) !important;
+  color: var(--white) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background: rgba(12, 26, 46, 0.95) !important;
+}
+
+.leaflet-popup-content {
+  color: var(--white) !important;
+  font-family: system-ui, sans-serif !important;
+  font-size: 0.82rem !important;
+  line-height: 1.5 !important;
+}
+
+/* ── RADAR PANEL ──────────────────────────────────────────────────── */
+/*
+  Add these styles to style.css before @keyframes cardEnter
+*/
+
+.radar-panel {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.radar-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.radar-panel-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.radar-panel-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.radar-panel-timestamp {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.04em;
+}
+
+/*
+  Compact radar color key strip that sits below the map.
+  Gives Darnell a quick reference without cluttering the map itself.
+*/
+.radar-color-key {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.15);
+  flex-wrap: wrap;
+}
+ 
+.radar-key-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+}
+ 
+.radar-key-swatches {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+ 
+.radar-key-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+ 
+.radar-key-swatch {
+  width: 20px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+ 
+.radar-key-item span {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+/*
+  The studio button links to radar.html in a new tab.
+  Styled to match the broadcast aesthetic.
+*/
+.radar-studio-btn {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.radar-studio-btn:hover {
+  background: rgba(251, 191, 36, 0.2);
+}
+
+/*
+  Preview map height — shorter than the studio, just enough
+  to show Iowa context without dominating the screenshot.
+*/
+#radar-preview-map {
+  height: 390px;
+  width: 100%;
+}
+
+/* Leaflet overrides for preview map */
+#radar-preview-map .leaflet-control-attribution {
+  font-size: 0.55rem;
+  background: rgba(10,22,40,0.7) !important;
+  color: rgba(255,255,255,0.3) !important;
+}
+
+/* ── PERIOD LABELS ────────────────────────────────────────────────── */
+.period-labels {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.period-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.period-name {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+.period-temp {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--white);
+}
+
+
+/* ── HOURLY CHART ─────────────────────────────────────────────────── */
+.hourly-chart-wrap {
+  position: relative;
+  height: 150px;
+  min-height: 150px;
+}
+
+.hourly-chart-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.hourly-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.hourly-nav-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  color: var(--white);
+  font-size: 1.1rem;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.hourly-nav-btn:hover    { background: rgba(255,255,255,0.15); }
+.hourly-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+.hourly-nav-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* ── PRECIP BARS ──────────────────────────────────────────────────── */
+/*
+  The precip section sits directly below the chart sharing the same
+  time axis. Bars only appear where there is precipitation.
+*/
+.precip-bars-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+.precip-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 32px;
+  width: 100%;
+}
+
+.precip-bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 2px;
+  font-size: 0.52rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  transition: opacity 0.2s;
+  min-width: 0;
+}
+
+.precip-bar.empty {
+  background: rgba(255,255,255,0.04);
+  height: 4px !important;
+}
+
+.precip-time-axis {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.precip-time-label {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.3);
+  text-align: center;
+  flex: 1;
+}
+
+.precip-time-label.now {
+  color: var(--precip-color);
+  font-weight: 700;
+}
+
+.radar-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.1);
+}
+
+.radar-ctrl-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  color: var(--white);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+  min-width: 70px;
+}
+
+.radar-ctrl-btn:hover   { background: rgba(255,255,255,0.18); }
+.radar-ctrl-btn.playing { color: #fbbf24; border-color: rgba(251,191,36,0.4); }
+
+.radar-timeline {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.radar-timeline-bar {
+  height: 100%;
+  background: var(--blue);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.2s;
+}
+
+.radar-time-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  min-width: 70px;
+}
+
+.radar-time-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.radar-time-type { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.radar-time-type.past     { color: rgba(255,255,255,0.35); }
+.radar-time-type.current  { color: #4ade80; }
+.radar-time-type.forecast { color: #a78bfa; }
 
 /* ── 20. CARD ENTRANCE ANIMATION ──────────────────────────────────── */
 @keyframes cardEnter {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SITE LOGO ─────────────────────────────────────────────────────── */
+.site-logo-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 0 4px;
+  pointer-events: none;
+}
+
+.site-logo {
+  height: 110px;
+  width: auto;
+  max-width: 520px;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 24px rgba(59,130,246,0.3));
+}
+
+/* ── RADAR TAB BAR ─────────────────────────────────────────────────── */
+.radar-tab-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  gap: 12px;
+}
+
+.radar-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.radar-tab {
+  padding: 6px 18px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.73rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.radar-tab:hover  { color: rgba(255,255,255,0.75); }
+.radar-tab.active { background: rgba(255,255,255,0.12); color: #ffffff; }
+
+.radar-panel-timestamp-row {
+  padding: 6px 16px 0;
+}
+
+/* ── UNIFORM LEAFLET ATTRIBUTION ───────────────────────────────────── */
+/* Applied to both preview radar and SPC outlook maps */
+#radar-preview-map .leaflet-control-attribution,
+#spc-outlook-map .leaflet-control-attribution {
+  font-size: 0.55rem !important;
+  background: rgba(10,22,40,0.75) !important;
+  color: rgba(255,255,255,0.3) !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#radar-preview-map .leaflet-control-attribution a,
+#spc-outlook-map .leaflet-control-attribution a {
+  color: rgba(255,255,255,0.4) !important;
+}
+
+/* ── SPC OUTLOOK MAP VIEW ──────────────────────────────────────────── */
+.spc-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.spc-view-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+}
+
+.spc-day-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.spc-day-tab {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.spc-day-tab:hover  { color: rgba(255,255,255,0.7); }
+.spc-day-tab.active { background: rgba(255,255,255,0.12); color: #ffffff; }
+
+/* SPC map — exact same height as preview radar map */
+#spc-outlook-map {
+  height: 390px;
+  width: 100%;
+}
+
+.spc-risk-key {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.15);
+  flex-wrap: wrap;
+}
+
+.spc-key-item { display: flex; align-items: center; gap: 5px; }
+.spc-key-swatch { width: 20px; height: 8px; border-radius: 2px; }
+.spc-key-item span { font-size: 0.62rem; color: rgba(255,255,255,0.55); white-space: nowrap; }
+/* ── SITE FOOTER ─────────────────────────────────────────────────── */
+.site-footer {
+  margin-top: 24px;
+  padding: 20px 0 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.2);
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-logo {
+  height: 48px;
+  width: auto;
+  filter: drop-shadow(0 0 10px rgba(59,130,246,0.3));
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: rgba(255,255,255,0.9);
+}
+
+.footer-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.footer-credit {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.35);
+}
+
+.credit-link {
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.credit-link:hover {
+  color: #60a5fa;
+}
+
+.footer-sponsor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.sponsor-label {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sponsor-logo {
+  height: 24px;
+  width: auto;
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.last-updated {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.3);
+}
+
+/* Update details grid for 2x5 */
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }

@@ -1,3 +1,3 @@
 const config = {
-    defaultCity: 'Iowa City'
+    defaultCity: 'Iowa City',
 };

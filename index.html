@@ -4,21 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Darnoppler's Forecast</title>
-  <link rel="icon" type="image/x-icon" href="darnoppler2.jpg">
+  <link rel="icon" type="image/x-icon" href="img/darnoppler_mascot.jpg">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
   <link rel="stylesheet" href="style.css">
+
+  <!-- ANALYTICS: Add Google Analytics or Plausible script here -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
   <div class="app">
 
+    <!-- LOGO -->
+    <div class="site-logo-wrap">
+      <img src="img/darnoppler_mascot.jpg" alt="Darnoppler's Forecast" class="site-logo"
+        onerror="this.style.display='none'">
+    </div>
+
+    <!-- SEARCH -->
     <div class="search-section">
       <div class="search-wrapper">
-        <input
-          type="text"
-          id="city-input"
-          placeholder="Search city..."
-          autocomplete="off"
-        >
+        <input type="text" id="city-input" placeholder="Search city..." autocomplete="off">
         <div class="suggestions-dropdown" id="suggestions-dropdown"></div>
       </div>
       <button id="search-btn">Search</button>
@@ -30,16 +37,11 @@
     <div class="screenshot-panel" id="screenshot-panel" hidden>
 
       <!-- WEATHER CARD -->
-      <div class="weather-card expandable" id="weather-card">
-
-        <div class="expand-hint">▼ TAP FOR MORE</div>
-
+      <div class="weather-card" id="weather-card">
         <div class="weather-date-bar" id="weather-date-bar">--</div>
-
         <div class="holiday-bar" id="holiday-bar" hidden></div>
 
         <div class="weather-body">
-
           <div class="weather-scene" id="weather-scene"></div>
 
           <div class="weather-main">
@@ -51,8 +53,15 @@
               <div id="weather-icon" class="weather-icon"></div>
             </div>
             <div class="temp-section">
-              <span id="temperature" class="temp">--</span>
-              <span class="temp-unit">°F</span>
+              <div class="temp-precip-wrapper">
+                <div class="temp-display">
+                  <span id="temperature" class="temp">--</span>
+                  <div class="temp-right">
+                    <span class="temp-unit">°F</span>
+                    <div class="temp-precip-hint" id="temp-precip-hint"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -90,81 +99,164 @@
                 <span class="detail-label">Today's Low</span>
                 <span class="detail-value" id="today-low">--</span>
               </div>
+              <div class="detail-item">
+                <span class="detail-label">Sunrise</span>
+                <span class="detail-value" id="sunrise">--</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Sunset</span>
+                <span class="detail-value" id="sunset">--</span>
+              </div>
             </div>
           </div>
-
         </div>
-        <!-- end .weather-body -->
-
       </div>
-      <!-- end .weather-card -->
 
       <!-- EXPAND PANEL -->
       <div class="expand-panel" id="expand-panel">
         <div class="expand-inner">
-
-          <div class="expand-section">
-            <div class="expand-section-title">TEMPERATURES THROUGHOUT THE DAY</div>
-            <div class="expand-temp-row">
-              <div class="expand-temp-item">
-                <span class="expand-temp-label">Morning</span>
-                <span class="expand-temp-value" id="temp-morn">--</span>
-              </div>
-              <div class="expand-temp-item">
-                <span class="expand-temp-label">Evening</span>
-                <span class="expand-temp-value" id="temp-eve">--</span>
-              </div>
-              <div class="expand-temp-item">
-                <span class="expand-temp-label">Night</span>
-                <span class="expand-temp-value" id="temp-night">--</span>
-              </div>
+          <div class="period-labels" id="period-labels">
+            <div class="period-item">
+              <span class="period-name">Morning</span>
+              <span class="period-temp" id="period-morn">--</span>
+            </div>
+            <div class="period-item">
+              <span class="period-name">Afternoon</span>
+              <span class="period-temp" id="period-aftn">--</span>
+            </div>
+            <div class="period-item">
+              <span class="period-name">Evening</span>
+              <span class="period-temp" id="period-eve">--</span>
+            </div>
+            <div class="period-item">
+              <span class="period-name">Night</span>
+              <span class="period-temp" id="period-night">--</span>
             </div>
           </div>
 
-          <div class="expand-section">
-            <div class="expand-section-title">PRECIPITATION</div>
-            <div class="expand-detail-row">
-              <div class="expand-detail-item">
-                <span class="expand-temp-label">Chance</span>
-                <span class="expand-temp-value" id="wind-gust">--</span>
-              </div>
-              <div class="expand-detail-item">
-                <span class="expand-temp-label">Total</span>
-                <span class="expand-temp-value" id="rain-vol">--</span>
-              </div>
-              <div class="expand-detail-item">
-                <span class="expand-temp-label">Type</span>
-                <span class="expand-temp-value" id="snow-vol">--</span>
-              </div>
-            </div>
+          <div class="hourly-nav">
+            <button class="hourly-nav-btn" id="hourly-prev">‹</button>
+            <span class="hourly-nav-label" id="hourly-nav-label">Now</span>
+            <button class="hourly-nav-btn" id="hourly-next">›</button>
           </div>
 
+          <div class="hourly-chart-wrap">
+            <canvas id="hourly-chart"></canvas>
+          </div>
         </div>
       </div>
-      <!-- end .expand-panel -->
 
       <!-- 6-DAY FORECAST GRID -->
       <div class="forecast-grid" id="forecast-grid"></div>
 
-      <!-- BRAND FOOTER -->
-      <div class="brand-footer">
-        <div class="brand-text">
-          <div class="brand-name-display">WEATHER BY</div>
+      <!-- SPC SEVERE WEATHER OUTLOOK — Iowa active risk only -->
+      <div class="spc-panel" id="spc-panel" hidden>
+        <div class="spc-inner">
+          <div class="spc-header">
+            <span class="spc-title">⚡ SEVERE WEATHER OUTLOOK</span>
+            <span class="spc-source">Storm Prediction Center · Day 1</span>
+          </div>
+          <div class="spc-content">
+            <div class="spc-badge" id="spc-badge">
+              <span class="spc-risk-label" id="spc-risk-label">Checking...</span>
+            </div>
+            <div class="spc-description" id="spc-description"></div>
+          </div>
+          <a href="https://www.spc.noaa.gov" target="_blank" class="spc-link">
+            View full outlook at spc.noaa.gov →
+          </a>
         </div>
-        <img
-          src="darnoppler2.jpg"
-          class="mascot"
-          alt="Darnoppler"
-          onerror="this.style.display='none'"
-        >
       </div>
 
+      <!-- RADAR PANEL — tabs: Radar | SPC Outlook -->
+      <div class="radar-panel" id="radar-panel">
+
+        <!-- Tab bar -->
+        <div class="radar-tab-bar">
+          <div class="radar-tabs">
+            <button class="radar-tab active" id="tab-radar">🌧️ Radar</button>
+            <button class="radar-tab" id="tab-spc">⚡ SPC Outlook</button>
+          </div>
+          <a href="radar.html" class="radar-studio-btn" target="_blank">
+            ✏️ Open Studio
+          </a>
+        </div>
+
+        <!-- RADAR VIEW -->
+        <div class="radar-view" id="radar-view">
+          <div class="radar-panel-timestamp-row">
+            <span class="radar-panel-timestamp" id="radar-panel-timestamp">Loading...</span>
+          </div>
+          <div id="radar-preview-map"></div>
+          <div class="radar-color-key">
+            <span class="radar-key-label">Reflectivity:</span>
+            <div class="radar-key-swatches">
+              <div class="radar-key-item"><div class="radar-key-swatch" style="background:#04e9e7;"></div><span>Light</span></div>
+              <div class="radar-key-item"><div class="radar-key-swatch" style="background:#02fd02;"></div><span>Moderate</span></div>
+              <div class="radar-key-item"><div class="radar-key-swatch" style="background:#fdf802;"></div><span>Heavy</span></div>
+              <div class="radar-key-item"><div class="radar-key-swatch" style="background:#fd9500;"></div><span>Very Heavy</span></div>
+              <div class="radar-key-item"><div class="radar-key-swatch" style="background:#fd0000;"></div><span>Extreme</span></div>
+              <div class="radar-key-item"><div class="radar-key-swatch" style="background:#bc00bc;"></div><span>Violent</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SPC OUTLOOK VIEW -->
+        <div class="spc-view" id="spc-view" hidden>
+          <div class="spc-view-header">
+            <span class="spc-view-title">Storm Prediction Center Outlook</span>
+            <div class="spc-day-tabs">
+              <button class="spc-day-tab active" data-day="1">Day 1</button>
+              <button class="spc-day-tab" data-day="2">Day 2</button>
+              <button class="spc-day-tab" data-day="3">Day 3</button>
+            </div>
+          </div>
+          <div id="spc-outlook-map"></div>
+          <div class="spc-risk-key">
+            <div class="spc-key-item"><div class="spc-key-swatch" style="background:#4daf4d;"></div><span>Marginal</span></div>
+            <div class="spc-key-item"><div class="spc-key-swatch" style="background:#f0f04d;"></div><span>Slight</span></div>
+            <div class="spc-key-item"><div class="spc-key-swatch" style="background:#e8a032;"></div><span>Enhanced</span></div>
+            <div class="spc-key-item"><div class="spc-key-swatch" style="background:#e84040;"></div><span>Moderate</span></div>
+            <div class="spc-key-item"><div class="spc-key-swatch" style="background:#ff40ff;"></div><span>High</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <div class="footer-brand">
+            <img src="img/darnoppler_mascot.jpg" alt="Darnoppler's Forecast" class="footer-logo" onerror="this.style.display='none'">
+          </div>
+          <nav class="footer-links">
+            <a href="about/index.html" class="footer-link">About</a>
+            <a href="https://www.facebook.com/profile.php?id=61575352000960" target="_blank" rel="noopener" class="footer-link">
+              <svg class="footer-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              Facebook
+            </a>
+            <a href="https://www.facebook.com/profile.php?id=61575352000960" target="_blank" rel="noopener" class="footer-link">Contact Us</a>
+          </nav>
+          <div class="footer-credit">
+            <span>Developed by <a href="https://derekdhoang.github.io/portfolio/" class="credit-link">Derek Hoang</a></span>
+          </div>
+          <!-- Sponsor placeholder -->
+          <div class="footer-sponsor" style="display:none;">
+            <span class="sponsor-label">Sponsored by</span>
+            <img src="" alt="" class="sponsor-logo">
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span class="last-updated" id="last-updated"></span>
+        </div>
+      </footer>
+
     </div>
-    <!-- end .screenshot-panel -->
 
   </div>
-  <!-- end .app -->
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
   <script src="config.js"></script>
   <script src="app.js"></script>
 
