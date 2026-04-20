@@ -2186,9 +2186,24 @@
       mix-blend-mode: normal !important;
     }
 
-    /* Crosshair cursor when a draw tool is active */
+    /* Crosshair cursor when a draw tool is active - aggressive override */
     .leaflet-container.draw-tool-active,
-    .leaflet-container.draw-tool-active .leaflet-interactive {
+    .leaflet-container.draw-tool-active .leaflet-interactive,
+    .leaflet-container.draw-tool-active .leaflet-tile-pane,
+    .leaflet-container.draw-tool-active .leaflet-overlay-pane,
+    .leaflet-container.draw-tool-active .leaflet-marker-pane,
+    .leaflet-container.draw-tool-active .leaflet-shadow-pane,
+    .leaflet-container.draw-tool-active .leaflet-popup-pane,
+    .leaflet-container.draw-tool-active .leaflet-tile-container,
+    .leaflet-container.draw-tool-active.leaflet-grab,
+    .leaflet-container.draw-tool-active.leaflet-crosshair,
+    .leaflet-container.draw-tool-active .leaflet-grab,
+    .leaflet-container.draw-tool-active path,
+    .leaflet-container.draw-tool-active svg {
+      cursor: crosshair !important;
+    }
+    /* Also override the drawing-active cursor that Leaflet.draw adds */
+    .leaflet-drawing {
       cursor: crosshair !important;
     }
 
@@ -4821,6 +4836,17 @@
     map.on(L.Draw.Event.EDITED,  saveDrawings);
     map.on(L.Draw.Event.DELETED, saveDrawings);
 
+    // Keep crosshair cursor during active drawing (between vertex clicks)
+    map.on(L.Draw.Event.DRAWSTART, () => {
+      map.getContainer().classList.add('draw-tool-active');
+    });
+    map.on(L.Draw.Event.DRAWSTOP, () => {
+      const stillDrawing = ['tool-polygon','tool-rectangle','tool-polyline','tool-circle'].includes(currentTool);
+      if (!stillDrawing) {
+        map.getContainer().classList.remove('draw-tool-active');
+      }
+    });
+
     // Map click handler — text tool and arrow placement
     map.on('click', (e) => {
       if (textToolActive && editMode) {
@@ -7281,44 +7307,87 @@
       { attribution: '', maxZoom: 19, opacity: 1, zIndex: 950 }
     ).addTo(spcMap);
 
-    // Load state + county borders for SPC map
-    loadSpcStateAndCountyBorders();
+    // Load Iowa geography for SPC map (mirrors radar view toggles)
+    loadSpcIowaGeography();
 
     loadSPCLayer(spcCurrentDay);
   }
 
   let spcStatesLayer = null;
   let spcCountiesLayer = null;
+  let spcIowaOutlineLayer = null;
+  let spcSurroundingStatesLayer = null;
 
-  async function loadSpcStateAndCountyBorders() {
+  // Load Iowa geography for SPC map - mirrors the radar view toggles
+  async function loadSpcIowaGeography() {
     if (!spcMap) return;
     try {
-      // State borders
-      if (!spcStatesLayer) {
-        const statesRes = await fetch('https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json');
-        const statesData = await statesRes.json();
-        spcStatesLayer = L.geoJSON(statesData, {
-          style: { color: '#ffffff', weight: 1.2, fillOpacity: 0, opacity: 0.8 },
-          interactive: false,
-        }).addTo(spcMap);
-        spcStatesLayer.bringToFront();
+      // Iowa outline (bold blue line)
+      if (!spcIowaOutlineLayer) {
+        const res = await fetch('https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json');
+        const data = await res.json();
+        spcIowaOutlineLayer = L.geoJSON(data, {
+          style: (f) => {
+            const name = f.properties.name || f.properties.NAME || '';
+            const fips = String(f.id || f.properties.STATE || f.properties.STATEFP || '');
+            if (name === 'Iowa' || fips === IOWA_FIPS)
+              return { color: '#60a5fa', weight: 2.5, fillOpacity: 0, interactive: false };
+            return { opacity: 0, fillOpacity: 0, interactive: false };
+          }
+        });
+        if (document.getElementById('filter-outline')?.checked !== false) {
+          spcIowaOutlineLayer.addTo(spcMap);
+        }
       }
 
-      // County borders (US-wide from Census Bureau via GitHub)
+      // Iowa counties
       if (!spcCountiesLayer) {
-        const countiesRes = await fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json');
-        const countiesData = await countiesRes.json();
-        spcCountiesLayer = L.geoJSON(countiesData, {
-          style: { color: '#ffffff', weight: 0.4, fillOpacity: 0, opacity: 0.4 },
-          interactive: false,
-        }).addTo(spcMap);
+        const res = await fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json');
+        const data = await res.json();
+        const iowa = {
+          type: 'FeatureCollection',
+          features: data.features.filter(f => {
+            const id = String(f.id || '');
+            const fips = String(f.properties?.STATEFP || f.properties?.STATE || '');
+            return id.startsWith('19') || fips === '19';
+          })
+        };
+        spcCountiesLayer = L.geoJSON(iowa, {
+          style: { color: '#2563eb', weight: 0.8, fillOpacity: 0, interactive: false }
+        });
+        if (document.getElementById('filter-counties')?.checked !== false) {
+          spcCountiesLayer.addTo(spcMap);
+        }
       }
-      
-      // Make sure labels stay on top
-      if (spcLabelsLayer) spcLabelsLayer.bringToFront();
+
+      // Surrounding states (dashed blue)
+      if (!spcSurroundingStatesLayer) {
+        const res = await fetch('https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json');
+        const data = await res.json();
+        const surrounding = {
+          type: 'FeatureCollection',
+          features: data.features.filter(f => {
+            const fips = String(f.id || f.properties.STATE || f.properties.STATEFP || '');
+            const name = f.properties.name || f.properties.NAME || '';
+            return ['17', '27', '29', '31', '46', '55'].includes(fips) ||
+                   ['Minnesota', 'Wisconsin', 'Illinois', 'Missouri', 'Nebraska', 'South Dakota'].includes(name);
+          })
+        };
+        spcSurroundingStatesLayer = L.geoJSON(surrounding, {
+          style: { color: '#60a5fa', weight: 1.5, fillOpacity: 0, interactive: false, dashArray: '4,4' }
+        });
+        if (document.getElementById('filter-surrounding')?.checked === true) {
+          spcSurroundingStatesLayer.addTo(spcMap);
+        }
+      }
     } catch (e) {
-      console.error('Failed to load SPC borders:', e);
+      console.error('SPC Iowa geography failed:', e);
     }
+  }
+
+  // Deprecated - kept for backward compatibility
+  async function loadSpcStateAndCountyBorders() {
+    return loadSpcIowaGeography();
   }
 
   let spcBaseLayer = null;
@@ -7406,12 +7475,22 @@
         if (e.target.checked) map.addLayer(iowaOutlineLayer);
         else map.removeLayer(iowaOutlineLayer);
       }
+      // Mirror on SPC map
+      if (spcMap && spcIowaOutlineLayer) {
+        if (e.target.checked) spcMap.addLayer(spcIowaOutlineLayer);
+        else spcMap.removeLayer(spcIowaOutlineLayer);
+      }
     });
 
     document.getElementById('filter-counties').addEventListener('change', (e) => {
       if (iowaCountiesLayer) {
         if (e.target.checked) map.addLayer(iowaCountiesLayer);
         else map.removeLayer(iowaCountiesLayer);
+      }
+      // Mirror on SPC map
+      if (spcMap && spcCountiesLayer) {
+        if (e.target.checked) spcMap.addLayer(spcCountiesLayer);
+        else spcMap.removeLayer(spcCountiesLayer);
       }
     });
 
@@ -7424,6 +7503,11 @@
           map.removeLayer(surroundingStatesLayer);
           surroundingStatesLayer = null;
         }
+      }
+      // Mirror on SPC map
+      if (spcMap && spcSurroundingStatesLayer) {
+        if (e.target.checked) spcMap.addLayer(spcSurroundingStatesLayer);
+        else spcMap.removeLayer(spcSurroundingStatesLayer);
       }
     });
 
@@ -7901,6 +7985,21 @@
           polyline: { shapeOptions: { color: color, weight: 3 } },
         });
         map.addControl(drawControl);
+        
+        // If a draw tool is currently active, re-trigger it so user doesn't have to click again
+        const drawToolMap = {
+          'tool-polygon': 'polygon',
+          'tool-rectangle': 'rectangle',
+          'tool-polyline': 'polyline',
+          'tool-circle': 'circle',
+        };
+        if (drawToolMap[currentTool] && editMode) {
+          setTimeout(() => {
+            const toolbar = document.querySelector(`.leaflet-draw-draw-${drawToolMap[currentTool]}`);
+            if (toolbar) toolbar.click();
+            map.getContainer().classList.add('draw-tool-active');
+          }, 50);
+        }
       }
       
       // Update arrow color
