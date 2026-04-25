@@ -2959,6 +2959,90 @@
       color: #fff;
     }
 
+    /* ── SEVERITY POTENTIAL PRESET ────────────────────────────────────── */
+    .preset-severity {
+      background: #fff;
+      border-radius: 6px;
+      overflow: hidden;
+      min-width: 340px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      font-family: Arial Black, Arial, sans-serif;
+    }
+    .preset-severity .sev-header {
+      display: flex;
+      align-items: stretch;
+    }
+    .preset-severity .sev-logo-area {
+      background: #e84040;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 56px;
+    }
+    .preset-severity .sev-logo-img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+    .preset-severity .sev-title-area {
+      flex: 1;
+      padding: 6px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .preset-severity .sev-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #111;
+      text-transform: uppercase;
+      line-height: 1;
+      letter-spacing: 0.5px;
+    }
+    .preset-severity .sev-subtitle {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 2px;
+    }
+    .preset-severity .sev-boxes-area {
+      display: flex;
+      align-items: center;
+      padding: 6px 8px;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+    .preset-severity .sev-box {
+      width: 34px;
+      height: 34px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+    }
+
+    /* Severity field color pickers */
+    .preset-field-color {
+      width: 36px;
+      height: 28px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 2px;
+      background: transparent;
+      flex-shrink: 0;
+    }
+    .preset-field-color::-webkit-color-swatch-wrapper { padding: 0; }
+    .preset-field-color::-webkit-color-swatch { border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); }
+
     /* Position classes for broadcast */
     .broadcast-preset.pos-top { top: 0; left: 50%; transform: translateX(-50%); }
     .broadcast-preset.pos-bottom { bottom: 60px; left: 50%; transform: translateX(-50%); }
@@ -3915,6 +3999,10 @@
                   <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
                   <span>Location</span>
                 </button>
+                <button class="add-preset-btn" data-preset="severity-card">
+                  <svg viewBox="0 0 24 24"><rect x="2" y="8" width="4" height="8" rx="1"/><rect x="7" y="6" width="4" height="10" rx="1"/><rect x="12" y="4" width="4" height="12" rx="1"/><rect x="17" y="2" width="4" height="14" rx="1"/></svg>
+                  <span>Severity</span>
+                </button>
               </div>
             </div>
 
@@ -4608,7 +4696,7 @@
   const CITY_TIER_ZOOMS = {
     1: 8,   // Major Iowa cities + neighboring metros
     2: 10,   // Regional Iowa + neighboring state cities
-    3: 10,   // Small Iowa towns
+    3: 12,   // Small Iowa towns
   };
 
   // Iowa county FIPS by region (approximate)
@@ -4932,7 +5020,7 @@
       center: IOWA_CENTER, zoom: DEFAULT_ZOOM,
       zoomControl: true, scrollWheelZoom: true,
       minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
-      maxZoom: 12,  // ← can't zoom in past county-level detail
+      maxZoom: 12,
     });
 
     // Base layer
@@ -6125,6 +6213,30 @@
         locName: city || 'Location',
       }),
     },
+    'severity-card': {
+      name: 'Severe Potential',
+      fields: [
+        { key: 'title',    label: 'Title',        default: 'SEVERE POTENTIAL' },
+        { key: 'day',      label: 'Day',           default: '' },
+        { key: 'boxCount', label: 'Boxes (1-5)',   default: '5' },
+        { key: 'color1',   label: 'Box 1 Color',   default: '#e8a032', type: 'color' },
+        { key: 'color2',   label: 'Box 2 Color',   default: '#e85020', type: 'color' },
+        { key: 'color3',   label: 'Box 3 Color',   default: '#e84040', type: 'color' },
+        { key: 'color4',   label: 'Box 4 Color',   default: '#cc1080', type: 'color' },
+        { key: 'color5',   label: 'Box 5 Color',   default: '#e060e0', type: 'color' },
+      ],
+      autoPopulate: () => ({
+        title:    'SEVERE POTENTIAL',
+        day:      new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
+        boxCount: '5',
+        color1:   '#e8a032',
+        color2:   '#e85020',
+        color3:   '#e84040',
+        color4:   '#cc1080',
+        color5:   '#e060e0',
+      }),
+minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
+      maxZoom: 12,    },
   };
 
   function getWindDir(deg) {
@@ -6402,6 +6514,11 @@
         hour12: true 
       }).toUpperCase();
     }
+
+    // Auto-populate day for severity card
+    if (type === 'severity-card') {
+      presetData.day = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+    }
     
     presetPosition = 'top';
     document.querySelectorAll('.preset-position-btn').forEach(b => {
@@ -6430,16 +6547,25 @@
     if (!template) return;
 
     const container = document.getElementById('preset-fields');
-    container.innerHTML = template.fields.map(f => `
-      <div class="preset-field-row" data-key="${f.key}">
-        <span class="preset-field-label">${f.label}</span>
-        <input type="text" class="preset-field-input" data-key="${f.key}" 
-               value="${presetData[f.key] || ''}" placeholder="${f.label}...">
-        <button class="preset-field-delete" data-key="${f.key}" title="Clear field">×</button>
-      </div>
-    `).join('');
+    container.innerHTML = template.fields.map(f => {
+      if (f.type === 'color') {
+        const val = presetData[f.key] || f.default || '#ffffff';
+        return `
+          <div class="preset-field-row" data-key="${f.key}">
+            <span class="preset-field-label">${f.label}</span>
+            <input type="color" class="preset-field-color" data-key="${f.key}" value="${val}">
+          </div>`;
+      }
+      return `
+        <div class="preset-field-row" data-key="${f.key}">
+          <span class="preset-field-label">${f.label}</span>
+          <input type="text" class="preset-field-input" data-key="${f.key}" 
+                 value="${presetData[f.key] || ''}" placeholder="${f.label}...">
+          <button class="preset-field-delete" data-key="${f.key}" title="Clear field">×</button>
+        </div>`;
+    }).join('');
 
-    // Wire up input listeners
+    // Wire text inputs
     container.querySelectorAll('.preset-field-input').forEach(input => {
       input.addEventListener('input', (e) => {
         presetData[e.target.dataset.key] = e.target.value;
@@ -6447,7 +6573,15 @@
       });
     });
 
-    // Wire up delete buttons
+    // Wire color pickers
+    container.querySelectorAll('.preset-field-color').forEach(input => {
+      input.addEventListener('input', (e) => {
+        presetData[e.target.dataset.key] = e.target.value;
+        updatePresetPreview();
+      });
+    });
+
+    // Wire delete buttons
     container.querySelectorAll('.preset-field-delete').forEach(btn => {
       btn.addEventListener('click', () => {
         presetData[btn.dataset.key] = '';
@@ -6521,7 +6655,36 @@
             <span class="loc-name">${data.locName || 'Location'}</span>
           </div>
         `;
-      
+
+      case 'severity-card': {
+        const count = Math.min(5, Math.max(1, parseInt(data.boxCount) || 5));
+        const colors = [
+          data.color1 || '#e8a032',
+          data.color2 || '#e85020',
+          data.color3 || '#e84040',
+          data.color4 || '#cc1080',
+          data.color5 || '#e060e0',
+        ];
+        const boxes = Array.from({ length: count }, (_, i) =>
+          `<div class="sev-box" style="background:${colors[i]};">${i + 1}</div>`
+        ).join('');
+        return `
+          <div class="preset-severity" style="${scale}">
+            <div class="sev-header">
+              <div class="sev-logo-area">
+                <img src="img/darnoppler_radar.png" alt="" class="sev-logo-img"
+                     onerror="this.style.display='none'">
+              </div>
+              <div class="sev-title-area">
+                <div class="sev-title">${data.title || 'SEVERE POTENTIAL'}</div>
+                <div class="sev-subtitle">${data.day || ''}</div>
+              </div>
+              <div class="sev-boxes-area">${boxes}</div>
+            </div>
+          </div>
+        `;
+      }
+
       default:
         return '<div style="color:rgba(255,255,255,0.3);">Select a preset type</div>';
     }
