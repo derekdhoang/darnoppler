@@ -1050,9 +1050,12 @@
     /* ── BROADCAST OVERLAY FRAMES ─────────────────────────────────────── */
     .broadcast-overlay-frame {
       position: absolute;
-      inset: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
       pointer-events: none;
-      z-index: 900;
+      z-index: 1000;
       display: none;
       flex-direction: column;
     }
@@ -1063,7 +1066,7 @@
 
     /* Presets should appear ABOVE broadcast overlay */
     .studio-presets-container {
-      z-index: 950 !important;
+      z-index: 1050 !important;
     }
 
     /* ── RADAR OVERLAY ─────────────────────────────────────────────────── */
@@ -2186,24 +2189,9 @@
       mix-blend-mode: normal !important;
     }
 
-    /* Crosshair cursor when a draw tool is active - aggressive override */
+    /* Crosshair cursor when a draw tool is active */
     .leaflet-container.draw-tool-active,
-    .leaflet-container.draw-tool-active .leaflet-interactive,
-    .leaflet-container.draw-tool-active .leaflet-tile-pane,
-    .leaflet-container.draw-tool-active .leaflet-overlay-pane,
-    .leaflet-container.draw-tool-active .leaflet-marker-pane,
-    .leaflet-container.draw-tool-active .leaflet-shadow-pane,
-    .leaflet-container.draw-tool-active .leaflet-popup-pane,
-    .leaflet-container.draw-tool-active .leaflet-tile-container,
-    .leaflet-container.draw-tool-active.leaflet-grab,
-    .leaflet-container.draw-tool-active.leaflet-crosshair,
-    .leaflet-container.draw-tool-active .leaflet-grab,
-    .leaflet-container.draw-tool-active path,
-    .leaflet-container.draw-tool-active svg {
-      cursor: crosshair !important;
-    }
-    /* Also override the drawing-active cursor that Leaflet.draw adds */
-    .leaflet-drawing {
+    .leaflet-container.draw-tool-active .leaflet-interactive {
       cursor: crosshair !important;
     }
 
@@ -3528,6 +3516,7 @@
     <div style="flex:1;"></div>
 
     <div class="topbar-actions">
+      <button class="topbar-btn" id="btn-screenshot" title="Screenshot map (Ctrl+Shift+S)">📸 Screenshot</button>
       <a href="https://www.spc.noaa.gov" target="_blank" class="topbar-btn amber">⚡ SPC</a>
       <a href="index.html" class="topbar-btn blue">← Back</a>
     </div>
@@ -3654,14 +3643,22 @@
                   <div class="toggle-thumb"></div>
                 </label>
               </div>
+              <div class="filter-row">
+                <span class="filter-label">Live Warnings</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="filter-warnings" checked>
+                  <div class="toggle-track"></div>
+                  <div class="toggle-thumb"></div>
+                </label>
+              </div>
             </div>
 
             <div class="panel-section">
               <div class="panel-section-title">Map Style</div>
               <select class="map-layer-select" id="map-layer-select">
-                <option value="streets">Streets (Light)</option>
+                <option value="esri-light" selected>Light Gray (Default)</option>
                 <option value="satellite">Satellite</option>
-                <option value="dark">Dark</option>
+                <option value="esri-dark">Dark Gray</option>
               </select>
             </div>
 
@@ -4577,31 +4574,41 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@3.4.1/dist/dom-to-image-more.min.js"></script>
   <script src="config.js"></script>
 
   <script>
 
   // ── CONSTANTS ────────────────────────────────────────────────────────
   const IOWA_CENTER      = [41.878, -93.097];
-  const DEFAULT_ZOOM     = 6;
+  const DEFAULT_ZOOM     = 8;
   const STORAGE_KEY      = 'darnoppler-radar-drawings';
   const TEXT_STORAGE_KEY = 'darnoppler-radar-text-labels';
   const IOWA_FIPS        = '19';
 
   // Map tile layers
   const MAP_LAYERS = {
-    streets: {
-      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png',
-      attr: '&copy; <a href="https://openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
+    'esri-light': {
+      url: 'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+      attr: '&copy; Esri, HERE, Garmin'
     },
     satellite: {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       attr: '&copy; Esri'
     },
-    dark: {
-      url: 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
-      attr: '&copy; <a href="https://openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
-    }
+    'esri-dark': {
+      url: 'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+      attr: '&copy; Esri, HERE, Garmin'
+    },
+  };
+
+  // ── CITY LABEL ZOOM TIERS ─────────────────────────────────────────────
+  // Edit these numbers to adjust when each tier of city labels appears.
+  // Iowa state view is roughly zoom 6. County detail is zoom 9+.
+  const CITY_TIER_ZOOMS = {
+    1: 8,   // Major Iowa cities + neighboring metros
+    2: 10,   // Regional Iowa + neighboring state cities
+    3: 10,   // Small Iowa towns
   };
 
   // Iowa county FIPS by region (approximate)
@@ -4638,7 +4645,7 @@
   let spcCurrentType = 'cat'; // 'cat', 'torn', 'wind', 'hail'
   let currentView   = 'radar';
   let currentRegion = 'all';
-  let currentMapStyle = 'streets';
+  let currentMapStyle = 'esri-light';
   let opacityLevel  = 0.7;
   let editToolsCollapsed = false;
 
@@ -4695,6 +4702,156 @@
   };
 
   let map, drawnItems, drawControl;
+
+
+  // ── IOWA CITY LABELS ─────────────────────────────────────────────────
+  // ALL CAPS, bold white + thick black outline. Zoom-tiered visibility.
+  // Adjust CITY_TIER_ZOOMS above to change when each tier appears.
+  const IOWA_CITY_LABELS = [
+    // Tier 1: Major Iowa + neighboring metros (z≥6)
+    { name: 'DES MOINES',    lat: 41.5868, lon: -93.6250, tier: 1, size: 22 },
+    { name: 'CEDAR RAPIDS',  lat: 41.9779, lon: -91.6656, tier: 1, size: 20 },
+    { name: 'DAVENPORT',     lat: 41.5236, lon: -90.5776, tier: 1, size: 20 },
+    { name: 'SIOUX CITY',    lat: 42.4963, lon: -96.4049, tier: 1, size: 20 },
+    { name: 'WATERLOO',      lat: 42.4928, lon: -92.3426, tier: 1, size: 20 },
+    { name: 'IOWA CITY',     lat: 41.6611, lon: -91.5302, tier: 1, size: 20 },
+    { name: 'DUBUQUE',       lat: 42.5006, lon: -90.6645, tier: 1, size: 20 },
+    { name: 'MUSCATINE',     lat: 41.4242, lon: -91.0432, tier: 1, size: 18 },
+    { name: 'OTTUMWA',       lat: 41.0200, lon: -92.4113, tier: 1, size: 18 },
+    { name: 'BURLINGTON',    lat: 40.8076, lon: -91.1129, tier: 1, size: 18 },
+    { name: 'KEOKUK',        lat: 40.3970, lon: -91.3847, tier: 1, size: 16 },
+    { name: 'OMAHA',         lat: 41.2565, lon: -95.9345, tier: 1, size: 20 },
+    { name: 'KANSAS CITY',   lat: 39.0997, lon: -94.5786, tier: 1, size: 18 },
+    { name: 'MINNEAPOLIS',   lat: 44.9778, lon: -93.2650, tier: 1, size: 18 },
+    { name: 'CHICAGO',       lat: 41.8781, lon: -87.6298, tier: 1, size: 18 },
+    { name: 'ST. LOUIS',     lat: 38.6270, lon: -90.1994, tier: 1, size: 16 },
+    { name: 'MADISON',       lat: 43.0731, lon: -89.4012, tier: 1, size: 16 },
+    { name: 'LINCOLN',       lat: 40.8136, lon: -96.7026, tier: 1, size: 16 },
+    { name: 'SIOUX FALLS',   lat: 43.5446, lon: -96.7311, tier: 1, size: 16 },
+    { name: 'PEORIA',        lat: 40.6936, lon: -89.5890, tier: 1, size: 16 },
+    // Tier 2: Regional Iowa + neighboring state cities (z≥8)
+    { name: 'COUNCIL BLUFFS',lat: 41.2619, lon: -95.8608, tier: 2, size: 16 },
+    { name: 'AMES',          lat: 42.0308, lon: -93.6319, tier: 2, size: 16 },
+    { name: 'MASON CITY',    lat: 43.1536, lon: -93.2010, tier: 2, size: 16 },
+    { name: 'FORT DODGE',    lat: 42.4975, lon: -94.1680, tier: 2, size: 16 },
+    { name: 'CLINTON',       lat: 41.8444, lon: -90.1887, tier: 2, size: 16 },
+    { name: 'MARSHALLTOWN',  lat: 42.0494, lon: -92.9080, tier: 2, size: 16 },
+    { name: 'ANKENY',        lat: 41.7297, lon: -93.6058, tier: 2, size: 15 },
+    { name: 'BETTENDORF',    lat: 41.5247, lon: -90.5152, tier: 2, size: 15 },
+    { name: 'CEDAR FALLS',   lat: 42.5275, lon: -92.4453, tier: 2, size: 15 },
+    { name: 'WEST DES MOINES',lat:41.5772, lon: -93.7113, tier: 2, size: 15 },
+    { name: 'MARION',        lat: 42.0342, lon: -91.5976, tier: 2, size: 15 },
+    { name: 'INDIANOLA',     lat: 41.3580, lon: -93.5572, tier: 2, size: 15 },
+    { name: 'DECORAH',       lat: 43.3033, lon: -91.7857, tier: 2, size: 15 },
+    { name: 'OSKALOOSA',     lat: 41.2964, lon: -92.6446, tier: 2, size: 15 },
+    { name: 'FAIRFIELD',     lat: 41.0086, lon: -91.9626, tier: 2, size: 15 },
+    { name: 'NEWTON',        lat: 41.6997, lon: -93.0479, tier: 2, size: 15 },
+    { name: 'SPENCER',       lat: 43.1414, lon: -95.1444, tier: 2, size: 15 },
+    { name: 'STORM LAKE',    lat: 42.6411, lon: -95.1900, tier: 2, size: 15 },
+    { name: 'CHARLES CITY',  lat: 43.0656, lon: -92.6736, tier: 2, size: 15 },
+    { name: 'FORT MADISON',  lat: 40.6298, lon: -91.3152, tier: 2, size: 15 },
+    { name: 'MOUNT PLEASANT',lat: 40.9635, lon: -91.5548, tier: 2, size: 15 },
+    { name: 'ROCKFORD',      lat: 42.2711, lon: -89.0940, tier: 2, size: 15 },
+    { name: 'GREEN BAY',     lat: 44.5133, lon: -88.0158, tier: 2, size: 15 },
+    { name: 'LA CROSSE',     lat: 43.8014, lon: -91.2396, tier: 2, size: 15 },
+    { name: 'ROCHESTER',     lat: 44.0121, lon: -92.4802, tier: 2, size: 15 },
+    { name: 'FARGO',         lat: 46.8772, lon: -96.7898, tier: 2, size: 15 },
+    { name: 'TOPEKA',        lat: 39.0473, lon: -95.6752, tier: 2, size: 15 },
+    { name: 'ST. JOSEPH',    lat: 39.7675, lon: -94.8467, tier: 2, size: 15 },
+    { name: 'GRAND ISLAND',  lat: 40.9264, lon: -98.3420, tier: 2, size: 15 },
+    { name: 'RAPID CITY',    lat: 44.0805, lon: -103.231, tier: 2, size: 15 },
+    { name: 'BISMARCK',      lat: 46.8083, lon: -100.784, tier: 2, size: 15 },
+    // Tier 3: Small Iowa towns (z≥9)
+    { name: 'WEST LIBERTY',  lat: 41.5735, lon: -91.2632, tier: 3, size: 14 },
+    { name: 'CONESVILLE',    lat: 41.3801, lon: -91.3495, tier: 3, size: 14 },
+    { name: 'PELLA',         lat: 41.4825, lon: -92.9146, tier: 3, size: 14 },
+    { name: 'GRINNELL',      lat: 41.7452, lon: -92.7225, tier: 3, size: 14 },
+    { name: 'BOONE',         lat: 42.0594, lon: -93.8805, tier: 3, size: 14 },
+    { name: 'CARROLL',       lat: 42.0636, lon: -94.8697, tier: 3, size: 14 },
+    { name: 'DENISON',       lat: 42.0150, lon: -95.3555, tier: 3, size: 14 },
+    { name: 'ATLANTIC',      lat: 41.4028, lon: -95.0139, tier: 3, size: 14 },
+    { name: 'CRESTON',       lat: 41.0583, lon: -94.3619, tier: 3, size: 14 },
+    { name: 'RED OAK',       lat: 41.0100, lon: -95.2247, tier: 3, size: 14 },
+    { name: 'SHENANDOAH',    lat: 40.7664, lon: -95.3719, tier: 3, size: 14 },
+    { name: 'WASHINGTON',    lat: 41.2997, lon: -91.6921, tier: 3, size: 14 },
+    { name: 'CENTERVILLE',   lat: 40.7336, lon: -92.8724, tier: 3, size: 14 },
+    { name: 'CHARITON',      lat: 41.0139, lon: -93.3063, tier: 3, size: 14 },
+    { name: 'OSCEOLA',       lat: 41.0358, lon: -93.7659, tier: 3, size: 14 },
+    { name: 'OELWEIN',       lat: 42.6747, lon: -91.9135, tier: 3, size: 14 },
+    { name: 'WAVERLY',       lat: 42.7258, lon: -92.4752, tier: 3, size: 14 },
+    { name: 'IOWA FALLS',    lat: 42.5214, lon: -93.2524, tier: 3, size: 14 },
+    { name: 'WEBSTER CITY',  lat: 42.4597, lon: -93.8122, tier: 3, size: 14 },
+    { name: 'ALGONA',        lat: 43.0694, lon: -94.2333, tier: 3, size: 14 },
+    { name: 'SPIRIT LAKE',   lat: 43.4222, lon: -95.1022, tier: 3, size: 14 },
+    { name: 'CLEAR LAKE',    lat: 43.1378, lon: -93.3786, tier: 3, size: 14 },
+    { name: 'MAQUOKETA',     lat: 42.0700, lon: -90.6651, tier: 3, size: 14 },
+    { name: 'ANAMOSA',       lat: 42.1083, lon: -91.2857, tier: 3, size: 14 },
+    { name: 'NORTH LIBERTY', lat: 41.7486, lon: -91.6003, tier: 3, size: 14 },
+    { name: 'CORALVILLE',    lat: 41.6764, lon: -91.5803, tier: 3, size: 14 },
+    { name: 'LE MARS',       lat: 42.7958, lon: -96.1661, tier: 3, size: 14 },
+    { name: 'CHEROKEE',      lat: 42.7486, lon: -95.5519, tier: 3, size: 14 },
+    { name: 'SHELDON',       lat: 43.1811, lon: -95.8561, tier: 3, size: 14 },
+    { name: 'KNOXVILLE',     lat: 41.3213, lon: -93.0994, tier: 3, size: 14 },
+    { name: 'GLENWOOD',      lat: 41.0478, lon: -95.7428, tier: 3, size: 14 },
+    { name: 'HARLAN',        lat: 41.6536, lon: -95.3258, tier: 3, size: 14 },
+    { name: 'POSTVILLE',     lat: 43.0847, lon: -91.5692, tier: 3, size: 14 },
+    { name: 'WAUKON',        lat: 43.2694, lon: -91.4757, tier: 3, size: 14 },
+    { name: 'GUTTENBERG',    lat: 42.7861, lon: -91.1015, tier: 3, size: 14 },
+    { name: 'ELKADER',       lat: 42.8547, lon: -91.4052, tier: 3, size: 14 },
+    { name: 'DYERSVILLE',    lat: 42.4844, lon: -91.1229, tier: 3, size: 14 },
+  ];
+
+  function makeCityIcon(name, size) {
+    return L.divIcon({
+      html: `<span style="
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: ${size}px;
+        font-weight: 900;
+        color: #ffffff;
+        text-shadow:
+          -2px -2px 0 #000, 2px -2px 0 #000,
+          -2px  2px 0 #000, 2px  2px 0 #000,
+          -2px     0 0 #000, 2px     0 0 #000,
+             0 -2px 0 #000,    0  2px 0 #000,
+          -3px    0  0 rgba(0,0,0,0.5),
+           3px    0  0 rgba(0,0,0,0.5);
+        white-space: nowrap;
+        pointer-events: none;
+        user-select: none;
+        letter-spacing: 0.04em;
+        display: block;
+        transform: translateX(-50%);
+      ">${name}</span>`,
+      className: '',
+      iconSize: null,
+      iconAnchor: [0, 0],
+    });
+  }
+
+  function initIowaCityLabels(targetMap) {
+    const group = L.layerGroup().addTo(targetMap);
+    group._markers = IOWA_CITY_LABELS.map(c => {
+      const m = L.marker([c.lat, c.lon], {
+        icon: makeCityIcon(c.name, c.size),
+        interactive: false, keyboard: false, zIndexOffset: 500,
+      });
+      m._tier = c.tier;
+      return m;
+    });
+    _refreshCityLabels(targetMap, group);
+    targetMap.on('zoomend', () => _refreshCityLabels(targetMap, group));
+    return group;
+  }
+
+  function _refreshCityLabels(targetMap, group) {
+    if (!group?._markers) return;
+    const zoom = targetMap.getZoom();
+    group._markers.forEach(m => {
+      const show = zoom >= (CITY_TIER_ZOOMS[m._tier] ?? 99);
+      if (show && !group.hasLayer(m)) group.addLayer(m);
+      else if (!show && group.hasLayer(m)) group.removeLayer(m);
+    });
+  }
 
 
   // ── TOAST NOTIFICATION ───────────────────────────────────────────────
@@ -4774,21 +4931,21 @@
     map = L.map('radar-map', {
       center: IOWA_CENTER, zoom: DEFAULT_ZOOM,
       zoomControl: true, scrollWheelZoom: true,
+      minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
+      maxZoom: 12,  // ← can't zoom in past county-level detail
     });
 
     // Base layer
-    baseLayer = L.tileLayer(MAP_LAYERS.streets.url,
-      { attribution: MAP_LAYERS.streets.attr, maxZoom: 19, opacity: 1, zIndex: 1 }
+    baseLayer = L.tileLayer(MAP_LAYERS['esri-light'].url,
+      { attribution: MAP_LAYERS['esri-light'].attr, maxZoom: 19, opacity: 1, zIndex: 1 }
     ).addTo(map);
 
     // NOAA WMS radar
     loadRadar();
     setInterval(loadRadar, 10 * 60 * 1000);
 
-    // City/state labels always on top - high z-index so warnings don't cover them
-    labelsLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',
-      { attribution: '', maxZoom: 19, opacity: 1, zIndex: 950, className: 'city-labels-bright' }
-    ).addTo(map);
+    // Iowa custom city labels (ALL CAPS bold white + black outline, zoom-tiered)
+    initIowaCityLabels(map);
 
     // Load Iowa geography
     loadIowaOutline();
@@ -4826,6 +4983,7 @@
       layer.feature.properties.label = l;
       layer.bindPopup(`<strong style="color:${c}">${l}</strong>`);
       drawnItems.addLayer(layer);
+      if (layer instanceof L.Circle) attachCircleContextMenu(layer);
       
       // Push to undo stack
       pushUndo({ type: 'draw-shape', layer });
@@ -4835,17 +4993,6 @@
 
     map.on(L.Draw.Event.EDITED,  saveDrawings);
     map.on(L.Draw.Event.DELETED, saveDrawings);
-
-    // Keep crosshair cursor during active drawing (between vertex clicks)
-    map.on(L.Draw.Event.DRAWSTART, () => {
-      map.getContainer().classList.add('draw-tool-active');
-    });
-    map.on(L.Draw.Event.DRAWSTOP, () => {
-      const stillDrawing = ['tool-polygon','tool-rectangle','tool-polyline','tool-circle'].includes(currentTool);
-      if (!stillDrawing) {
-        map.getContainer().classList.remove('draw-tool-active');
-      }
-    });
 
     // Map click handler — text tool and arrow placement
     map.on('click', (e) => {
@@ -4883,6 +5030,7 @@
     loadPresets();
     initBroadcastMode();
     initWarnings();
+    initScreenshot();
   }
   
   // Arrow markers
@@ -5233,7 +5381,7 @@
               <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
               Preset
             </button>
-            <button class="warning-action-btn" data-action="caption" data-warning-id="${w.id}" title="Copy Facebook caption">
+            <button class="warning-action-btn" data-action="caption" data-warning-id="${w.id}" title="Copy caption">
               <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               Caption
             </button>
@@ -7303,91 +7451,47 @@
       { attribution: layerConfig.attr, maxZoom: 19, opacity: 1 }
     ).addTo(spcMap);
 
-    spcLabelsLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',
-      { attribution: '', maxZoom: 19, opacity: 1, zIndex: 950 }
-    ).addTo(spcMap);
+    // Iowa custom city labels on SPC map too
+    initIowaCityLabels(spcMap);
 
-    // Load Iowa geography for SPC map (mirrors radar view toggles)
-    loadSpcIowaGeography();
+    // Load state + county borders for SPC map
+    loadSpcStateAndCountyBorders();
 
     loadSPCLayer(spcCurrentDay);
   }
 
   let spcStatesLayer = null;
   let spcCountiesLayer = null;
-  let spcIowaOutlineLayer = null;
-  let spcSurroundingStatesLayer = null;
 
-  // Load Iowa geography for SPC map - mirrors the radar view toggles
-  async function loadSpcIowaGeography() {
+  async function loadSpcStateAndCountyBorders() {
     if (!spcMap) return;
     try {
-      // Iowa outline (bold blue line)
-      if (!spcIowaOutlineLayer) {
-        const res = await fetch('https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json');
-        const data = await res.json();
-        spcIowaOutlineLayer = L.geoJSON(data, {
-          style: (f) => {
-            const name = f.properties.name || f.properties.NAME || '';
-            const fips = String(f.id || f.properties.STATE || f.properties.STATEFP || '');
-            if (name === 'Iowa' || fips === IOWA_FIPS)
-              return { color: '#60a5fa', weight: 2.5, fillOpacity: 0, interactive: false };
-            return { opacity: 0, fillOpacity: 0, interactive: false };
-          }
-        });
-        if (document.getElementById('filter-outline')?.checked !== false) {
-          spcIowaOutlineLayer.addTo(spcMap);
-        }
+      // State borders
+      if (!spcStatesLayer) {
+        const statesRes = await fetch('https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json');
+        const statesData = await statesRes.json();
+        spcStatesLayer = L.geoJSON(statesData, {
+          style: { color: '#ffffff', weight: 1.2, fillOpacity: 0, opacity: 0.8 },
+          interactive: false,
+        }).addTo(spcMap);
+        spcStatesLayer.bringToFront();
       }
 
-      // Iowa counties
+      // County borders (US-wide from Census Bureau via GitHub)
       if (!spcCountiesLayer) {
-        const res = await fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json');
-        const data = await res.json();
-        const iowa = {
-          type: 'FeatureCollection',
-          features: data.features.filter(f => {
-            const id = String(f.id || '');
-            const fips = String(f.properties?.STATEFP || f.properties?.STATE || '');
-            return id.startsWith('19') || fips === '19';
-          })
-        };
-        spcCountiesLayer = L.geoJSON(iowa, {
-          style: { color: '#2563eb', weight: 0.8, fillOpacity: 0, interactive: false }
-        });
-        if (document.getElementById('filter-counties')?.checked !== false) {
-          spcCountiesLayer.addTo(spcMap);
-        }
+        const countiesRes = await fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json');
+        const countiesData = await countiesRes.json();
+        spcCountiesLayer = L.geoJSON(countiesData, {
+          style: { color: '#ffffff', weight: 0.4, fillOpacity: 0, opacity: 0.4 },
+          interactive: false,
+        }).addTo(spcMap);
       }
-
-      // Surrounding states (dashed blue)
-      if (!spcSurroundingStatesLayer) {
-        const res = await fetch('https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json');
-        const data = await res.json();
-        const surrounding = {
-          type: 'FeatureCollection',
-          features: data.features.filter(f => {
-            const fips = String(f.id || f.properties.STATE || f.properties.STATEFP || '');
-            const name = f.properties.name || f.properties.NAME || '';
-            return ['17', '27', '29', '31', '46', '55'].includes(fips) ||
-                   ['Minnesota', 'Wisconsin', 'Illinois', 'Missouri', 'Nebraska', 'South Dakota'].includes(name);
-          })
-        };
-        spcSurroundingStatesLayer = L.geoJSON(surrounding, {
-          style: { color: '#60a5fa', weight: 1.5, fillOpacity: 0, interactive: false, dashArray: '4,4' }
-        });
-        if (document.getElementById('filter-surrounding')?.checked === true) {
-          spcSurroundingStatesLayer.addTo(spcMap);
-        }
-      }
+      
+      // Make sure labels stay on top
+      if (spcLabelsLayer) spcLabelsLayer.bringToFront();
     } catch (e) {
-      console.error('SPC Iowa geography failed:', e);
+      console.error('Failed to load SPC borders:', e);
     }
-  }
-
-  // Deprecated - kept for backward compatibility
-  async function loadSpcStateAndCountyBorders() {
-    return loadSpcIowaGeography();
   }
 
   let spcBaseLayer = null;
@@ -7475,22 +7579,12 @@
         if (e.target.checked) map.addLayer(iowaOutlineLayer);
         else map.removeLayer(iowaOutlineLayer);
       }
-      // Mirror on SPC map
-      if (spcMap && spcIowaOutlineLayer) {
-        if (e.target.checked) spcMap.addLayer(spcIowaOutlineLayer);
-        else spcMap.removeLayer(spcIowaOutlineLayer);
-      }
     });
 
     document.getElementById('filter-counties').addEventListener('change', (e) => {
       if (iowaCountiesLayer) {
         if (e.target.checked) map.addLayer(iowaCountiesLayer);
         else map.removeLayer(iowaCountiesLayer);
-      }
-      // Mirror on SPC map
-      if (spcMap && spcCountiesLayer) {
-        if (e.target.checked) spcMap.addLayer(spcCountiesLayer);
-        else spcMap.removeLayer(spcCountiesLayer);
       }
     });
 
@@ -7504,16 +7598,36 @@
           surroundingStatesLayer = null;
         }
       }
-      // Mirror on SPC map
-      if (spcMap && spcSurroundingStatesLayer) {
-        if (e.target.checked) spcMap.addLayer(spcSurroundingStatesLayer);
-        else spcMap.removeLayer(spcSurroundingStatesLayer);
-      }
     });
 
     // Presets visibility toggle
     document.getElementById('filter-presets').addEventListener('change', (e) => {
       renderPresetsOnStudio();
+    });
+
+    // Live Warnings sidebar toggle
+    document.getElementById('filter-warnings').addEventListener('change', (e) => {
+      const sidebar = document.getElementById('warnings-sidebar');
+      const expandBtn = document.getElementById('warnings-expand-btn');
+      if (!sidebar) return;
+      if (e.target.checked) {
+        // Show sidebar — restore display, keep whatever collapsed state it had
+        sidebar.style.display = '';
+        // Restore expand button to its natural display (flex when .visible class present)
+        if (expandBtn) expandBtn.style.display = '';
+        if (map) setTimeout(() => map.invalidateSize(), 260);
+        if (spcMap) setTimeout(() => spcMap.invalidateSize(), 260);
+      } else {
+        // Hide entirely — collapse first so when restored it comes back tidy
+        if (!sidebar.classList.contains('collapsed')) {
+          sidebar.classList.add('collapsed');
+          if (expandBtn) expandBtn.classList.add('visible');
+        }
+        sidebar.style.display = 'none';
+        if (expandBtn) expandBtn.style.display = 'none';
+        if (map) setTimeout(() => map.invalidateSize(), 260);
+        if (spcMap) setTimeout(() => spcMap.invalidateSize(), 260);
+      }
     });
 
     // Radar opacity slider and presets
@@ -7985,21 +8099,6 @@
           polyline: { shapeOptions: { color: color, weight: 3 } },
         });
         map.addControl(drawControl);
-        
-        // If a draw tool is currently active, re-trigger it so user doesn't have to click again
-        const drawToolMap = {
-          'tool-polygon': 'polygon',
-          'tool-rectangle': 'rectangle',
-          'tool-polyline': 'polyline',
-          'tool-circle': 'circle',
-        };
-        if (drawToolMap[currentTool] && editMode) {
-          setTimeout(() => {
-            const toolbar = document.querySelector(`.leaflet-draw-draw-${drawToolMap[currentTool]}`);
-            if (toolbar) toolbar.click();
-            map.getContainer().classList.add('draw-tool-active');
-          }, 50);
-        }
       }
       
       // Update arrow color
@@ -8470,7 +8569,11 @@
       if (geo?.features) {
         L.geoJSON(geo, {
           style: (f) => ({ color: f.properties.color||'#4daf4d', fillColor: f.properties.color||'#4daf4d', fillOpacity: 0.35, weight: 2 }),
-          onEachFeature: (f, layer) => { layer.bindPopup(`<strong style="color:${f.properties.color||'#4daf4d'}">${f.properties.label||'Risk Zone'} Risk</strong>`); drawnItems.addLayer(layer); }
+          onEachFeature: (f, layer) => {
+            layer.bindPopup(`<strong style="color:${f.properties.color||'#4daf4d'}">${f.properties.label||'Risk Zone'} Risk</strong>`);
+            drawnItems.addLayer(layer);
+            if (layer instanceof L.Circle) attachCircleContextMenu(layer);
+          }
         });
       }
       if (data.counties) { filledCounties = data.counties; restoreCountyFills(); }
@@ -8488,6 +8591,179 @@
   function showSaveIndicator() {
     const el = document.getElementById('save-indicator'); el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2200);
   }
+
+  // ── SCREENSHOT ────────────────────────────────────────────────────────
+  function initScreenshot() {
+    const btn = document.getElementById('btn-screenshot');
+    if (!btn) return;
+
+    const doScreenshot = async () => {
+      if (btn.disabled) return;
+      btn.disabled = true;
+      btn.textContent = '⏳ Capturing...';
+
+      const HIDE_IDS = [
+        'map-legend',
+        'spc-controls-panel',
+        'save-indicator',
+        'warnings-expand-btn',
+      ];
+      const HIDE_SELECTORS = [
+        '.leaflet-control-container',
+        '.leaflet-top',
+        '.leaflet-bottom',
+      ];
+
+      const hidden = [];
+      const hide = (el) => {
+        if (el && el.style.visibility !== 'hidden') {
+          hidden.push({ el, prev: el.style.visibility });
+          el.style.visibility = 'hidden';
+        }
+      };
+
+      HIDE_IDS.forEach(id => hide(document.getElementById(id)));
+      HIDE_SELECTORS.forEach(sel =>
+        document.querySelectorAll(sel).forEach(hide)
+      );
+
+      try {
+        const mapEl = document.querySelector('.map-area');
+        if (!mapEl) { showToast('Map not found'); return; }
+
+        await document.fonts.ready;
+        await new Promise(r => setTimeout(r, 200));
+
+        const dataUrl = await domtoimage.toPng(mapEl, {
+          bgcolor: '#0a1628',
+          style: { overflow: 'hidden' },
+        });
+
+        const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        const a = document.createElement('a');
+        a.download = `darnoppler-${ts}.png`;
+        a.href = dataUrl;
+        a.click();
+
+        try {
+          const res = await fetch(dataUrl);
+          const blob = await res.blob();
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          showToast('Saved + copied to clipboard!');
+        } catch {
+          showToast('Screenshot saved!');
+        }
+
+      } catch (err) {
+        console.error('Screenshot failed:', err);
+        showToast('Screenshot failed — try again');
+      } finally {
+        hidden.forEach(({ el, prev }) => el.style.visibility = prev);
+        btn.disabled = false;
+        btn.textContent = '📸 Screenshot';
+      }
+    };
+
+    btn.addEventListener('click', doScreenshot);
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+        e.preventDefault();
+        doScreenshot();
+      }
+    });
+  }
+
+  // ── CIRCLE RESIZE ─────────────────────────────────────────────────────
+  let _circleMenu = null;
+  let _circleTarget = null;
+
+  function attachCircleContextMenu(circle) {
+    circle.on('contextmenu', (e) => {
+      if (!editMode) return;
+      L.DomEvent.stopPropagation(e);
+      _showCircleMenu(e.originalEvent.clientX, e.originalEvent.clientY, circle);
+    });
+  }
+
+  function _showCircleMenu(x, y, circle) {
+    _circleTarget = circle;
+    if (!_circleMenu) {
+      _circleMenu = document.createElement('div');
+      _circleMenu.className = 'preset-context-menu';
+      _circleMenu.innerHTML = `
+        <div class="preset-context-item" data-action="resize">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <circle cx="12" cy="12" r="9"/>
+            <line x1="12" y1="3" x2="12" y2="21"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+          </svg> Resize
+        </div>
+        <div class="preset-context-item danger" data-action="delete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+          </svg> Delete
+        </div>`;
+      document.body.appendChild(_circleMenu);
+      _circleMenu.addEventListener('click', (e) => {
+        const item = e.target.closest('.preset-context-item');
+        if (!item) return;
+        const action = item.dataset.action;
+        const target = _circleTarget;
+        _hideCircleMenu();
+        if (action === 'resize' && target) _startCircleResize(target);
+        else if (action === 'delete' && target) {
+          drawnItems.removeLayer(target);
+          saveDrawings();
+          showToast('Circle deleted');
+        }
+      });
+    }
+    _circleMenu.style.left = x + 'px';
+    _circleMenu.style.top  = y + 'px';
+    _circleMenu.classList.add('active');
+    requestAnimationFrame(() => {
+      const r = _circleMenu.getBoundingClientRect();
+      if (r.right  > window.innerWidth)  _circleMenu.style.left = (x - r.width)  + 'px';
+      if (r.bottom > window.innerHeight) _circleMenu.style.top  = (y - r.height) + 'px';
+    });
+  }
+
+  function _hideCircleMenu() {
+    if (_circleMenu) _circleMenu.classList.remove('active');
+    _circleTarget = null;
+  }
+
+  function _startCircleResize(circle) {
+    map.getContainer().style.cursor = 'ew-resize';
+    map.dragging.disable();
+    // Temporarily disable popup so it doesn't fire on the confirmation click
+    circle.unbindPopup();
+    showToast('Move cursor to resize — click to confirm');
+    const center = circle.getLatLng();
+    const originalColor = circle.options.color;
+    const originalLabel = circle.feature?.properties?.label || 'Zone';
+
+    function onMove(e) { circle.setRadius(center.distanceTo(e.latlng)); }
+    function onConfirm(e) {
+      circle.setRadius(center.distanceTo(e.latlng));
+      map.off('mousemove', onMove);
+      map.off('click', onConfirm);
+      map.dragging.enable();
+      map.getContainer().style.cursor = '';
+      // Restore popup
+      circle.bindPopup(`<strong style="color:${originalColor}">${originalLabel} Risk</strong>`);
+      saveDrawings();
+      showToast('Circle resized!');
+    }
+    map.on('mousemove', onMove);
+    map.once('click', onConfirm);
+  }
+
+  document.addEventListener('click', (e) => {
+    if (_circleMenu && !e.target.closest('.preset-context-item')) _hideCircleMenu();
+  });
+
 
     // ── INIT STUDIO IMMEDIATELY ──────────────────────────────────────────
   initStudio();
