@@ -1,3 +1,93 @@
+/* ============================================
+   BACKGROUND WORLD — Phase 2 & 3
+   ============================================ */
+
+.bg-world {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  transition: opacity 2s ease-in-out;
+}
+
+.bg-image.day {
+  background-image: url('img/bg-day.png');
+}
+
+.bg-image.night {
+  background-image: url('img/bg-night.png');
+}
+
+.bg-image.morning {
+  background-image: url('img/bg-morning.png');
+}
+
+.bg-image.evening {
+  background-image: url('img/bg-evening.png');
+}
+
+.bg-overlay {
+  position: absolute;
+  inset: 0;
+  transition: background 2s ease-in-out;
+}
+
+.bg-overlay.day {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 60, 120, 0.15) 0%,
+    rgba(20, 80, 140, 0.05) 40%,
+    transparent 70%
+  );
+}
+
+.bg-overlay.night {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 5, 30, 0.35) 0%,
+    rgba(0, 10, 40, 0.15) 50%,
+    transparent 80%
+  );
+}
+
+.bg-overlay.morning {
+  background: linear-gradient(
+    180deg,
+    rgba(80, 30, 0, 0.2) 0%,
+    rgba(120, 60, 0, 0.05) 50%,
+    transparent 75%
+  );
+}
+
+.bg-overlay.evening {
+  background: linear-gradient(
+    180deg,
+    rgba(120, 50, 0, 0.25) 0%,
+    rgba(100, 40, 0, 0.08) 50%,
+    transparent 75%
+  );
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+}
+
+/* Make sure all existing content sits above the background */
+.app {
+  position: relative;
+  z-index: 1;
+}
+
 /* ── 1. RESET ─────────────────────────────────────────────────────── */
 *, *::before, *::after {
   margin: 0;
@@ -24,9 +114,6 @@
 /* ── 3. BODY ──────────────────────────────────────────────────────── */
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: 
-    linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.4) 100%),
-    url('img/darnoppler_bg.png') center center / cover no-repeat fixed;
   background-color: #030a14;
   min-height: 100vh;
   display: flex;

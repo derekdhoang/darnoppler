@@ -3,6 +3,35 @@
 // Powered by Pirate Weather (pirateweather.net)
 // =====================================================================
 
+// ── BACKGROUND — Real-time Iowa sky system ───────────────────────────
+
+function getIowaHour() {
+  const now = new Date();
+  const iowa = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+  return iowa.getHours();
+}
+
+function getTimeOfDay(hour) {
+  if (hour >= 5 && hour < 10) return 'morning';
+  if (hour >= 10 && hour < 19) return 'day';
+  if (hour >= 19 && hour < 21) return 'evening';
+  return 'night';
+}
+
+function applyBackground() {
+  const hour = getIowaHour();
+  const timeOfDay = getTimeOfDay(hour);
+
+  const bgImage = document.getElementById('bg-image');
+  const bgOverlay = document.getElementById('bg-overlay');
+
+  if (!bgImage || !bgOverlay) return;
+
+  bgImage.className = 'bg-image ' + timeOfDay;
+  bgOverlay.className = 'bg-overlay ' + timeOfDay;
+}
+
+applyBackground();
 
 // ── DOM REFERENCES ────────────────────────────────────────────────────
 const cityInput           = document.getElementById('city-input');
@@ -981,17 +1010,25 @@ function initRadarPreview() {
     keyboard:        false,
   });
 
-  // Lighter dark-grey basemap
-  L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
-    { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>', maxZoom: 19, opacity: 1, zIndex: 1 }
-  ).addTo(previewMap);
+  // Base map — switches with time of day
+  const isNightMode = getTimeOfDay(getIowaHour()) === 'night';
 
-  // City/state labels on top of radar — same as studio
-  L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
-    { attribution: '', maxZoom: 19, opacity: 1, zIndex: 450 }
-  ).addTo(previewMap);
+  const baseMapUrl = isNightMode
+    ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
+
+  const labelUrl = isNightMode
+    ? 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png';
+
+  L.tileLayer(baseMapUrl, {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    maxZoom: 19, opacity: 1, zIndex: 1
+  }).addTo(previewMap);
+
+  L.tileLayer(labelUrl, {
+    attribution: '', maxZoom: 19, opacity: 1, zIndex: 450
+  }).addTo(previewMap);
 
   loadPreviewStateBoundaries();
   refreshRadarPreview();
@@ -1230,17 +1267,25 @@ function initSPCOutlookMap() {
     attributionControl: true,
   });
 
-  // Same lighter grey basemap as preview radar
-  L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
-    { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>', maxZoom: 19, opacity: 1 }
-  ).addTo(spcOutlookMap);
+ // SPC Base map — switches with time of day
+  const spcNightMode = getTimeOfDay(getIowaHour()) === 'night';
 
-  // City/state labels on top
-  L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
-    { attribution: '', maxZoom: 19, opacity: 1, zIndex: 450 }
-  ).addTo(spcOutlookMap);
+  const spcBaseUrl = spcNightMode
+    ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
+
+  const spcLabelUrl = spcNightMode
+    ? 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png';
+
+  L.tileLayer(spcBaseUrl, {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    maxZoom: 19, opacity: 1
+  }).addTo(spcOutlookMap);
+
+  L.tileLayer(spcLabelUrl, {
+    attribution: '', maxZoom: 19, opacity: 1, zIndex: 450
+  }).addTo(spcOutlookMap);
 
   applyUniformAttribution(spcOutlookMap);
   loadSPCOutlookLayer(spcCurrentDay);
