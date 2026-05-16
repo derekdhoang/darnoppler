@@ -961,6 +961,7 @@ async function fetchSPCOutlook(lat, lon) {
   }
 }
 
+const MRMS_PROXY_URL = 'https://mrms-proxy.derekdhoang.workers.dev';
 
 // ── RADAR PREVIEW MAP — NOAA WMS ──────────────────────────────────────
 function initRadarPreview() {
@@ -1022,20 +1023,31 @@ async function loadPreviewStateBoundaries() {
   }
 }
 
-function refreshRadarPreview() {
+async function refreshRadarPreview() {
   if (!previewMap) return;
   if (previewRadar) { previewMap.removeLayer(previewRadar); previewRadar = null; }
 
-  previewRadar = L.tileLayer.wms(
-    'https://mapservices.weather.noaa.gov/eventdriven/services/radar/radar_base_reflectivity/MapServer/WMSServer',
-    { layers: '0', format: 'image/png', transparent: true, opacity: 0.55, attribution: 'NOAA NWS', zIndex: 200 }
-  ).addTo(previewMap);
+  try {
+    const res = await fetch(`${MRMS_PROXY_URL}/latest`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { latest, lag_minutes } = await res.json();
 
-  radarPanelTimestamp.textContent = 'NOAA NWS · Updated ' +
-    new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+    previewRadar = L.tileLayer(
+      `${MRMS_PROXY_URL}/tiles/${latest}/{z}/{x}/{y}.png`,
+      { opacity: 0.55, attribution: 'MRMS · NOAA', zIndex: 200 }
+    ).addTo(previewMap);
+
+    const lagText = lag_minutes < 10
+      ? `${Math.round(lag_minutes)}m ago`
+      : `⚠️ ${Math.round(lag_minutes)}m ago`;
+    radarPanelTimestamp.textContent = `MRMS · ${lagText}`;
+  } catch (err) {
+    console.error('MRMS preview failed:', err);
+    radarPanelTimestamp.textContent = 'Radar unavailable';
+  }
 }
 
-setInterval(refreshRadarPreview, 10 * 60 * 1000);
+setInterval(refreshRadarPreview, 2 * 60 * 1000);
 
 function updatePreviewCityMarker(cityName, lat, lon) {
   if (!previewMap) return;
