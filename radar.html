@@ -4999,6 +4999,7 @@
 
   // ── CONSTANTS ────────────────────────────────────────────────────────
   const IOWA_CENTER      = [41.878, -93.097];
+  const MRMS_PROXY_URL = 'https://mrms-proxy.derekdhoang.workers.dev';
   const DEFAULT_ZOOM     = 6;
   const STORAGE_KEY      = 'darnoppler-radar-drawings';
   const TEXT_STORAGE_KEY = 'darnoppler-radar-text-labels';
@@ -5360,7 +5361,7 @@
 
     // NOAA WMS radar
     loadRadar();
-    setInterval(loadRadar, 10 * 60 * 1000);
+    setInterval(loadRadar, 2 * 60 * 1000);
 
     // Iowa custom city labels (ALL CAPS bold white + black outline, zoom-tiered)
     initIowaCityLabels(map);
@@ -6246,11 +6247,20 @@
         { attribution: layerConfig.attr, maxZoom: 19, opacity: 1, zIndex: 1 }
       ).addTo(broadcastMap);
 
-      // NOAA radar
-      broadcastRadar = L.tileLayer.wms(
-        'https://mapservices.weather.noaa.gov/eventdriven/services/radar/radar_base_reflectivity/MapServer/WMSServer',
-        { layers: '0', format: 'image/png', transparent: true, opacity: 0.85, attribution: 'NOAA NWS', zIndex: 200 }
-      ).addTo(broadcastMap);
+      // MRMS observed radar
+      (async () => {
+        try {
+          const res = await fetch(`${MRMS_PROXY_URL}/latest`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const { latest } = await res.json();
+          broadcastRadar = L.tileLayer(
+            `${MRMS_PROXY_URL}/tiles/${latest}/{z}/{x}/{y}.png`,
+            { opacity: 0.85, attribution: 'MRMS · NOAA', zIndex: 200 }
+          ).addTo(broadcastMap);
+        } catch (err) {
+          console.error('MRMS broadcastRadar failed:', err);
+        }
+      })();
 
       // City/state labels on top
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',
@@ -7523,17 +7533,28 @@
 
 
   // ── RADAR ────────────────────────────────────────────────────────────
-  function loadRadar() {
+  async function loadRadar() {
     if (radarLayer && map) { map.removeLayer(radarLayer); radarLayer = null; }
     if (!map) return;
-    radarLayer = L.tileLayer.wms(
-      'https://mapservices.weather.noaa.gov/eventdriven/services/radar/radar_base_reflectivity/MapServer/WMSServer',
-      { layers: '0', format: 'image/png', transparent: true, opacity: opacityLevel, attribution: 'NOAA NWS', zIndex: 200 }
-    ).addTo(map);
-    const t = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
-    document.getElementById('radar-timestamp').textContent = '📡 NOAA NWS · ' + t;
-  }
+    try {
+      const res = await fetch(`${MRMS_PROXY_URL}/latest`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const { latest, lag_minutes } = await res.json();
 
+      radarLayer = L.tileLayer(
+        `${MRMS_PROXY_URL}/tiles/${latest}/{z}/{x}/{y}.png`,
+        { opacity: opacityLevel, attribution: 'MRMS · NOAA', zIndex: 200 }
+      ).addTo(map);
+
+      const lagText = lag_minutes < 10
+        ? `${Math.round(lag_minutes)}m ago`
+        : `⚠️ ${Math.round(lag_minutes)}m ago`;
+      document.getElementById('radar-timestamp').textContent = `📡 MRMS · ${lagText}`;
+    } catch (err) {
+      console.error('MRMS loadRadar failed:', err);
+      document.getElementById('radar-timestamp').textContent = '📡 MRMS · unavailable';
+    }
+  }
 
   // ── IOWA GEOGRAPHY ───────────────────────────────────────────────────
   async function loadIowaOutline() {
