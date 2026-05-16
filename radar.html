@@ -1047,6 +1047,182 @@
       display: none !important;
     }
 
+    /* ── SIG HATCH TOOL ──────────────────────────────────────────────── */
+    .hatch-intensity-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .hatch-intensity-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 4px;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.05);
+      cursor: pointer;
+      transition: all 0.15s;
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .hatch-intensity-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); }
+    .hatch-intensity-btn.active { border-color: #60a5fa; background: rgba(96,165,250,0.15); }
+    .hatch-intensity-btn svg { width: 36px; height: 24px; border-radius: 3px; overflow: hidden; }
+
+    /* ── WARNING CARD PRESET ─────────────────────────────────────────── */
+    .preset-warning-card {
+      background: rgba(10,22,40,0.95);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      overflow: hidden;
+      min-width: 280px;
+      max-width: 340px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .preset-warning-card .wc-header {
+      padding: 10px 14px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .preset-warning-card .wc-type {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+    }
+    .preset-warning-card .wc-expires {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.5);
+      margin-top: 2px;
+      letter-spacing: 0.03em;
+    }
+    .preset-warning-card .wc-body {
+      padding: 8px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .preset-warning-card .wc-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preset-warning-card .wc-icon {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .preset-warning-card .wc-label {
+      font-size: 0.58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.4);
+      width: 48px;
+      flex-shrink: 0;
+    }
+    .preset-warning-card .wc-value {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+    .preset-warning-card .wc-footer {
+      padding: 6px 14px 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .preset-warning-card .wc-counties-label {
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 4px;
+    }
+    .preset-warning-card .wc-counties {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.4;
+    }
+
+    /* Load from warning button in preset modal */
+    .load-warning-btn {
+      width: 100%;
+      padding: 8px 12px;
+      background: rgba(96,165,250,0.15);
+      border: 1px solid rgba(96,165,250,0.4);
+      border-radius: 6px;
+      color: #60a5fa;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+      margin-bottom: 10px;
+      letter-spacing: 0.03em;
+      transition: all 0.15s;
+    }
+    .load-warning-btn:hover { background: rgba(96,165,250,0.25); }
+    .load-warning-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: rgba(10,22,40,0.95);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.72rem;
+      margin-bottom: 8px;
+      cursor: pointer;
+      appearance: auto;
+    }
+    .load-warning-select option {
+      background: #0a1628;
+      color: #fff;
+    }
+    .load-warning-select:focus {
+      outline: none;
+      border-color: rgba(96,165,250,0.5);
+    }
+
+    /* SPC legend intensity swatches */
+    .spc-legend-intensity {
+      margin-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 6px;
+    }
+    .spc-legend-intensity-title {
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 4px;
+    }
+    .spc-legend-intensity-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+    .spc-legend-intensity-swatch {
+      width: 28px;
+      height: 16px;
+      border-radius: 2px;
+      border: 1px solid rgba(255,255,255,0.2);
+      flex-shrink: 0;
+    }
+    .spc-legend-intensity-label {
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.7);
+    }
+
     /* ── BROADCAST OVERLAY FRAMES ─────────────────────────────────────── */
     .broadcast-overlay-frame {
       position: absolute;
@@ -1238,6 +1414,54 @@
     .spc-risk-segment.enhanced { background: #e8a032; }
     .spc-risk-segment.moderate { background: #e84040; }
     .spc-risk-segment.high { background: #ff40ff; }
+
+    /* Probability bar segments for tornado/wind/hail overlay */
+    .spc-prob-segment {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+      letter-spacing: 0.02em;
+    }
+    /* SIG hatched swatch at end of bar */
+    .spc-sig-segment {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      font-weight: 700;
+      color: #000;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 4px,
+        rgba(0,0,0,0.8) 4px,
+        rgba(0,0,0,0.8) 6px
+      );
+      background-color: rgba(255,255,255,0.2);
+      letter-spacing: 0.04em;
+      gap: 1px;
+      min-width: 110px;
+      border-left: 2px solid rgba(0,0,0,0.4);
+      text-shadow: 0 0 4px #fff, 0 0 8px #fff, 0 0 12px #fff;
+      line-height: 1.2;
+    }
+    .spc-sig-segment .sig-label {
+      font-size: 0.85rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+    .spc-sig-segment .sig-desc {
+      font-size: 0.65rem;
+      font-weight: 700;
+      opacity: 0.9;
+      letter-spacing: 0.02em;
+    }
 
     /* ── RIGHT-CLICK CONTEXT MENU ──────────────────────────────────────── */
     .preset-context-menu {
@@ -3642,6 +3866,14 @@
           <button class="tool-icon-btn" id="tool-freehand" data-tooltip="Freehand (H)" disabled>
             <svg viewBox="0 0 24 24"><path d="M3 17c3-2 6-8 9-8s6 6 9 4"/><path d="M3 12c3-2 6-8 9-8s6 6 9 4"/></svg>
           </button>
+          <button class="tool-icon-btn" id="tool-sig-hatch" data-tooltip="SIG Hatch (G)" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="2" width="20" height="20" rx="3"/>
+              <line x1="2" y1="8" x2="8" y2="2"/><line x1="2" y1="14" x2="14" y2="2"/>
+              <line x1="2" y1="20" x2="20" y2="2"/><line x1="8" y1="22" x2="22" y2="8"/>
+              <line x1="14" y1="22" x2="22" y2="14"/><line x1="20" y1="22" x2="22" y2="20"/>
+            </svg>
+          </button>
           <button class="tool-icon-btn" id="tool-fill" data-tooltip="County Fill (F)" disabled>
             <svg viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
           </button>
@@ -3740,10 +3972,33 @@
             <div class="panel-section">
               <div class="panel-section-title">Map Style</div>
               <select class="map-layer-select" id="map-layer-select">
-                <option value="esri-light" selected>Light Gray (Default)</option>
+                <option value="esri-light">Light Gray</option>
                 <option value="satellite">Satellite</option>
-                <option value="esri-dark">Dark Gray</option>
+                <option value="esri-dark" selected>Dark Gray (Default)</option>
               </select>
+            </div>
+
+            <!-- SPC Outlook Controls -->
+            <div class="panel-section" id="spc-settings-section">
+              <div class="panel-section-title" id="spc-settings-toggle" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;" title="Click to expand/collapse">
+                SPC Outlook
+                <svg id="spc-settings-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div id="spc-settings-body" style="display:none;margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+                <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.4);margin-bottom:2px;">Day</div>
+                <div style="display:flex;gap:4px;">
+                  <button class="spc-day-btn active" data-day="1" style="flex:1;">Day 1</button>
+                  <button class="spc-day-btn" data-day="2" style="flex:1;">Day 2</button>
+                  <button class="spc-day-btn" id="spc-day3-btn" data-day="3" style="flex:1;">Day 3</button>
+                </div>
+                <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.4);margin-top:4px;margin-bottom:2px;">Outlook Type</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                  <button class="spc-type-btn active" data-type="cat">⚡ Categorical</button>
+                  <button class="spc-type-btn" data-type="torn">🌪️ Tornado</button>
+                  <button class="spc-type-btn" data-type="wind">💨 Wind</button>
+                  <button class="spc-type-btn" data-type="hail">🧊 Hail</button>
+                </div>
+              </div>
             </div>
 
             <div class="panel-section">
@@ -4003,6 +4258,10 @@
                   <svg viewBox="0 0 24 24"><rect x="2" y="8" width="4" height="8" rx="1"/><rect x="7" y="6" width="4" height="10" rx="1"/><rect x="12" y="4" width="4" height="12" rx="1"/><rect x="17" y="2" width="4" height="14" rx="1"/></svg>
                   <span>Severity</span>
                 </button>
+                <button class="add-preset-btn" data-preset="warning-card">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>
+                  <span>Warning Card</span>
+                </button>
               </div>
             </div>
 
@@ -4201,6 +4460,71 @@
             </div>
           </div>
 
+          <!-- SIG HATCH TOOL VIEW -->
+          <div class="panel-view" id="view-sig-hatch">
+            <div class="panel-section">
+              <div class="panel-section-title">SIG Hatch Draw</div>
+              <p style="font-size:0.72rem;color:rgba(255,255,255,0.6);margin-bottom:12px;line-height:1.5;">
+                Draw significant areas with SPC-style diagonal hatch fill. Select intensity then draw freehand.
+              </p>
+            </div>
+            <div class="panel-section">
+              <div class="panel-section-title">Intensity</div>
+              <div class="hatch-intensity-row">
+                <button class="hatch-intensity-btn active" data-intensity="1">
+                  <svg viewBox="0 0 36 24">
+                    <rect width="36" height="24" fill="white"/>
+                    <line x1="0" y1="8" x2="8" y2="0" stroke="#000" stroke-width="1.2"/>
+                    <line x1="0" y1="18" x2="18" y2="0" stroke="#000" stroke-width="1.2"/>
+                    <line x1="6" y1="24" x2="24" y2="6" stroke="#000" stroke-width="1.2"/>
+                    <line x1="16" y1="24" x2="34" y2="6" stroke="#000" stroke-width="1.2"/>
+                    <line x1="26" y1="24" x2="36" y2="14" stroke="#000" stroke-width="1.2"/>
+                  </svg>
+                  1 — Light
+                </button>
+                <button class="hatch-intensity-btn" data-intensity="2">
+                  <svg viewBox="0 0 36 24">
+                    <rect width="36" height="24" fill="white"/>
+                    <line x1="0" y1="5" x2="5" y2="0" stroke="#000" stroke-width="1.4"/>
+                    <line x1="0" y1="11" x2="11" y2="0" stroke="#000" stroke-width="1.4"/>
+                    <line x1="0" y1="17" x2="17" y2="0" stroke="#000" stroke-width="1.4"/>
+                    <line x1="0" y1="23" x2="23" y2="0" stroke="#000" stroke-width="1.4"/>
+                    <line x1="6" y1="24" x2="24" y2="6" stroke="#000" stroke-width="1.4"/>
+                    <line x1="12" y1="24" x2="30" y2="6" stroke="#000" stroke-width="1.4"/>
+                    <line x1="18" y1="24" x2="36" y2="6" stroke="#000" stroke-width="1.4"/>
+                    <line x1="24" y1="24" x2="36" y2="12" stroke="#000" stroke-width="1.4"/>
+                    <line x1="30" y1="24" x2="36" y2="18" stroke="#000" stroke-width="1.4"/>
+                  </svg>
+                  2 — Medium
+                </button>
+                <button class="hatch-intensity-btn" data-intensity="3">
+                  <svg viewBox="0 0 36 24">
+                    <rect width="36" height="24" fill="white"/>
+                    <line x1="0" y1="5" x2="5" y2="0" stroke="#000" stroke-width="1.5"/>
+                    <line x1="0" y1="11" x2="11" y2="0" stroke="#000" stroke-width="1.5"/>
+                    <line x1="0" y1="17" x2="17" y2="0" stroke="#000" stroke-width="1.5"/>
+                    <line x1="0" y1="23" x2="23" y2="0" stroke="#000" stroke-width="1.5"/>
+                    <line x1="6" y1="24" x2="24" y2="6" stroke="#000" stroke-width="1.5"/>
+                    <line x1="12" y1="24" x2="30" y2="6" stroke="#000" stroke-width="1.5"/>
+                    <line x1="18" y1="24" x2="36" y2="6" stroke="#000" stroke-width="1.5"/>
+                    <line x1="24" y1="24" x2="36" y2="12" stroke="#000" stroke-width="1.5"/>
+                    <line x1="30" y1="24" x2="36" y2="18" stroke="#000" stroke-width="1.5"/>
+                    <!-- cross lines -->
+                    <line x1="0" y1="6" x2="6" y2="0" stroke="#000" stroke-width="1.5" transform="scale(-1,1) translate(-36,0)"/>
+                    <line x1="0" y1="12" x2="12" y2="0" stroke="#000" stroke-width="1.5" transform="scale(-1,1) translate(-36,0)"/>
+                    <line x1="0" y1="18" x2="18" y2="0" stroke="#000" stroke-width="1.5" transform="scale(-1,1) translate(-36,0)"/>
+                    <line x1="0" y1="24" x2="24" y2="0" stroke="#000" stroke-width="1.5" transform="scale(-1,1) translate(-36,0)"/>
+                    <line x1="6" y1="24" x2="36" y2="0" stroke="#000" stroke-width="1.5" transform="scale(-1,1) translate(-36,0)"/>
+                  </svg>
+                  3 — Cross
+                </button>
+              </div>
+              <p style="font-size:0.6rem;color:rgba(255,255,255,0.35);margin-top:8px;line-height:1.4;">
+                Click and drag on the map to draw the significant area. Shape fills with the selected hatch pattern.
+              </p>
+            </div>
+          </div>
+
           <!-- TEXT TOOL VIEW -->
           <div class="panel-view" id="view-text">
             <div class="panel-section">
@@ -4255,13 +4579,8 @@
 
       <!-- SPC OUTLOOK BROADCAST OVERLAY -->
       <div class="broadcast-overlay-frame" id="broadcast-spc-overlay-frame">
-        <div class="spc-overlay-header">
-          <span class="spc-overlay-title">DARNOPPLER</span>
-          <span class="spc-overlay-title-line2">SEVERE WEATHER</span>
-          <span class="spc-overlay-title-line3">OUTLOOK</span>
-        </div>
-        <div class="spc-overlay-footer">
-          <div class="spc-risk-bar">
+        <div class="spc-overlay-footer" id="spc-overlay-footer">
+          <div class="spc-risk-bar" id="spc-overlay-bar">
             <div class="spc-risk-label">RISK</div>
             <div class="spc-risk-segment marginal">MARGINAL</div>
             <div class="spc-risk-segment slight">SLIGHT</div>
@@ -4288,35 +4607,6 @@
         </div>
       </div>
 
-      <!-- SPC controls panel - day + outlook type stacked -->
-      <div class="spc-controls-panel" id="spc-controls-panel">
-        <div class="spc-controls-section-label">Day</div>
-        <div class="spc-day-bar" id="spc-day-bar">
-          <button class="spc-day-btn active" data-day="1">Day 1</button>
-          <button class="spc-day-btn" data-day="2">Day 2</button>
-          <button class="spc-day-btn" id="spc-day3-btn" data-day="3">Day 3</button>
-        </div>
-        <div class="spc-controls-section-label">Outlook</div>
-        <div class="spc-type-bar" id="spc-type-bar">
-          <button class="spc-type-btn active" data-type="cat" title="Categorical Risk">
-            <span class="spc-type-icon">⚡</span>
-            <span class="spc-type-label">Categorical</span>
-          </button>
-          <button class="spc-type-btn" data-type="torn" title="Tornado Probability">
-            <span class="spc-type-icon">🌪️</span>
-            <span class="spc-type-label">Tornado</span>
-          </button>
-          <button class="spc-type-btn" data-type="wind" title="Damaging Wind Probability">
-            <span class="spc-type-icon">💨</span>
-            <span class="spc-type-label">Wind</span>
-          </button>
-          <button class="spc-type-btn" data-type="hail" title="Large Hail Probability">
-            <span class="spc-type-icon">🧊</span>
-            <span class="spc-type-label">Hail</span>
-          </button>
-        </div>
-      </div>
-
       <!-- Timestamp -->
       <div class="radar-timestamp" id="radar-timestamp">Loading NOAA NWS radar...</div>
 
@@ -4330,6 +4620,28 @@
         <div class="legend-row"><div class="legend-swatch" style="background:#fd9500;"></div><span class="legend-text">Extreme / Hail</span><span class="legend-dbz">60 dBZ</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#fd0000;"></div><span class="legend-text">Severe / Hail</span><span class="legend-dbz">65 dBZ</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#bc00bc;"></div><span class="legend-text">Violent / Tornado</span><span class="legend-dbz">75 dBZ</span></div>
+        <!-- SIG Hatch Intensity -->
+        <div class="spc-legend-intensity" style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.1);padding-top:6px;">
+          <div class="legend-section-title" style="margin-bottom:5px;">⬛ SIG Intensity</div>
+          <div class="spc-legend-intensity-row">
+            <div class="spc-legend-intensity-swatch">
+              <svg width="28" height="16" xmlns="http://www.w3.org/2000/svg"><rect width="28" height="16" fill="white"/><line x1="0" y1="5" x2="5" y2="0" stroke="#000" stroke-width="1.1"/><line x1="0" y1="11" x2="11" y2="0" stroke="#000" stroke-width="1.1"/><line x1="0" y1="17" x2="17" y2="0" stroke="#000" stroke-width="1.1"/><line x1="6" y1="16" x2="16" y2="6" stroke="#000" stroke-width="1.1"/><line x1="12" y1="16" x2="22" y2="6" stroke="#000" stroke-width="1.1"/><line x1="18" y1="16" x2="28" y2="6" stroke="#000" stroke-width="1.1"/></svg>
+            </div>
+            <span class="spc-legend-intensity-label">1 — Light</span>
+          </div>
+          <div class="spc-legend-intensity-row">
+            <div class="spc-legend-intensity-swatch">
+              <svg width="28" height="16" xmlns="http://www.w3.org/2000/svg"><rect width="28" height="16" fill="white"/><line x1="0" y1="3" x2="3" y2="0" stroke="#000" stroke-width="1.3"/><line x1="0" y1="7" x2="7" y2="0" stroke="#000" stroke-width="1.3"/><line x1="0" y1="11" x2="11" y2="0" stroke="#000" stroke-width="1.3"/><line x1="0" y1="15" x2="15" y2="0" stroke="#000" stroke-width="1.3"/><line x1="4" y1="16" x2="16" y2="4" stroke="#000" stroke-width="1.3"/><line x1="8" y1="16" x2="20" y2="4" stroke="#000" stroke-width="1.3"/><line x1="12" y1="16" x2="24" y2="4" stroke="#000" stroke-width="1.3"/><line x1="16" y1="16" x2="28" y2="4" stroke="#000" stroke-width="1.3"/><line x1="20" y1="16" x2="28" y2="8" stroke="#000" stroke-width="1.3"/><line x1="24" y1="16" x2="28" y2="12" stroke="#000" stroke-width="1.3"/></svg>
+            </div>
+            <span class="spc-legend-intensity-label">2 — Medium</span>
+          </div>
+          <div class="spc-legend-intensity-row">
+            <div class="spc-legend-intensity-swatch">
+              <svg width="28" height="16" xmlns="http://www.w3.org/2000/svg"><rect width="28" height="16" fill="white"/><line x1="0" y1="3" x2="3" y2="0" stroke="#000" stroke-width="1.4"/><line x1="0" y1="7" x2="7" y2="0" stroke="#000" stroke-width="1.4"/><line x1="0" y1="11" x2="11" y2="0" stroke="#000" stroke-width="1.4"/><line x1="0" y1="15" x2="15" y2="0" stroke="#000" stroke-width="1.4"/><line x1="4" y1="16" x2="16" y2="4" stroke="#000" stroke-width="1.4"/><line x1="8" y1="16" x2="20" y2="4" stroke="#000" stroke-width="1.4"/><line x1="12" y1="16" x2="24" y2="4" stroke="#000" stroke-width="1.4"/><line x1="16" y1="16" x2="28" y2="4" stroke="#000" stroke-width="1.4"/><line x1="28" y1="3" x2="25" y2="0" stroke="#000" stroke-width="1.4"/><line x1="28" y1="7" x2="21" y2="0" stroke="#000" stroke-width="1.4"/><line x1="28" y1="11" x2="17" y2="0" stroke="#000" stroke-width="1.4"/><line x1="28" y1="15" x2="13" y2="0" stroke="#000" stroke-width="1.4"/><line x1="24" y1="16" x2="12" y2="4" stroke="#000" stroke-width="1.4"/><line x1="20" y1="16" x2="8" y2="4" stroke="#000" stroke-width="1.4"/><line x1="16" y1="16" x2="4" y2="4" stroke="#000" stroke-width="1.4"/><line x1="12" y1="16" x2="0" y2="4" stroke="#000" stroke-width="1.4"/></svg>
+            </div>
+            <span class="spc-legend-intensity-label">3 — Cross</span>
+          </div>
+        </div>
       </div>
 
       <!-- SPC Risk Level Legend (visible in SPC view) -->
@@ -4660,6 +4972,24 @@
   </div>
   <!-- end #broadcast-spc-view -->
 
+  <!-- SVG hatch patterns for SIG draw tool -->
+  <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none;">
+    <defs>
+      <!-- Intensity 1: sparse single diagonal -->
+      <pattern id="hatch-1" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(135)">
+        <line x1="0" y1="0" x2="0" y2="10" stroke="#000" stroke-width="1.2" stroke-opacity="0.75"/>
+      </pattern>
+      <!-- Intensity 2: medium single diagonal -->
+      <pattern id="hatch-2" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(135)">
+        <line x1="0" y1="0" x2="0" y2="6" stroke="#000" stroke-width="1.4" stroke-opacity="0.85"/>
+      </pattern>
+      <!-- Intensity 3: dense cross-hatch -->
+      <pattern id="hatch-3" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(135)">
+        <line x1="0" y1="0" x2="0" y2="6" stroke="#000" stroke-width="1.5" stroke-opacity="0.9"/>
+        <line x1="0" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5" stroke-opacity="0.9"/>
+      </pattern>
+    </defs>
+  </svg>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@3.4.1/dist/dom-to-image-more.min.js"></script>
@@ -4669,7 +4999,7 @@
 
   // ── CONSTANTS ────────────────────────────────────────────────────────
   const IOWA_CENTER      = [41.878, -93.097];
-  const DEFAULT_ZOOM     = 8;
+  const DEFAULT_ZOOM     = 6;
   const STORAGE_KEY      = 'darnoppler-radar-drawings';
   const TEXT_STORAGE_KEY = 'darnoppler-radar-text-labels';
   const IOWA_FIPS        = '19';
@@ -4733,7 +5063,7 @@
   let spcCurrentType = 'cat'; // 'cat', 'torn', 'wind', 'hail'
   let currentView   = 'radar';
   let currentRegion = 'all';
-  let currentMapStyle = 'esri-light';
+  let currentMapStyle = 'esri-dark';
   let opacityLevel  = 0.7;
   let editToolsCollapsed = false;
 
@@ -5024,8 +5354,8 @@
     });
 
     // Base layer
-    baseLayer = L.tileLayer(MAP_LAYERS['esri-light'].url,
-      { attribution: MAP_LAYERS['esri-light'].attr, maxZoom: 19, opacity: 1, zIndex: 1 }
+    baseLayer = L.tileLayer(MAP_LAYERS['esri-dark'].url,
+      { attribution: MAP_LAYERS['esri-dark'].attr, maxZoom: 19, opacity: 1, zIndex: 1 }
     ).addTo(map);
 
     // NOAA WMS radar
@@ -5071,7 +5401,10 @@
       layer.feature.properties.label = l;
       layer.bindPopup(`<strong style="color:${c}">${l}</strong>`);
       drawnItems.addLayer(layer);
-      if (layer instanceof L.Circle) attachCircleContextMenu(layer);
+      if (layer instanceof L.Circle) {
+        attachCircleContextMenu(layer);
+        attachCircleDrag(layer);
+      }
       
       // Push to undo stack
       pushUndo({ type: 'draw-shape', layer });
@@ -5108,6 +5441,7 @@
     initSidebarPalette();
     initColorPalette();
     initFreehandDrawing();
+    initSigHatchDraw();
     initToolIconButtons();
     initKeyboardShortcuts();
     initPresetSystem();
@@ -5253,6 +5587,7 @@
         if (e.key === 'l' || e.key === 'L') document.getElementById('tool-polyline')?.click();
         if (e.key === 'c' || e.key === 'C') document.getElementById('tool-circle')?.click();
         if (e.key === 'h' || e.key === 'H') document.getElementById('tool-freehand')?.click();
+        if (e.key === 'g' || e.key === 'G') document.getElementById('tool-sig-hatch')?.click();
         if (e.key === 't' || e.key === 'T') document.getElementById('tool-text')?.click();
         if (e.key === 'a' || e.key === 'A') document.getElementById('tool-arrow')?.click();
         if (e.key === 'o' || e.key === 'O') document.getElementById('tool-presets')?.click();
@@ -5804,7 +6139,7 @@
       scale: '100',
       data: {
         alertTitle: warning.event.toUpperCase(),
-        alertSub: warning.areaDesc ? warning.areaDesc.split(';')[0].trim() : 'Take shelter immediately',
+        alertSub: warning.areaDesc ? warning.areaDesc.split(';').map(s => s.trim()).filter(Boolean).join('; ') : 'Take shelter immediately',
       },
     };
     savedPresets.push(newPreset);
@@ -6235,8 +6570,26 @@
         color4:   '#cc1080',
         color5:   '#e060e0',
       }),
-minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
-      maxZoom: 12,    },
+    },
+    'warning-card': {
+      name: 'Warning Card',
+      fields: [
+        { key: 'warnType',   label: 'Warning Type', default: 'TORNADO WARNING' },
+        { key: 'expires',    label: 'Expires',       default: '' },
+        { key: 'wind',       label: 'Wind',          default: '' },
+        { key: 'hail',       label: 'Hail',          default: '' },
+        { key: 'motion',     label: 'Motion',        default: '' },
+        { key: 'counties',   label: 'Counties',      default: '' },
+      ],
+      autoPopulate: () => ({
+        warnType: 'TORNADO WARNING',
+        expires:  '',
+        wind:     '',
+        hail:     '',
+        motion:   '',
+        counties: '',
+      }),
+    },
   };
 
   function getWindDir(deg) {
@@ -6491,6 +6844,17 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
 
     document.getElementById('preset-modal-title').textContent = `Add ${template.name}`;
     document.getElementById('preset-city-input').value = '';
+
+    // Hide city search for warning-card (uses warning dropdown instead)
+    const citySearch = document.querySelector('.preset-city-search');
+    const recentRow = document.getElementById('recent-cities-row');
+    if (type === 'warning-card') {
+      if (citySearch) citySearch.style.display = 'none';
+      if (recentRow) recentRow.style.display = 'none';
+    } else {
+      if (citySearch) citySearch.style.display = '';
+      if (recentRow) recentRow.style.display = '';
+    }
     
     // Initialize with defaults
     presetData = {};
@@ -6519,15 +6883,17 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
     if (type === 'severity-card') {
       presetData.day = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
     }
-    
-    presetPosition = 'top';
+
+    // Warning card defaults to bottom-left
+    presetPosition = type === 'warning-card' ? 'bottom-left' : 'top';
     document.querySelectorAll('.preset-position-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.position === 'top');
+      b.classList.toggle('active', b.dataset.position === presetPosition);
     });
 
-    presetScale = '100';
+    // Alert banner defaults to 200% scale
+    presetScale = type === 'alert-banner' ? '200' : '100';
     document.querySelectorAll('.preset-scale-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.scale === '100');
+      b.classList.toggle('active', b.dataset.scale === presetScale);
     });
 
     renderPresetFields();
@@ -6547,7 +6913,32 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
     if (!template) return;
 
     const container = document.getElementById('preset-fields');
-    container.innerHTML = template.fields.map(f => {
+
+    // For warning-card: show "Load from Warning" selector at the top
+    let warningLoaderHTML = '';
+    if (currentPresetType === 'warning-card') {
+      const iowaWarnings = filterWarnings(); // Iowa-only, already filtered
+      if (iowaWarnings.length > 0) {
+        const options = iowaWarnings.map((w, i) =>
+          `<option value="${i}">${w.event} — ${w.areaDesc?.split(';')[0]?.trim() || 'Unknown'}</option>`
+        ).join('');
+        warningLoaderHTML = `
+          <div style="margin-bottom:10px;">
+            <select class="load-warning-select" id="warning-loader-select">
+              <option value="">— Select active Iowa warning —</option>
+              ${options}
+            </select>
+            <button class="load-warning-btn" id="load-warning-btn">⚡ Load Warning Data</button>
+          </div>`;
+      } else {
+        warningLoaderHTML = `
+          <div style="margin-bottom:10px;padding:8px 10px;background:rgba(255,255,255,0.05);border-radius:6px;font-size:0.7rem;color:rgba(255,255,255,0.4);">
+            No active Iowa warnings — fill fields manually below.
+          </div>`;
+      }
+    }
+
+    container.innerHTML = warningLoaderHTML + template.fields.map(f => {
       if (f.type === 'color') {
         const val = presetData[f.key] || f.default || '#ffffff';
         return `
@@ -6564,6 +6955,60 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
           <button class="preset-field-delete" data-key="${f.key}" title="Clear field">×</button>
         </div>`;
     }).join('');
+
+    // Wire "Load Warning" button
+    const loadBtn = container.querySelector('#load-warning-btn');
+    if (loadBtn) {
+      loadBtn.addEventListener('click', () => {
+        const sel = container.querySelector('#warning-loader-select');
+        const idx = parseInt(sel.value);
+        if (isNaN(idx)) return;
+        const iowaWarnings = filterWarnings();
+        const w = iowaWarnings[idx];
+        if (!w) return;
+
+        // Parse expires
+        const expiresDate = w.expires ? new Date(w.expires) : null;
+        const expiresStr = expiresDate ? expiresDate.toLocaleString('en-US', {
+          hour: 'numeric', minute: '2-digit', hour12: true,
+          month: 'numeric', day: 'numeric', year: 'numeric'
+        }) : '';
+
+        // Parse wind/hail/motion from NWS parameters
+        const params = w.parameters || {};
+        const windArr = params.maxWindGust || params.windSpeed || [];
+        const hailArr = params.maxHailSize || [];
+        const motionArr = params.tornadoDetection || params.stormMotion || [];
+
+        const windStr = windArr.length ? windArr[0] : '';
+        const hailStr = hailArr.length ? `${hailArr[0]} inches` : '';
+        const motionStr = motionArr.length ? motionArr[0] : '';
+
+        // All counties
+        const counties = w.areaDesc
+          ? w.areaDesc.split(';').map(s => s.trim()).filter(Boolean).join('; ')
+          : '';
+
+        // Update presetData and inputs
+        const updates = {
+          warnType: w.event?.toUpperCase() || 'WARNING',
+          expires:  expiresStr,
+          wind:     windStr,
+          hail:     hailStr,
+          motion:   motionStr,
+          counties: counties,
+        };
+
+        Object.entries(updates).forEach(([key, val]) => {
+          presetData[key] = val;
+          const input = container.querySelector(`input[data-key="${key}"]`);
+          if (input) input.value = val;
+        });
+
+        updatePresetPreview();
+        showToast('Warning data loaded!');
+      });
+    }
 
     // Wire text inputs
     container.querySelectorAll('.preset-field-input').forEach(input => {
@@ -6681,6 +7126,36 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
               </div>
               <div class="sev-boxes-area">${boxes}</div>
             </div>
+          </div>
+        `;
+      }
+
+      case 'warning-card': {
+        // Determine border color from warning type
+        const wtype = (data.warnType || 'TORNADO WARNING').toUpperCase();
+        let borderColor = '#e84040';
+        if (wtype.includes('TORNADO')) borderColor = '#e84040';
+        else if (wtype.includes('SEVERE')) borderColor = '#e8a032';
+        else if (wtype.includes('FLASH FLOOD') || wtype.includes('FLOOD')) borderColor = '#4daf4d';
+        else if (wtype.includes('WINTER') || wtype.includes('SNOW') || wtype.includes('ICE')) borderColor = '#60a5fa';
+        else if (wtype.includes('WIND')) borderColor = '#f0f04d';
+        const rows = [
+          data.wind    ? `<div class="wc-row"><span class="wc-icon">💨</span><span class="wc-label">WIND</span><span class="wc-value">${data.wind}</span></div>` : '',
+          data.hail    ? `<div class="wc-row"><span class="wc-icon">🧊</span><span class="wc-label">HAIL</span><span class="wc-value">${data.hail}</span></div>` : '',
+          data.motion  ? `<div class="wc-row"><span class="wc-icon">➡️</span><span class="wc-label">MOTION</span><span class="wc-value">${data.motion}</span></div>` : '',
+        ].filter(Boolean).join('');
+        return `
+          <div class="preset-warning-card" style="${scale};border-left:4px solid ${borderColor};">
+            <div class="wc-header">
+              <div class="wc-type">${wtype}</div>
+              ${data.expires ? `<div class="wc-expires">Until ${data.expires}</div>` : ''}
+            </div>
+            ${rows ? `<div class="wc-body">${rows}</div>` : ''}
+            ${data.counties ? `
+              <div class="wc-footer">
+                <div class="wc-counties-label">Affected Counties</div>
+                <div class="wc-counties">${data.counties}</div>
+              </div>` : ''}
           </div>
         `;
       }
@@ -7141,7 +7616,8 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
             delete filledCounties[fips];
             layer.setStyle({ fillColor: 'transparent', fillOpacity: 0 });
           } else {
-            filledCounties[fips] = { color: activeColor, label: activeLabel };
+            const isHatch = false; // SIG hatch now handled by dedicated tool
+            filledCounties[fips] = { color: activeColor, label: activeLabel, hatch: isHatch };
             layer.setStyle({ fillColor: activeColor, fillOpacity: 0.45 });
           }
           
@@ -7163,7 +7639,11 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
       const fips  = String(layer.feature?.id || layer.feature?.properties?.GEO_ID || '');
       const saved = filledCounties[fips];
       if (saved) {
-        layer.setStyle({ fillColor: saved.color, fillOpacity: 0.45 });
+        if (saved.hatch) {
+          layer.setStyle({ fillColor: 'transparent', fillOpacity: 0, color: '#000', weight: 2.5, dashArray: '8,5' });
+        } else {
+          layer.setStyle({ fillColor: saved.color, fillOpacity: 0.45 });
+        }
       } else {
         // Reset to default transparent fill
         layer.setStyle({ fillColor: 'transparent', fillOpacity: 0 });
@@ -7325,6 +7805,7 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
       'tool-polyline': { view: 'view-draw', title: 'Draw: Polyline', drawTool: 'polyline' },
       'tool-circle': { view: 'view-draw', title: 'Draw: Circle', drawTool: 'circle' },
       'tool-freehand': { view: 'view-freehand', title: 'Freehand Draw', action: 'freehand' },
+      'tool-sig-hatch': { view: 'view-sig-hatch', title: 'SIG Hatch Draw', action: 'sig-hatch' },
       'tool-text': { view: 'view-text', title: 'Text Label', action: 'text' },
       'tool-arrow': { view: 'view-arrow', title: 'Arrow' },
       'tool-presets': { view: 'view-presets', title: 'Presets' },
@@ -7347,7 +7828,7 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
         btn.classList.add('active');
         
         // Add pulse for tools that are "active" waiting for map interaction
-        if (config.drawTool || config.action === 'text' || config.action === 'freehand' || btnId === 'tool-arrow' || btnId === 'tool-fill') {
+        if (config.drawTool || config.action === 'text' || config.action === 'freehand' || config.action === 'sig-hatch' || btnId === 'tool-arrow' || btnId === 'tool-fill') {
           btn.classList.add('tool-active');
         }
         
@@ -7363,25 +7844,36 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
         // Handle draw tools
         if (config.drawTool) {
           setFreehandMode(false);
+          setSigHatchMode(false);
           activateDrawTool(config.drawTool);
         } else if (config.action === 'text') {
           activateTextTool();
+          setFreehandMode(false);
+          setSigHatchMode(false);
           countyFillMode = false;
         } else if (config.action === 'freehand') {
           deactivateLeafletDraw();
           setFreehandMode(true);
+          setSigHatchMode(false);
+          countyFillMode = false;
+        } else if (config.action === 'sig-hatch') {
+          deactivateLeafletDraw();
+          setFreehandMode(false);
+          setSigHatchMode(true);
           countyFillMode = false;
         } else if (btnId === 'tool-fill') {
           countyFillMode = true;
           setFreehandMode(false);
+          setSigHatchMode(false);
           deactivateLeafletDraw();
         } else if (btnId === 'tool-arrow') {
-          // Arrow tool - wait for direction selection
           setFreehandMode(false);
+          setSigHatchMode(false);
           deactivateLeafletDraw();
           countyFillMode = false;
         } else {
           setFreehandMode(false);
+          setSigHatchMode(false);
           deactivateLeafletDraw();
           countyFillMode = false;
         }
@@ -7470,7 +7962,6 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
     const tabSpc      = document.getElementById('view-tab-spc');
     const radarMapEl  = document.getElementById('radar-map');
     const spcMapEl    = document.getElementById('spc-studio-map');
-    const spcControls = document.getElementById('spc-controls-panel');
     const legend      = document.getElementById('map-legend');
     const spcLegend   = document.getElementById('spc-legend');
     const timestamp   = document.getElementById('radar-timestamp');
@@ -7481,7 +7972,6 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
       tabSpc.classList.remove('active');
       radarMapEl.style.display = 'block';
       spcMapEl.style.display   = 'none';
-      spcControls.classList.remove('visible');
       legend.style.display    = 'block';
       if (spcLegend) spcLegend.classList.remove('visible');
       timestamp.style.display = 'block';
@@ -7505,7 +7995,6 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
       tabRadar.classList.remove('active');
       radarMapEl.style.display = 'none';
       spcMapEl.style.display   = 'block';
-      spcControls.classList.add('visible');
       legend.style.display    = 'none';
       if (spcLegend) spcLegend.classList.add('visible');
       timestamp.style.display = 'none';
@@ -7523,6 +8012,19 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
       }
     });
 
+    // SPC settings panel collapse toggle
+    const spcSettingsToggle = document.getElementById('spc-settings-toggle');
+    const spcSettingsBody   = document.getElementById('spc-settings-body');
+    const spcSettingsChevron = document.getElementById('spc-settings-chevron');
+    if (spcSettingsToggle) {
+      spcSettingsToggle.addEventListener('click', () => {
+        const isOpen = spcSettingsBody.style.display !== 'none';
+        spcSettingsBody.style.display = isOpen ? 'none' : 'flex';
+        spcSettingsChevron.style.transform = isOpen ? 'rotate(-90deg)' : '';
+      });
+    }
+
+    // SPC day buttons (now in settings panel)
     document.querySelectorAll('.spc-day-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         if (btn.disabled) return;
@@ -7530,25 +8032,23 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
         btn.classList.add('active');
         spcCurrentDay = parseInt(btn.dataset.day);
         loadSPCLayer(spcCurrentDay);
-        // Also update broadcast SPC if open
         if (broadcastSpcInited) loadBroadcastSpcLayer(spcCurrentDay);
       });
     });
 
-    // SPC outlook type buttons
+    // SPC type buttons (now in settings panel)
     document.querySelectorAll('.spc-type-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.spc-type-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         spcCurrentType = btn.dataset.type;
 
-        // Day 3 only exists for categorical outlook
+        // Day 3 only for categorical
         const day3Btn = document.getElementById('spc-day3-btn');
         if (spcCurrentType === 'cat') {
-          day3Btn.disabled = false;
+          if (day3Btn) day3Btn.disabled = false;
         } else {
-          day3Btn.disabled = true;
-          // If Day 3 was selected, switch to Day 1
+          if (day3Btn) day3Btn.disabled = true;
           if (spcCurrentDay === 3) {
             spcCurrentDay = 1;
             document.querySelectorAll('.spc-day-btn').forEach(b => b.classList.remove('active'));
@@ -7557,6 +8057,7 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
         }
 
         updateSpcLegend();
+        updateSpcOverlayBar();
         loadSPCLayer(spcCurrentDay);
         if (broadcastSpcInited) loadBroadcastSpcLayer(spcCurrentDay);
       });
@@ -7567,6 +8068,29 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
   function updateSpcLegend() {
     const legend = document.getElementById('spc-legend');
     if (!legend) return;
+
+    // Inline SVG hatch patterns for legend swatches
+    const hatchSvg1 = `<svg width="28" height="16" xmlns="http://www.w3.org/2000/svg"><rect width="28" height="16" fill="white" stroke="rgba(0,0,0,0.2)" stroke-width="0.5"/><line x1="0" y1="5" x2="5" y2="0" stroke="#000" stroke-width="1.1"/><line x1="0" y1="11" x2="11" y2="0" stroke="#000" stroke-width="1.1"/><line x1="0" y1="17" x2="17" y2="0" stroke="#000" stroke-width="1.1"/><line x1="6" y1="16" x2="16" y2="6" stroke="#000" stroke-width="1.1"/><line x1="12" y1="16" x2="22" y2="6" stroke="#000" stroke-width="1.1"/><line x1="18" y1="16" x2="28" y2="6" stroke="#000" stroke-width="1.1"/></svg>`;
+    const hatchSvg2 = `<svg width="28" height="16" xmlns="http://www.w3.org/2000/svg"><rect width="28" height="16" fill="white" stroke="rgba(0,0,0,0.2)" stroke-width="0.5"/><line x1="0" y1="3" x2="3" y2="0" stroke="#000" stroke-width="1.3"/><line x1="0" y1="7" x2="7" y2="0" stroke="#000" stroke-width="1.3"/><line x1="0" y1="11" x2="11" y2="0" stroke="#000" stroke-width="1.3"/><line x1="0" y1="15" x2="15" y2="0" stroke="#000" stroke-width="1.3"/><line x1="4" y1="16" x2="16" y2="4" stroke="#000" stroke-width="1.3"/><line x1="8" y1="16" x2="20" y2="4" stroke="#000" stroke-width="1.3"/><line x1="12" y1="16" x2="24" y2="4" stroke="#000" stroke-width="1.3"/><line x1="16" y1="16" x2="28" y2="4" stroke="#000" stroke-width="1.3"/><line x1="20" y1="16" x2="28" y2="8" stroke="#000" stroke-width="1.3"/><line x1="24" y1="16" x2="28" y2="12" stroke="#000" stroke-width="1.3"/></svg>`;
+    const hatchSvg3 = `<svg width="28" height="16" xmlns="http://www.w3.org/2000/svg"><rect width="28" height="16" fill="white" stroke="rgba(0,0,0,0.2)" stroke-width="0.5"/><line x1="0" y1="3" x2="3" y2="0" stroke="#000" stroke-width="1.4"/><line x1="0" y1="7" x2="7" y2="0" stroke="#000" stroke-width="1.4"/><line x1="0" y1="11" x2="11" y2="0" stroke="#000" stroke-width="1.4"/><line x1="0" y1="15" x2="15" y2="0" stroke="#000" stroke-width="1.4"/><line x1="4" y1="16" x2="16" y2="4" stroke="#000" stroke-width="1.4"/><line x1="8" y1="16" x2="20" y2="4" stroke="#000" stroke-width="1.4"/><line x1="12" y1="16" x2="24" y2="4" stroke="#000" stroke-width="1.4"/><line x1="16" y1="16" x2="28" y2="4" stroke="#000" stroke-width="1.4"/><line x1="28" y1="3" x2="25" y2="0" stroke="#000" stroke-width="1.4"/><line x1="28" y1="7" x2="21" y2="0" stroke="#000" stroke-width="1.4"/><line x1="28" y1="11" x2="17" y2="0" stroke="#000" stroke-width="1.4"/><line x1="28" y1="15" x2="13" y2="0" stroke="#000" stroke-width="1.4"/><line x1="24" y1="16" x2="12" y2="4" stroke="#000" stroke-width="1.4"/><line x1="20" y1="16" x2="8" y2="4" stroke="#000" stroke-width="1.4"/><line x1="16" y1="16" x2="4" y2="4" stroke="#000" stroke-width="1.4"/><line x1="12" y1="16" x2="0" y2="4" stroke="#000" stroke-width="1.4"/></svg>`;
+
+    const intensityBlock = `
+      <div class="spc-legend-intensity">
+        <div class="spc-legend-intensity-title">Intensity</div>
+        <div class="spc-legend-intensity-row">
+          <div class="spc-legend-intensity-swatch">${hatchSvg1}</div>
+          <span class="spc-legend-intensity-label">1 — Light</span>
+        </div>
+        <div class="spc-legend-intensity-row">
+          <div class="spc-legend-intensity-swatch">${hatchSvg2}</div>
+          <span class="spc-legend-intensity-label">2 — Medium</span>
+        </div>
+        <div class="spc-legend-intensity-row">
+          <div class="spc-legend-intensity-swatch">${hatchSvg3}</div>
+          <span class="spc-legend-intensity-label">3 — Cross-hatch</span>
+        </div>
+      </div>`;
+
     if (spcCurrentType === 'cat') {
       legend.innerHTML = `
         <div class="legend-section-title">⚡ Risk Level</div>
@@ -7579,9 +8103,9 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
       `;
     } else {
       const typeLabel = { torn: '🌪️ Tornado', wind: '💨 Damaging Wind', hail: '🧊 Large Hail' };
-      const subLabel = { torn: 'Significant (EF2+)', wind: 'Significant (75+ mph)', hail: 'Significant (2"+ diameter)' };
+      const sigLabel  = { torn: 'Sig Tornado (EF2+)', wind: 'Sig Wind (75+mph)', hail: 'Sig Hail (2"+)' };
       legend.innerHTML = `
-        <div class="legend-section-title">${typeLabel[spcCurrentType]} Probability</div>
+        <div class="legend-section-title">${typeLabel[spcCurrentType]} Prob.</div>
         <div class="legend-row"><div class="legend-swatch" style="background:#4daf4d;"></div><span class="legend-text">2%</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#8b5a2b;"></div><span class="legend-text">5%</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#f0f04d;"></div><span class="legend-text">10%</span></div>
@@ -7589,7 +8113,50 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
         <div class="legend-row"><div class="legend-swatch" style="background:#e84040;"></div><span class="legend-text">30%</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#ff40ff;"></div><span class="legend-text">45%</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#9400d3;"></div><span class="legend-text">60%</span></div>
-        <div class="legend-row"><div class="legend-swatch" style="background:transparent;border:2px dashed #000;"></div><span class="legend-text">${subLabel[spcCurrentType]}</span></div>
+        <div class="legend-row"><div class="legend-swatch" style="background:transparent;border:1px dashed #666;"></div><span class="legend-text">${sigLabel[spcCurrentType]}</span></div>
+        ${intensityBlock}
+      `;
+    }
+    updateSpcOverlayBar();
+  }
+
+  // Update the SPC broadcast overlay bottom bar to match current type
+  function updateSpcOverlayBar() {
+    const bar = document.getElementById('spc-overlay-bar');
+    if (!bar) return;
+
+    if (spcCurrentType === 'cat') {
+      bar.innerHTML = `
+        <div class="spc-risk-label">RISK</div>
+        <div class="spc-risk-segment marginal">MARGINAL</div>
+        <div class="spc-risk-segment slight">SLIGHT</div>
+        <div class="spc-risk-segment enhanced">ENHANCED</div>
+        <div class="spc-risk-segment moderate">MODERATE</div>
+        <div class="spc-risk-segment high">HIGH</div>
+      `;
+    } else {
+      const labels = {
+        torn: { label: '🌪️ TORNADO', probs: ['2%','5%','10%','15%','30%','45%','60%'],
+                colors: ['#4daf4d','#8b5a2b','#f0f04d','#e8a032','#e84040','#ff40ff','#9400d3'],
+                sig: 'SIG TORN', sigDesc: '10%+ EF2+' },
+        wind: { label: '💨 WIND', probs: ['5%','15%','30%','45%','60%'],
+                colors: ['#4daf4d','#f0f04d','#e8a032','#e84040','#ff40ff'],
+                sig: 'SIG WIND', sigDesc: '10%+ 75mph+' },
+        hail: { label: '🧊 HAIL', probs: ['5%','15%','30%','45%','60%'],
+                colors: ['#4daf4d','#f0f04d','#e8a032','#e84040','#ff40ff'],
+                sig: 'SIG HAIL', sigDesc: '10%+ 2"+' },
+      };
+      const cfg = labels[spcCurrentType];
+      const segments = cfg.probs.map((p, i) =>
+        `<div class="spc-prob-segment" style="background:${cfg.colors[i]};${cfg.colors[i]==='#f0f04d'?'color:#333;':''}">${p}</div>`
+      ).join('');
+      bar.innerHTML = `
+        <div class="spc-risk-label">${cfg.label}</div>
+        ${segments}
+        <div class="spc-sig-segment">
+          <span class="sig-label">${cfg.sig}</span>
+          <span class="sig-desc">${cfg.sigDesc}</span>
+        </div>
       `;
     }
   }
@@ -8235,36 +8802,29 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
     // Global setActiveColor function that updates ALL palettes
     function setActiveColor(color) {
       activeColor = color;
-      
+
       // Update all swatches across all palettes
       document.querySelectorAll('.color-swatch').forEach(s => {
         s.classList.toggle('active', s.dataset.color === color);
       });
-      
-      // Update all tool-specific active colors and custom pickers
-      document.querySelectorAll('.tool-active-color').forEach(el => {
-        el.style.background = color;
-      });
-      document.querySelectorAll('.tool-color-label').forEach(el => {
-        el.textContent = color;
-      });
-      document.querySelectorAll('.tool-custom-picker').forEach(el => {
-        el.value = color;
-      });
-      
+
+      // Update active color indicators and custom pickers
+      document.querySelectorAll('.tool-active-color').forEach(el => el.style.background = color);
+      document.querySelectorAll('.tool-color-label').forEach(el => el.textContent = color);
+      document.querySelectorAll('.tool-custom-picker').forEach(el => el.value = color);
+
       // Update draw control colors
       if (drawControl && map) {
         map.removeControl(drawControl);
         drawControl.setDrawingOptions({
-          polygon:  { shapeOptions: { color: color, fillColor: color, fillOpacity: 0.35, weight: 2 } },
-          rectangle:{ shapeOptions: { color: color, fillColor: color, fillOpacity: 0.35, weight: 2 } },
-          circle:   { shapeOptions: { color: color, fillColor: color, fillOpacity: 0.35, weight: 2 } },
-          polyline: { shapeOptions: { color: color, weight: 3 } },
+          polygon:  { shapeOptions: { color, fillColor: color, fillOpacity: 0.35, weight: 2 } },
+          rectangle:{ shapeOptions: { color, fillColor: color, fillOpacity: 0.35, weight: 2 } },
+          circle:   { shapeOptions: { color, fillColor: color, fillOpacity: 0.35, weight: 2 } },
+          polyline: { shapeOptions: { color, weight: 3 } },
         });
         map.addControl(drawControl);
       }
-      
-      // Update arrow color
+
       arrowColor = color;
     }
 
@@ -8279,6 +8839,7 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
 
     // Initialize with default color
     setActiveColor(activeColor);
+
   }
 
   // Freehand drawing system
@@ -8348,18 +8909,22 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
       
       let shape;
       if (fillEnabled) {
-        // Create filled polygon
+        // Create filled polygon — SIG hatch uses dashed black border, transparent fill
+        const isHatch = window._freehandHatchOn?.() === true;
         shape = L.polygon(freehandPoints, {
-          color: activeColor,
-          fillColor: activeColor,
-          fillOpacity: opacity,
-          weight: strokeWidth
+          color: isHatch ? '#000000' : activeColor,
+          fillColor: isHatch ? 'transparent' : activeColor,
+          fillOpacity: isHatch ? 0 : opacity,
+          weight: isHatch ? 2.5 : strokeWidth,
+          dashArray: isHatch ? '8,5' : null,
         }).addTo(drawnItems);
       } else {
         // Create unfilled polyline (stroke only)
+        const isHatch = window._freehandHatchOn?.() === true;
         shape = L.polyline(freehandPoints, {
-          color: activeColor,
-          weight: strokeWidth,
+          color: isHatch ? '#000000' : activeColor,
+          weight: isHatch ? 2.5 : strokeWidth,
+          dashArray: isHatch ? '8,5' : null,
           opacity: 1
         }).addTo(drawnItems);
       }
@@ -8452,6 +9017,158 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
       freehandDrawing = false;
       freehandPoints = [];
     }
+  }
+
+
+  // ── SIG HATCH DRAW TOOL ───────────────────────────────────────────────
+  let sigHatchActive = false;
+  let sigHatchDrawing = false;
+  let sigHatchPoints = [];
+  let sigHatchPolyline = null;
+  let sigHatchIntensity = 1; // 1, 2, or 3
+
+  function setSigHatchMode(active) {
+    sigHatchActive = active;
+    const mapContainer = map.getContainer();
+    if (active) {
+      mapContainer.style.cursor = 'crosshair';
+    } else {
+      mapContainer.style.cursor = '';
+      if (sigHatchPolyline) { map.removeLayer(sigHatchPolyline); sigHatchPolyline = null; }
+      sigHatchDrawing = false;
+      sigHatchPoints = [];
+    }
+  }
+
+  function initSigHatchDraw() {
+    const mapContainer = map.getContainer();
+
+    // Intensity button wiring
+    document.querySelectorAll('.hatch-intensity-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.hatch-intensity-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        sigHatchIntensity = parseInt(btn.dataset.intensity);
+      });
+    });
+
+    // Mouse events — disable map drag while drawing
+    mapContainer.addEventListener('mousedown', (e) => {
+      if (!sigHatchActive || !editMode || e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      map.dragging.disable();
+      sigHatchDrawing = true;
+
+      const pt = map.mouseEventToLatLng(e);
+      sigHatchPoints = [pt];
+
+      sigHatchPolyline = L.polyline(sigHatchPoints, {
+        color: '#000', weight: 1.8, opacity: 0.8, dashArray: '5,3',
+      }).addTo(map);
+    });
+
+    mapContainer.addEventListener('mousemove', (e) => {
+      if (!sigHatchDrawing || !sigHatchActive) return;
+      e.preventDefault();
+      const pt = map.mouseEventToLatLng(e);
+      sigHatchPoints.push(pt);
+      if (sigHatchPolyline) sigHatchPolyline.setLatLngs(sigHatchPoints);
+    });
+
+    mapContainer.addEventListener('mouseup', (e) => {
+      if (!sigHatchDrawing || !sigHatchActive) return;
+      e.preventDefault();
+      sigHatchDrawing = false;
+      map.dragging.enable();
+
+      if (sigHatchPolyline) { map.removeLayer(sigHatchPolyline); sigHatchPolyline = null; }
+
+      if (sigHatchPoints.length < 3) { sigHatchPoints = []; return; }
+
+      // Close shape
+      sigHatchPoints.push(sigHatchPoints[0]);
+
+      const patternId = `hatch-${sigHatchIntensity}`;
+      const poly = L.polygon(sigHatchPoints, {
+        color: '#000000',
+        weight: 1.8,
+        fillColor: `url(#${patternId})`,
+        fillOpacity: 1,
+        className: `sig-hatch-poly sig-hatch-intensity-${sigHatchIntensity}`,
+      }).addTo(drawnItems);
+
+      if (!poly.feature) poly.feature = { type: 'Feature', properties: {} };
+      poly.feature.properties.isSigHatch = true;
+      poly.feature.properties.hatchIntensity = sigHatchIntensity;
+      poly.feature.properties.color = '#000000';
+
+      // Apply SVG fill pattern after DOM is ready
+      requestAnimationFrame(() => {
+        const paths = poly.getElement?.()?.querySelectorAll('path');
+        paths?.forEach(p => { p.style.fill = `url(#${patternId})`; p.style.fillOpacity = '1'; });
+      });
+
+      pushUndo({ type: 'draw-shape', layer: poly });
+      saveDrawings();
+      sigHatchPoints = [];
+      showToast(`SIG hatch (intensity ${sigHatchIntensity}) drawn`);
+    });
+
+    // Touch support
+    mapContainer.addEventListener('touchstart', (e) => {
+      if (!sigHatchActive || !editMode) return;
+      e.preventDefault();
+      map.dragging.disable();
+      sigHatchDrawing = true;
+      const touch = e.touches[0];
+      sigHatchPoints = [map.mouseEventToLatLng(touch)];
+      sigHatchPolyline = L.polyline(sigHatchPoints, {
+        color: '#000', weight: 1.8, opacity: 0.8, dashArray: '5,3',
+      }).addTo(map);
+    }, { passive: false });
+
+    mapContainer.addEventListener('touchmove', (e) => {
+      if (!sigHatchDrawing || !sigHatchActive) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      sigHatchPoints.push(map.mouseEventToLatLng(touch));
+      if (sigHatchPolyline) sigHatchPolyline.setLatLngs(sigHatchPoints);
+    }, { passive: false });
+
+    mapContainer.addEventListener('touchend', (e) => {
+      if (!sigHatchDrawing || !sigHatchActive) return;
+      e.preventDefault();
+      sigHatchDrawing = false;
+      map.dragging.enable();
+
+      if (sigHatchPolyline) { map.removeLayer(sigHatchPolyline); sigHatchPolyline = null; }
+      if (sigHatchPoints.length < 3) { sigHatchPoints = []; return; }
+
+      sigHatchPoints.push(sigHatchPoints[0]);
+      const patternId = `hatch-${sigHatchIntensity}`;
+      const poly = L.polygon(sigHatchPoints, {
+        color: '#000000', weight: 1.8,
+        fillColor: `url(#${patternId})`, fillOpacity: 1,
+        className: `sig-hatch-poly sig-hatch-intensity-${sigHatchIntensity}`,
+      }).addTo(drawnItems);
+
+      if (!poly.feature) poly.feature = { type: 'Feature', properties: {} };
+      poly.feature.properties.isSigHatch = true;
+      poly.feature.properties.hatchIntensity = sigHatchIntensity;
+      poly.feature.properties.color = '#000000';
+
+      requestAnimationFrame(() => {
+        const paths = poly.getElement?.()?.querySelectorAll('path');
+        paths?.forEach(p => { p.style.fill = `url(#${patternId})`; p.style.fillOpacity = '1'; });
+      });
+
+      pushUndo({ type: 'draw-shape', layer: poly });
+      saveDrawings();
+      sigHatchPoints = [];
+      showToast(`SIG hatch (intensity ${sigHatchIntensity}) drawn`);
+    });
   }
 
 
@@ -8735,7 +9452,10 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
           onEachFeature: (f, layer) => {
             layer.bindPopup(`<strong style="color:${f.properties.color||'#4daf4d'}">${f.properties.label||'Risk Zone'} Risk</strong>`);
             drawnItems.addLayer(layer);
-            if (layer instanceof L.Circle) attachCircleContextMenu(layer);
+            if (layer instanceof L.Circle) {
+              attachCircleContextMenu(layer);
+              attachCircleDrag(layer);
+            }
           }
         });
       }
@@ -8836,7 +9556,46 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
     });
   }
 
-  // ── CIRCLE RESIZE ─────────────────────────────────────────────────────
+  // ── CIRCLE DRAG (edit mode only) ──────────────────────────────────────
+  function attachCircleDrag(circle) {
+    let dragging = false;
+    let startLatLng = null;
+    let startCenter = null;
+
+    circle.on('mousedown', (e) => {
+      if (!editMode) return;
+      // Don't start drag if resize is active
+      if (_circleResizeActive) return;
+      L.DomEvent.stopPropagation(e);
+      dragging = true;
+      startLatLng = e.latlng;
+      startCenter = circle.getLatLng();
+      map.dragging.disable();
+      map.getContainer().style.cursor = 'grabbing';
+
+      const onMove = (e) => {
+        if (!dragging) return;
+        const dlat = e.latlng.lat - startLatLng.lat;
+        const dlng = e.latlng.lng - startLatLng.lng;
+        circle.setLatLng([startCenter.lat + dlat, startCenter.lng + dlng]);
+      };
+
+      const onUp = () => {
+        if (!dragging) return;
+        dragging = false;
+        map.dragging.enable();
+        map.getContainer().style.cursor = '';
+        map.off('mousemove', onMove);
+        map.off('mouseup', onUp);
+        saveDrawings();
+      };
+
+      map.on('mousemove', onMove);
+      map.on('mouseup', onUp);
+    });
+  }
+
+  let _circleResizeActive = false;
   let _circleMenu = null;
   let _circleTarget = null;
 
@@ -8898,9 +9657,9 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
   }
 
   function _startCircleResize(circle) {
+    _circleResizeActive = true;
     map.getContainer().style.cursor = 'ew-resize';
     map.dragging.disable();
-    // Temporarily disable popup so it doesn't fire on the confirmation click
     circle.unbindPopup();
     showToast('Move cursor to resize — click to confirm');
     const center = circle.getLatLng();
@@ -8914,8 +9673,8 @@ minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
       map.off('click', onConfirm);
       map.dragging.enable();
       map.getContainer().style.cursor = '';
-      // Restore popup
       circle.bindPopup(`<strong style="color:${originalColor}">${originalLabel} Risk</strong>`);
+      _circleResizeActive = false;
       saveDrawings();
       showToast('Circle resized!');
     }
