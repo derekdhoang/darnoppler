@@ -20,6 +20,28 @@
   <div class="bg-overlay" id="bg-overlay"></div>
 </div>
 
+<!-- SIDEBAR NAV -->
+<nav class="side-nav" id="side-nav" aria-label="Page sections">
+  <ul class="side-nav-list">
+    <li class="side-nav-item active" data-target="section-today">
+      <span class="side-nav-label">Today</span>
+      <div class="side-nav-dot"></div>
+    </li>
+    <li class="side-nav-item" data-target="section-hourly">
+      <span class="side-nav-label">Hourly</span>
+      <div class="side-nav-dot"></div>
+    </li>
+    <li class="side-nav-item" data-target="section-forecast">
+      <span class="side-nav-label">7-Day</span>
+      <div class="side-nav-dot"></div>
+    </li>
+    <li class="side-nav-item" data-target="section-radar">
+      <span class="side-nav-label">Radar</span>
+      <div class="side-nav-dot"></div>
+    </li>
+  </ul>
+</nav>
+
   <div class="app">
 
     <!-- LOGO -->
@@ -44,6 +66,7 @@
 
       <!-- WEATHER CARD -->
       <div class="weather-card" id="weather-card">
+        <div class="weather-card" id="section-today"></div>
         <div class="weather-date-bar" id="weather-date-bar">--</div>
         <div class="holiday-bar" id="holiday-bar" hidden></div>
 
@@ -120,6 +143,7 @@
 
       <!-- EXPAND PANEL -->
       <div class="expand-panel" id="expand-panel">
+        <div class="expand-panel" id="section-hourly"></div>
         <div class="expand-inner">
           <div class="period-labels" id="period-labels">
             <div class="period-item">
@@ -154,6 +178,7 @@
 
       <!-- 6-DAY FORECAST GRID -->
       <div class="forecast-grid" id="forecast-grid"></div>
+        <div class="forecast-grid" id="section-forecast"></div>
 
       <!-- SPC SEVERE WEATHER OUTLOOK — Iowa active risk only -->
       <div class="spc-panel" id="spc-panel" hidden>
@@ -176,6 +201,7 @@
 
       <!-- RADAR PANEL — tabs: Radar | SPC Outlook -->
       <div class="radar-panel" id="radar-panel">
+        <div class="radar-panel" id="section-radar"></div>
 
         <!-- Tab bar -->
         <div class="radar-tab-bar">

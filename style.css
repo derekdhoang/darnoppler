@@ -1458,3 +1458,88 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
+
+/* ============================================
+   SIDEBAR NAV — Phase 3
+   ============================================ */
+
+.side-nav {
+  position: fixed;
+  left: 24px;
+  top: 38%;
+  transform: translateY(-50%);
+  z-index: 100;
+  pointer-events: all;
+  background: rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  padding: 14px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.side-nav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.side-nav-item {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+  width: 100%;
+}
+
+.side-nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.side-nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  transition: background 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.side-nav-item:hover .side-nav-dot {
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(1.15);
+}
+
+.side-nav-item.active .side-nav-dot {
+  background: #ffffff;
+  border-color: #ffffff;
+  transform: scale(1.25);
+}
+
+.side-nav-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+  padding-bottom: 1px;
+  border-bottom: 1px solid transparent;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.side-nav-item:hover .side-nav-label {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.side-nav-item.active .side-nav-label {
+  color: rgba(255, 255, 255, 1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+}
