@@ -4088,6 +4088,53 @@
             </div>
 
             <div class="panel-section">
+              <div class="panel-section-title">Radar History</div>
+
+              <!-- Toggle -->
+              <div class="filter-row">
+                <span class="filter-label">Show Loop</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="mrms-loop-toggle">
+                  <div class="toggle-track"></div>
+                  <div class="toggle-thumb"></div>
+                </label>
+              </div>
+
+              <!-- Frame time display -->
+              <div class="future-radar-info" id="mrms-loop-info" hidden>
+                <div class="forecast-time" id="mrms-loop-time-label">Loading…</div>
+                <div class="forecast-source">
+                  <span id="mrms-loop-source-label">MRMS · —</span>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <div class="forecast-controls" id="mrms-loop-controls" hidden>
+                <button class="forecast-nav-btn" id="mrms-prev-btn" title="Previous frame" type="button">⏮</button>
+                <button class="forecast-play-btn" id="mrms-play-btn" title="Play/Pause" type="button">▶</button>
+                <button class="forecast-nav-btn" id="mrms-next-btn" title="Next frame" type="button">⏭</button>
+                <span class="opacity-value forecast-hour" id="mrms-frame-label">0/0</span>
+              </div>
+
+              <!-- Slider -->
+              <div class="forecast-slider-block" id="mrms-slider-block" hidden>
+                <div class="forecast-slider-track">
+                  <input type="range" class="forecast-slider" id="mrms-slider" min="0" max="0" value="0" step="1">
+                </div>
+                <div class="forecast-tick-labels">
+                  <span id="mrms-slider-oldest">—</span>
+                  <span id="mrms-slider-latest">Now</span>
+                </div>
+              </div>
+
+              <!-- Loading -->
+              <div class="forecast-loading" id="mrms-loop-loading" hidden>
+                <span class="forecast-loading-dot"></span>
+                <span>Loading frame…</span>
+              </div>
+            </div>
+
+            <div class="panel-section">
               <div class="panel-section-title">Broadcast Overlay</div>
               <div class="filter-row">
                 <span class="filter-label">Radar Broadcast</span>
@@ -5004,6 +5051,159 @@
   const STORAGE_KEY      = 'darnoppler-radar-drawings';
   const TEXT_STORAGE_KEY = 'darnoppler-radar-text-labels';
   const IOWA_FIPS        = '19';
+
+  // ── MRMS HISTORY LOOP ────────────────────────────────────────────
+    let mrmsFrames        = [];
+    let mrmsFrameIndex    = 0;
+    let mrmsLoopActive    = false;
+    let mrmsLoopLayer     = null;
+    let mrmsPlayInterval  = null;
+
+    const mrmsLoopToggle  = document.getElementById('mrms-loop-toggle');
+    const mrmsLoopInfo    = document.getElementById('mrms-loop-info');
+    const mrmsLoopControls = document.getElementById('mrms-loop-controls');
+    const mrmsLoopLoading = document.getElementById('mrms-loop-loading');
+    const mrmsTimeLabel   = document.getElementById('mrms-loop-time-label');
+    const mrmsSourceLabel = document.getElementById('mrms-loop-source-label');
+    const mrmsFrameLabel  = document.getElementById('mrms-frame-label');
+    const mrmsPlayBtn     = document.getElementById('mrms-play-btn');
+    const mrmsPrevBtn     = document.getElementById('mrms-prev-btn');
+    const mrmsNextBtn     = document.getElementById('mrms-next-btn');
+    const mrmsSliderBlock = document.getElementById('mrms-slider-block');
+    const mrmsSlider      = document.getElementById('mrms-slider');
+    const mrmsSliderOldest = document.getElementById('mrms-slider-oldest');
+    const mrmsSliderLatest = document.getElementById('mrms-slider-latest');
+
+    function formatMrmsTimestamp(ts) {
+      // '20260516-062437' → '6:24 AM CDT'
+      const y = ts.slice(0,4), mo = ts.slice(4,6), d = ts.slice(6,8);
+      const h = ts.slice(9,11), mi = ts.slice(11,13), s = ts.slice(13,15);
+      const dt = new Date(`${y}-${mo}-${d}T${h}:${mi}:${s}Z`);
+      return dt.toLocaleTimeString('en-US', {
+        hour: 'numeric', minute: '2-digit', timeZoneName: 'short'
+      });
+    }
+
+    function showMrmsFrame(index) {
+      if (!mrmsFrames.length || !map) return;
+      mrmsFrameIndex = Math.max(0, Math.min(index, mrmsFrames.length - 1));
+      const ts = mrmsFrames[mrmsFrameIndex];
+
+      if (mrmsLoopLayer) { map.removeLayer(mrmsLoopLayer); mrmsLoopLayer = null; }
+
+      mrmsLoopLoading.hidden = false;
+      mrmsLoopLayer = L.tileLayer(
+        `${MRMS_PROXY_URL}/tiles/${ts}/{z}/{x}/{y}.png`,
+        { opacity: opacityLevel, attribution: 'MRMS · NOAA', zIndex: 200 }
+      ).addTo(map);
+
+      setTimeout(() => { mrmsLoopLoading.hidden = true; }, 1500);
+
+      mrmsTimeLabel.textContent = formatMrmsTimestamp(ts);
+      mrmsSourceLabel.textContent = `MRMS · frame ${mrmsFrameIndex + 1}/${mrmsFrames.length}`;
+      mrmsFrameLabel.textContent  = `${mrmsFrameIndex + 1}/${mrmsFrames.length}`;
+
+      mrmsPrevBtn.disabled = mrmsFrameIndex <= 0;
+      mrmsNextBtn.disabled = mrmsFrameIndex >= mrmsFrames.length - 1;
+      if (mrmsSlider) mrmsSlider.value = mrmsFrameIndex;
+    }
+
+    function startMrmsPlayback() {
+      if (mrmsPlayInterval) return;
+      mrmsPlayBtn.textContent = '⏸';
+      mrmsPlayBtn.classList.add('playing');
+      mrmsPlayInterval = setInterval(() => {
+        let next = mrmsFrameIndex + 1;
+        if (next >= mrmsFrames.length) next = 0;
+        showMrmsFrame(next);
+      }, 1200);
+    }
+
+    function stopMrmsPlayback() {
+      if (mrmsPlayInterval) {
+        clearInterval(mrmsPlayInterval);
+        mrmsPlayInterval = null;
+      }
+      mrmsPlayBtn.textContent = '▶';
+      mrmsPlayBtn.classList.remove('playing');
+    }
+
+    async function toggleMrmsLoop(enabled) {
+      mrmsLoopActive = enabled;
+
+      if (enabled) {
+        // Fetch frame inventory
+        try {
+          const res = await fetch(`${MRMS_PROXY_URL}/latest`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const { frames } = await res.json();
+          mrmsFrames = frames || [];
+        } catch (err) {
+          console.error('MRMS loop fetch failed:', err);
+          mrmsLoopToggle.checked = false;
+          mrmsLoopActive = false;
+          return;
+        }
+
+        if (!mrmsFrames.length) {
+          mrmsLoopToggle.checked = false;
+          mrmsLoopActive = false;
+          return;
+        }
+
+        // Hide live MRMS layer
+        if (radarLayer) map.removeLayer(radarLayer);
+
+        mrmsLoopInfo.hidden     = false;
+        mrmsLoopControls.hidden = false;
+        mrmsSliderBlock.hidden  = false;
+
+        // Set slider range
+        mrmsSlider.max   = mrmsFrames.length - 1;
+        mrmsSlider.value = 0;
+        mrmsSliderOldest.textContent = formatMrmsTimestamp(mrmsFrames[0]);
+        mrmsSliderLatest.textContent = 'Now';
+
+        // Start at oldest frame
+        showMrmsFrame(0);
+        startMrmsPlayback();
+
+      } else {
+        stopMrmsPlayback();
+
+        if (mrmsLoopLayer) { map.removeLayer(mrmsLoopLayer); mrmsLoopLayer = null; }
+
+        mrmsLoopInfo.hidden     = true;
+        mrmsLoopControls.hidden = true;
+        mrmsLoopLoading.hidden  = true;
+        mrmsSliderBlock.hidden  = true;
+
+        // Restore live MRMS
+        await loadRadar();
+      }
+    }
+
+    mrmsLoopToggle.addEventListener('change', (e) => toggleMrmsLoop(e.target.checked));
+    mrmsSlider.addEventListener('input', () => {
+      if (!mrmsLoopActive) return;
+      stopMrmsPlayback();
+      showMrmsFrame(parseInt(mrmsSlider.value));
+    });
+    mrmsPlayBtn.addEventListener('click', () => {
+      if (!mrmsLoopActive) return;
+      if (mrmsPlayInterval) stopMrmsPlayback();
+      else startMrmsPlayback();
+    });
+    mrmsPrevBtn.addEventListener('click', () => {
+      if (!mrmsLoopActive) return;
+      stopMrmsPlayback();
+      showMrmsFrame(mrmsFrameIndex - 1);
+    });
+    mrmsNextBtn.addEventListener('click', () => {
+      if (!mrmsLoopActive) return;
+      stopMrmsPlayback();
+      showMrmsFrame(mrmsFrameIndex + 1);
+    });
 
   // Map tile layers
   const MAP_LAYERS = {
@@ -8600,14 +8800,12 @@
           map.removeLayer(futureRadarLayer);
           futureRadarLayer = null;
         }
-        if (radarLayer) radarLayer.addTo(map);
- 
         futureInfo.hidden = true;
         futureControls.hidden = true;
         sliderBlock.hidden = true;
         loadingEl.hidden = true;
- 
-        loadRadar();
+
+        await loadRadar();
       }
     }
  
