@@ -72,6 +72,13 @@ function initSideNav() {
   });
 
   window.addEventListener('scroll', updateActiveDot, { passive: true });
+  // Fade sidebar when scrolled into dashboard
+  const sideNav = document.getElementById('side-nav');
+  window.addEventListener('scroll', () => {
+    if (!sideNav) return;
+    const scrolled = window.scrollY > window.innerHeight * 0.6;
+    sideNav.classList.toggle('hidden', scrolled);
+  }, { passive: true });
   updateActiveDot();
 }
 
@@ -81,13 +88,10 @@ initSideNav();
 const cityInput           = document.getElementById('city-input');
 const searchBtn           = document.getElementById('search-btn');
 const suggestionsDropdown = document.getElementById('suggestions-dropdown');
-const screenshotPanel     = document.getElementById('screenshot-panel');
-const forecastGrid        = document.getElementById('forecast-grid');
 const errorMessage        = document.getElementById('error-message');
 const cityNameEl          = document.getElementById('city-name');
 const weatherDesc         = document.getElementById('weather-desc');
 const weatherIcon         = document.getElementById('weather-icon');
-const weatherScene        = document.getElementById('weather-scene');
 const weatherDateBar      = document.getElementById('weather-date-bar');
 const holidayBar          = document.getElementById('holiday-bar');
 const temperature         = document.getElementById('temperature');
@@ -99,20 +103,20 @@ const visibility          = document.getElementById('visibility');
 const dewPoint            = document.getElementById('dew-point');
 const todayHigh           = document.getElementById('today-high');
 const todayLow            = document.getElementById('today-low');
-const expandPanel         = document.getElementById('expand-panel');
-const weatherCard         = document.getElementById('weather-card');
+const sunrise             = document.getElementById('sunrise');
+const sunset              = document.getElementById('sunset');
+const expandPanel         = document.getElementById('section-hourly');
+const forecastGrid        = document.getElementById('forecast-grid');
 const spcPanel            = document.getElementById('spc-panel');
 const spcBadge            = document.getElementById('spc-badge');
 const spcRiskLabel        = document.getElementById('spc-risk-label');
 const spcDescription      = document.getElementById('spc-description');
 const radarPanelTimestamp = document.getElementById('radar-panel-timestamp');
-const radarPanel          = document.getElementById('radar-panel');
 const tempPrecipHint      = document.getElementById('temp-precip-hint');
 const periodMorn          = document.getElementById('period-morn');
 const periodAftn          = document.getElementById('period-aftn');
 const periodEve           = document.getElementById('period-eve');
 const periodNight         = document.getElementById('period-night');
-
 
 // ── API ENDPOINTS ─────────────────────────────────────────────────────
 const GEO_URL    = 'https://geocoding-api.open-meteo.com/v1/search';
@@ -263,6 +267,7 @@ function debounce(func, delay) {
 // ── RECENT SEARCHES ───────────────────────────────────────────────────
 // Stores lat/lon — clicking a recent search bypasses geocoding entirely.
 function saveRecentSearch(city, state, country, lat, lon) {
+  if (!city || city.trim().toLowerCase() === 'iowa city') return;
   const label = state ? `${city}, ${state}, ${country}` : `${city}, ${country}`;
   let recents = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
   recents = recents.filter(r => r.label !== label);
@@ -427,15 +432,12 @@ async function fetchWeather(lat, lon, city, state, country) {
       });
     }
 
-    screenshotPanel.hidden = false;
     cityInput.value = '';
 
     // Check if location is in USA
     const isUSA = country === 'United States' || country === 'USA' || country === 'US';
     
     if (isUSA) {
-      // Show radar panel for US locations
-      radarPanel.hidden = false;
       initRadarPreview();
       updatePreviewCityMarker(city, lat, lon);
       loadDrawingsOntoPreview();
@@ -446,13 +448,13 @@ async function fetchWeather(lat, lon, city, state, country) {
         spcPanel.hidden = true;
       }
     } else {
-      // Hide radar and SPC panels for non-US locations
-      radarPanel.hidden = true;
       spcPanel.hidden = true;
     }
 
   } catch (err) {
-    errorMessage.textContent = err.message || 'Something went wrong. Please try again.';
+    if (err.message && !err.message.includes('404') && !err.message.includes('tiles')) {
+      errorMessage.textContent = err.message || 'Something went wrong. Please try again.';
+    }
   } finally {
     searchBtn.textContent = 'Search';
     searchBtn.disabled = false;
@@ -502,7 +504,6 @@ function renderCurrent(current, today, hourlyData, city, state, country, lat, lo
   const iconPath = getIconPath(icon);
   const desc     = current.summary || getIconDescription(icon);
 
-  weatherScene.innerHTML  = `<img src="${iconPath}" alt="${desc}">`;
   cityNameEl.textContent  = state ? `${city}, ${state}, ${country}` : `${city}, ${country}`;
   weatherDesc.textContent = desc;
   weatherIcon.innerHTML   = `<img src="${iconPath}" alt="${desc}">`;
@@ -1046,8 +1047,10 @@ function initRadarPreview() {
 
   previewMap = L.map('radar-preview-map', {
     center:          [41.878, -93.097],
-    zoom:            5,
-    zoomControl:     false,
+    zoom:            8,
+    minZoom:         6,
+    maxZoom:         8,
+    zoomControl:     true,
     scrollWheelZoom: true,
     dragging:        true,
     doubleClickZoom: true,
@@ -1077,12 +1080,6 @@ function initRadarPreview() {
   loadPreviewStateBoundaries();
   refreshRadarPreview();
   loadDrawingsOntoPreview();
-
-  previewMap.on('zoomend', () => {
-    if (!previewRadar) return;
-    const z = previewMap.getZoom();
-    previewRadar.setOpacity(z <= 6 ? 1 : z <= 8 ? 0.75 : z <= 10 ? 0.45 : 0.25);
-  });
 }
 
 async function loadPreviewStateBoundaries() {
