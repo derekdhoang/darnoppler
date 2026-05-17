@@ -184,24 +184,24 @@
           <span class="detail-value" id="today-high">--</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Today's Low</span>
-          <span class="detail-value" id="today-low">--</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Visibility</span>
-          <span class="detail-value" id="visibility">--</span>
+          <span class="detail-label">Sunrise</span>
+          <span class="detail-value" id="sunrise">--</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Dew Point</span>
           <span class="detail-value" id="dew-point">--</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Sunrise</span>
-          <span class="detail-value" id="sunrise">--</span>
+          <span class="detail-label">Today's Low</span>
+          <span class="detail-value" id="today-low">--</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Sunset</span>
           <span class="detail-value" id="sunset">--</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Visibility</span>
+          <span class="detail-value" id="visibility">--</span>
         </div>
       </div>
     </div>
@@ -240,7 +240,26 @@
         </div>
       </div>
       <div class="radar-view" id="radar-view">
-        <div id="radar-preview-map"></div>
+        <div id="radar-preview-map">
+          <div class="radar-control-pill" id="radar-control-pill">
+            <button class="radar-play-btn" id="radar-play-btn" aria-label="Play radar animation">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <polygon id="play-icon" points="3,1 14,8 3,15" fill="white"/>
+                <g id="pause-icon" style="display:none;">
+                  <rect x="2" y="1" width="4" height="14" rx="1.5" fill="white"/>
+                  <rect x="10" y="1" width="4" height="14" rx="1.5" fill="white"/>
+                </g>
+              </svg>
+            </button>
+            <div class="radar-timeline-wrap" id="radar-timeline-wrap">
+              <div class="radar-timeline-track">
+                <div class="radar-timeline-fill" id="radar-timeline-fill"></div>
+                <div class="radar-timeline-thumb" id="radar-timeline-thumb"></div>
+              </div>
+            </div>
+            <span class="radar-timestamp-pill" id="radar-timestamp-pill">--:-- --</span>
+          </div>
+        </div>
         <div class="radar-color-key">
           <span class="radar-key-label">Reflectivity:</span>
           <div class="radar-key-swatches">

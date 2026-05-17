@@ -95,7 +95,7 @@ const WEATHER_PROXY_URL = 'https://weather-proxy.derekdhoang.workers.dev';
 
 // ── CONSTANTS ─────────────────────────────────────────────────────────
 const RECENT_KEY  = 'darnoppler-recent-searches';
-const RECENT_MAX  = 5;
+const RECENT_MAX  = 4;
 const STORAGE_KEY = 'darnoppler-radar-drawings';
 
 const IOWA_BOUNDS = {
@@ -236,8 +236,9 @@ function debounce(func, delay) {
 
 // ── RECENT SEARCHES ───────────────────────────────────────────────────
 // Stores lat/lon — clicking a recent search bypasses geocoding entirely.
-function saveRecentSearch(city, state, country, lat, lon) {
-  if (!city || city.trim().toLowerCase() === 'iowa city') return;
+function saveRecentSearch(city, state, country, lat, lon, isDefault = false) {
+  if (!city) return;
+  if (isDefault && city.trim().toLowerCase() === 'iowa city') return;
   const label = state ? `${city}, ${state}, ${country}` : `${city}, ${country}`;
   let recents = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
   recents = recents.filter(r => r.label !== label);
@@ -277,7 +278,7 @@ function showRecentSearches() {
     item.className = 'suggestion-item';
     item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding-right:4px;';
     item.innerHTML = `
-      <span style="flex:1;cursor:pointer;">🕐 ${recent.label}</span>
+      <span style="flex:1;cursor:pointer;">${recent.label}</span>
       <button class="remove-recent-btn" style="background:none;border:none;
         color:rgba(255,255,255,0.25);font-size:0.8rem;cursor:pointer;
         padding:4px 8px;flex-shrink:0;border-radius:50%;width:26px;height:26px;
@@ -304,9 +305,11 @@ function showRecentSearches() {
     xBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       let r2 = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
-      r2.splice(idx, 1);
+      r2 = r2.filter(r => r.label !== recent.label);
       localStorage.setItem(RECENT_KEY, JSON.stringify(r2));
-      showRecentSearches();
+      item.remove();
+      const remaining = suggestionsDropdown.querySelectorAll('.suggestion-item');
+      if (!remaining.length) hideSuggestions();
     });
 
     suggestionsDropdown.appendChild(item);
@@ -460,7 +463,7 @@ function renderCurrent(current, today, hourlyData, city, state, country, lat, lo
   }).toUpperCase();
 
   localStorage.setItem('lastCity', city);
-  saveRecentSearch(city, state, country, lat, lon);
+  saveRecentSearch(city, state, country, lat, lon, true);
 
   const todayHoliday = getHoliday(new Date());
   if (todayHoliday) {
