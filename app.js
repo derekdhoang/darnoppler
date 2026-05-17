@@ -1027,6 +1027,8 @@ function initRadarPreview() {
     dragging:        true,
     doubleClickZoom: true,
     keyboard:        false,
+    maxBounds:       [[24.0, -130.0], [50.0, -60.0]],
+    maxBoundsViscosity: 1.0,
   });
 
   // Base map — always dark
@@ -1414,13 +1416,15 @@ function initSPCOutlookMap() {
   }
 
   spcOutlookMap = L.map('spc-outlook-map', {
-    center: [38.5, -96.0],
-    zoom: 5,
-    minZoom: 5,
-    maxZoom: 7,
-    zoomControl: false,
-    scrollWheelZoom: true,
-    dragging: true,
+    center:          [38.5, -96.0],
+    zoom:            5,
+    minZoom:         5,
+    maxZoom:         7,
+    zoomControl:     false,
+    scrollWheelZoom: false,
+    dragging:        false,
+    doubleClickZoom: false,
+    keyboard:        false,
     attributionControl: true,
   });
 
