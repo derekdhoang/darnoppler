@@ -1010,7 +1010,6 @@ async function fetchSPCOutlook(lat, lon) {
 
 const MRMS_PROXY_URL = 'https://mrms-proxy.derekdhoang.workers.dev';
 
-// ── RADAR PREVIEW MAP — NOAA WMS ──────────────────────────────────────
 function initRadarPreview() {
   if (previewMap) {
     refreshRadarPreview();
@@ -1030,30 +1029,19 @@ function initRadarPreview() {
     keyboard:        false,
   });
 
-  // Base map — switches with time of day
-  const isNightMode = getTimeOfDay(getIowaHour()) === 'night';
-  const mapBg = isNightMode ? '#0a1628' : '#f0f0f0';
-  document.getElementById('radar-preview-map').style.background = mapBg;
-
+  // Base map — always dark
+  document.getElementById('radar-preview-map').style.background = '#0a1628';
   const spcMap = document.getElementById('spc-outlook-map');
-  if (spcMap) spcMap.style.background = mapBg;
-  const baseMapUrl = isNightMode
-    ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
+  if (spcMap) spcMap.style.background = '#0a1628';
 
-  const labelUrl = isNightMode
-    ? 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png';
-
-  L.tileLayer(baseMapUrl, {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
     maxZoom: 19, opacity: 1, zIndex: 1
   }).addTo(previewMap);
 
-  L.tileLayer(labelUrl, {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
     attribution: '', maxZoom: 19, opacity: 1, zIndex: 450
   }).addTo(previewMap);
-  
 
   loadPreviewStateBoundaries();
   refreshRadarPreview();
@@ -1291,23 +1279,13 @@ function initSPCOutlookMap() {
     attributionControl: true,
   });
 
- // SPC Base map — switches with time of day
-  const spcNightMode = getTimeOfDay(getIowaHour()) === 'night';
-
-  const spcBaseUrl = spcNightMode
-    ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
-
-  const spcLabelUrl = spcNightMode
-    ? 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png';
-
-  L.tileLayer(spcBaseUrl, {
+  // SPC Base map — always dark
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
     maxZoom: 19, opacity: 1
   }).addTo(spcOutlookMap);
 
-  L.tileLayer(spcLabelUrl, {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
     attribution: '', maxZoom: 19, opacity: 1, zIndex: 450
   }).addTo(spcOutlookMap);
 
