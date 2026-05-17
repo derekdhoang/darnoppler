@@ -1046,6 +1046,7 @@ function initRadarPreview() {
   loadPreviewStateBoundaries();
   refreshRadarPreview();
   loadDrawingsOntoPreview();
+  initRadarControls();
 }
 
 async function loadPreviewStateBoundaries() {
@@ -1089,6 +1090,145 @@ async function refreshRadarPreview() {
     console.error('MRMS preview failed:', err);
     radarPanelTimestamp.textContent = 'Radar unavailable';
   }
+}
+
+// ── RADAR ANIMATION ───────────────────────────────────────────────────
+let radarFrames    = [];
+let radarFrameIdx  = 0;
+let radarPlaying   = false;
+let radarPlayTimer = null;
+
+async function loadRadarFrames() {
+  try {
+    const res  = await fetch(`${MRMS_PROXY_URL}/latest`);
+    if (!res.ok) return;
+    const data = await res.json();
+    radarFrames   = data.frames || [];
+    radarFrameIdx = radarFrames.length - 1;
+    updateRadarControls();
+    // Show the latest frame immediately
+    showRadarFrame(radarFrameIdx);
+  } catch (err) {
+    console.warn('Could not load radar frames:', err);
+  }
+}
+
+function updateRadarControls() {
+  const fill      = document.getElementById('radar-timeline-fill');
+  const thumb     = document.getElementById('radar-timeline-thumb');
+  const timestamp = document.getElementById('radar-timestamp-pill');
+  if (!radarFrames.length) return;
+
+  const pct = (radarFrameIdx / (radarFrames.length - 1)) * 100;
+  if (fill)  fill.style.width = pct + '%';
+  if (thumb) thumb.style.left = pct + '%';
+
+  if (timestamp) {
+    const frame = radarFrames[radarFrameIdx];
+    if (frame) {
+      // Parse timestamp format: 20260517-015440 → date object
+      const y  = frame.slice(0, 4);
+      const mo = frame.slice(4, 6);
+      const d  = frame.slice(6, 8);
+      const h  = frame.slice(9, 11);
+      const mi = frame.slice(11, 13);
+      const dt = new Date(`${y}-${mo}-${d}T${h}:${mi}:00Z`);
+      timestamp.textContent = dt.toLocaleTimeString('en-US', {
+        hour: 'numeric', minute: '2-digit',
+        timeZone: 'America/Chicago'
+      });
+    }
+  }
+}
+
+function showRadarFrame(idx) {
+  if (!previewMap || !radarFrames.length) return;
+  if (previewRadar) { previewMap.removeLayer(previewRadar); previewRadar = null; }
+
+  const frame = radarFrames[idx];
+  if (!frame) return;
+
+  previewRadar = L.tileLayer(
+    `${MRMS_PROXY_URL}/tiles/${frame}/{z}/{x}/{y}.png`,
+    { opacity: 0.55, attribution: 'MRMS · NOAA', zIndex: 200 }
+  ).addTo(previewMap);
+
+  radarFrameIdx = idx;
+  updateRadarControls();
+}
+
+function radarPlay() {
+  if (radarPlaying) return;
+  radarPlaying = true;
+
+  const playBtn   = document.getElementById('radar-play-btn');
+  const playIcon  = document.getElementById('play-icon');
+  const pauseIcon = document.getElementById('pause-icon');
+  if (playBtn)   playBtn.classList.add('playing');
+  if (playIcon)  playIcon.style.display  = 'none';
+  if (pauseIcon) pauseIcon.style.display = '';
+
+  radarPlayTimer = setInterval(() => {
+    let next = radarFrameIdx + 1;
+    if (next >= radarFrames.length) next = 0;
+    showRadarFrame(next);
+  }, 600);
+}
+
+function radarPause() {
+  radarPlaying = false;
+  clearInterval(radarPlayTimer);
+  radarPlayTimer = null;
+
+  const playBtn   = document.getElementById('radar-play-btn');
+  const playIcon  = document.getElementById('play-icon');
+  const pauseIcon = document.getElementById('pause-icon');
+  if (playBtn)   playBtn.classList.remove('playing');
+  if (playIcon)  playIcon.style.display  = '';
+  if (pauseIcon) pauseIcon.style.display = 'none';
+}
+
+function initRadarControls() {
+  const playBtn  = document.getElementById('radar-play-btn');
+  const timeline = document.getElementById('radar-timeline-wrap');
+
+  const pill = document.getElementById('radar-control-pill');
+  if (pill && previewMap) {
+    pill.addEventListener('mouseenter', () => {
+      previewMap.dragging.disable();
+      previewMap.scrollWheelZoom.disable();
+    });
+    pill.addEventListener('mouseleave', () => {
+      previewMap.dragging.enable();
+      previewMap.scrollWheelZoom.enable();
+    });
+  }
+
+  if (playBtn) {
+    playBtn.addEventListener('click', () => {
+      radarPlaying ? radarPause() : radarPlay();
+    });
+  }
+
+  if (timeline) {
+    timeline.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (!radarFrames.length) return;
+      const rect = timeline.getBoundingClientRect();
+      const pct  = (e.clientX - rect.left) / rect.width;
+      const idx  = Math.round(pct * (radarFrames.length - 1));
+      radarPause();
+      showRadarFrame(Math.max(0, Math.min(idx, radarFrames.length - 1)));
+    });
+
+    // Also block mousedown from reaching Leaflet
+    timeline.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+    });
+  }
+
+  loadRadarFrames();
 }
 
 setInterval(refreshRadarPreview, 2 * 60 * 1000);
