@@ -31,6 +31,27 @@ function applyBackground() {
   bgOverlay.className = 'bg-overlay ' + timeOfDay;
 }
 
+// ── DOPPLER WALK SYSTEM ───────────────────────────────────────────────
+function initDoppler() {
+  const wrap = document.getElementById('doppler-wrap');
+  if (!wrap) return;
+
+  const spawnLeft = Math.random() < 0.5;
+
+  if (spawnLeft) {
+    wrap.style.left = '8%';
+    wrap.style.right = 'auto';
+    wrap.style.bottom = '28%';
+    wrap.style.animation = 'doppler-walk-right 12s linear infinite';
+  } else {
+    wrap.style.right = '8%';
+    wrap.style.left = 'auto';
+    wrap.style.bottom = '25%';
+    wrap.style.animation = 'doppler-walk-left 12s linear infinite';
+  }
+}
+
+initDoppler();
 applyBackground();
 
 // ── DOM REFERENCES ────────────────────────────────────────────────────
@@ -62,10 +83,10 @@ const spcRiskLabel        = document.getElementById('spc-risk-label');
 const spcDescription      = document.getElementById('spc-description');
 const radarPanelTimestamp = document.getElementById('radar-panel-timestamp');
 const tempPrecipHint      = document.getElementById('temp-precip-hint');
-const periodMorn          = document.getElementById('period-morn');
-const periodAftn          = document.getElementById('period-aftn');
-const periodEve           = document.getElementById('period-eve');
-const periodNight         = document.getElementById('period-night');
+const periodMorn  = document.getElementById('period-morn');
+const periodAftn  = document.getElementById('period-aftn');
+const periodEve   = document.getElementById('period-eve');
+const periodNight = document.getElementById('period-night');
 
 // ── API ENDPOINTS ─────────────────────────────────────────────────────
 const GEO_URL    = 'https://geocoding-api.open-meteo.com/v1/search';
@@ -724,10 +745,10 @@ function renderHourlyChart(hourlyData, offset = 0) {
     return entry ? Math.round(entry.temperature) + '°F' : '--';
   };
 
-  periodMorn.textContent  = findPeriodTemp(6);
-  periodAftn.textContent  = findPeriodTemp(12);
-  periodEve.textContent   = findPeriodTemp(18);
-  periodNight.textContent = findPeriodTemp(21);
+  if (periodMorn)  periodMorn.textContent  = findPeriodTemp(6);
+  if (periodAftn)  periodAftn.textContent  = findPeriodTemp(12);
+  if (periodEve)   periodEve.textContent   = findPeriodTemp(18);
+  if (periodNight) periodNight.textContent = findPeriodTemp(21);
 
   if (hourlyChart) { hourlyChart.destroy(); hourlyChart = null; }
 
@@ -1008,7 +1029,11 @@ function initRadarPreview() {
 
   // Base map — switches with time of day
   const isNightMode = getTimeOfDay(getIowaHour()) === 'night';
+  const mapBg = isNightMode ? '#0a1628' : '#f0f0f0';
+  document.getElementById('radar-preview-map').style.background = mapBg;
 
+  const spcMap = document.getElementById('spc-outlook-map');
+  if (spcMap) spcMap.style.background = mapBg;
   const baseMapUrl = isNightMode
     ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
     : 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
@@ -1025,6 +1050,7 @@ function initRadarPreview() {
   L.tileLayer(labelUrl, {
     attribution: '', maxZoom: 19, opacity: 1, zIndex: 450
   }).addTo(previewMap);
+  
 
   loadPreviewStateBoundaries();
   refreshRadarPreview();
@@ -1209,13 +1235,14 @@ function applyUniformAttribution(leafletMap) {
 }
 
 function initRadarTabs() {
-  const tabRadar  = document.getElementById('tab-radar');
-  const tabSpc    = document.getElementById('tab-spc');
-  const radarView = document.getElementById('radar-view');
-  const spcView   = document.getElementById('spc-view');
+  const tabRadar    = document.getElementById('tab-radar');
+  const tabSpc      = document.getElementById('tab-spc');
+  const radarView   = document.getElementById('radar-view');
+  const spcView     = document.getElementById('spc-view');
+  const timestamp   = document.getElementById('radar-panel-timestamp');
+  const spcDayTabs  = document.getElementById('spc-day-tabs');
   if (!tabRadar || !tabSpc) return;
 
-  // Apply uniform attribution to preview map once it exists
   if (previewMap) applyUniformAttribution(previewMap);
 
   tabRadar.addEventListener('click', () => {
@@ -1223,6 +1250,8 @@ function initRadarTabs() {
     tabSpc.classList.remove('active');
     radarView.hidden = false;
     spcView.hidden   = true;
+    if (timestamp)  timestamp.style.display  = '';
+    if (spcDayTabs) spcDayTabs.style.display = 'none';
     if (previewMap) setTimeout(() => previewMap.invalidateSize(), 50);
   });
 
@@ -1231,6 +1260,8 @@ function initRadarTabs() {
     tabRadar.classList.remove('active');
     spcView.hidden   = false;
     radarView.hidden = true;
+    if (timestamp)  timestamp.style.display  = 'none';
+    if (spcDayTabs) spcDayTabs.style.display = '';
     initSPCOutlookMap();
   });
 

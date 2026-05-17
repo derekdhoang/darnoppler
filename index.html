@@ -159,24 +159,6 @@
     <!-- Hourly -->
     <div class="dash-section" id="section-hourly">
       <div class="dash-label">Hourly</div>
-      <div class="period-labels" id="period-labels">
-        <div class="period-item">
-          <span class="period-name">Morning</span>
-          <span class="period-temp" id="period-morn">--</span>
-        </div>
-        <div class="period-item">
-          <span class="period-name">Afternoon</span>
-          <span class="period-temp" id="period-aftn">--</span>
-        </div>
-        <div class="period-item">
-          <span class="period-name">Evening</span>
-          <span class="period-temp" id="period-eve">--</span>
-        </div>
-        <div class="period-item">
-          <span class="period-name">Night</span>
-          <span class="period-temp" id="period-night">--</span>
-        </div>
-      </div>
       <div class="hourly-nav">
         <button class="hourly-nav-btn" id="hourly-prev">‹</button>
         <span class="hourly-nav-label" id="hourly-nav-label">Now</span>
@@ -250,14 +232,14 @@
           <button class="radar-tab active" id="tab-radar">🌧️ Radar</button>
           <button class="radar-tab" id="tab-spc">⚡ SPC Outlook</button>
         </div>
-        <a href="radar.html" class="radar-studio-btn" target="_blank">
-          ✏️ Open Studio
-        </a>
+        <span class="radar-panel-timestamp" id="radar-panel-timestamp"></span>
+        <div class="spc-day-tabs" id="spc-day-tabs" style="display:none;">
+          <button class="spc-day-tab active" data-day="1">Day 1</button>
+          <button class="spc-day-tab" data-day="2">Day 2</button>
+          <button class="spc-day-tab" data-day="3">Day 3</button>
+        </div>
       </div>
       <div class="radar-view" id="radar-view">
-        <div class="radar-panel-timestamp-row">
-          <span class="radar-panel-timestamp" id="radar-panel-timestamp">Loading...</span>
-        </div>
         <div id="radar-preview-map"></div>
         <div class="radar-color-key">
           <span class="radar-key-label">Reflectivity:</span>
@@ -272,16 +254,9 @@
         </div>
       </div>
       <div class="spc-view" id="spc-view" hidden>
-        <div class="spc-view-header">
-          <span class="spc-view-title">Storm Prediction Center Outlook</span>
-          <div class="spc-day-tabs">
-            <button class="spc-day-tab active" data-day="1">Day 1</button>
-            <button class="spc-day-tab" data-day="2">Day 2</button>
-            <button class="spc-day-tab" data-day="3">Day 3</button>
-          </div>
-        </div>
         <div id="spc-outlook-map"></div>
         <div class="spc-risk-key">
+          <span class="spc-key-label">Risk Level:</span>
           <div class="spc-key-item"><div class="spc-key-swatch" style="background:#4daf4d;"></div><span>Marginal</span></div>
           <div class="spc-key-item"><div class="spc-key-swatch" style="background:#f0f04d;"></div><span>Slight</span></div>
           <div class="spc-key-item"><div class="spc-key-swatch" style="background:#e8a032;"></div><span>Enhanced</span></div>
