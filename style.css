@@ -132,7 +132,6 @@ html::-webkit-scrollbar-track { background: transparent; }
   overflow: hidden;
 }
 
-
 /* ── 7. TOP BAR ───────────────────────────────────────────────────── */
 .diorama-topbar {
   position: relative;
@@ -140,7 +139,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 24px;
+  padding: 20px 24px;
   transition: opacity 0.4s ease;
 }
 
@@ -168,6 +167,8 @@ html::-webkit-scrollbar-track { background: transparent; }
   display: flex;
   gap: 8px;
   align-items: center;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .diorama-search .search-wrapper {
@@ -405,7 +406,7 @@ html::-webkit-scrollbar-track { background: transparent; }
 .dash-details .details-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 20px 48px;
 }
 
 .dash-details .detail-item {
@@ -762,6 +763,9 @@ html::-webkit-scrollbar-track { background: transparent; }
   overflow: hidden;
 }
 
+.suggestions-dropdown:empty {
+  display: none;
+}
 
 /* ── 21. UTILITY ──────────────────────────────────────────────────── */
 .error-message {
