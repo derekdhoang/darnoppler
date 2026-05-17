@@ -30,14 +30,18 @@
       <div class="diorama-date" id="weather-date-bar">--</div>
       <div class="diorama-search">
         <div class="search-wrapper">
-          <input type="text" id="city-input" placeholder="Search city..." autocomplete="off">
+          <svg class="search-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8.5" cy="8.5" r="5.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <path d="M13.5 13.5L17 17" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <input type="text" id="city-input" placeholder="Search for a city" autocomplete="off">
           <div class="suggestions-dropdown" id="suggestions-dropdown"></div>
         </div>
         <button id="search-btn">Search</button>
       </div>
       <a href="radar.html" class="diorama-wordmark" target="_blank" title="Open Studio">
       DARNOPPLER
-</a>
+      </a>
     </div>
 
     <!-- Floating hero temp -->

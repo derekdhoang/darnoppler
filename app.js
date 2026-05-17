@@ -1414,8 +1414,13 @@ function initSPCOutlookMap() {
   }
 
   spcOutlookMap = L.map('spc-outlook-map', {
-    center: [38.5, -96.0], zoom: 4,
-    zoomControl: false, scrollWheelZoom: true, dragging: true,
+    center: [38.5, -96.0],
+    zoom: 5,
+    minZoom: 5,
+    maxZoom: 7,
+    zoomControl: false,
+    scrollWheelZoom: true,
+    dragging: true,
     attributionControl: true,
   });
 
