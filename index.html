@@ -20,28 +20,6 @@
   <div class="bg-overlay" id="bg-overlay"></div>
 </div>
 
-<!-- SIDEBAR NAV -->
-<nav class="side-nav" id="side-nav" aria-label="Page sections">
-  <ul class="side-nav-list">
-    <li class="side-nav-item active" data-target="section-today">
-      <span class="side-nav-label">Today</span>
-      <div class="side-nav-dot"></div>
-    </li>
-    <li class="side-nav-item" data-target="section-hourly">
-      <span class="side-nav-label">Hourly</span>
-      <div class="side-nav-dot"></div>
-    </li>
-    <li class="side-nav-item" data-target="section-forecast">
-      <span class="side-nav-label">7-Day</span>
-      <div class="side-nav-dot"></div>
-    </li>
-    <li class="side-nav-item" data-target="section-radar">
-      <span class="side-nav-label">Radar</span>
-      <div class="side-nav-dot"></div>
-    </li>
-  </ul>
-</nav>
-
 <div class="app">
 
   <!-- DIORAMA HERO — full viewport scene -->
@@ -63,16 +41,16 @@
     </div>
 
     <!-- Floating hero temp -->
-    <div class="diorama-hero" id="diorama-hero">
-      <div class="hero-location" id="city-name">--</div>
-      <div class="hero-temp-row">
-        <span class="hero-temp" id="temperature">--</span>
-        <span class="hero-temp-unit">°F</span>
-        <div class="hero-precip" id="temp-precip-hint"></div>
+      <div class="diorama-hero" id="diorama-hero">
+        <div class="hero-location" id="city-name">--</div>
+        <div class="hero-temp-row">
+          <span class="hero-temp" id="temperature">--</span>
+          <span class="hero-temp-unit">°F</span>
+          <div class="hero-precip" id="temp-precip-hint"></div>
+        </div>
+        <div class="hero-desc" id="weather-desc">--</div>
+        <div id="weather-icon" class="hero-icon" style="display:none;"></div>
       </div>
-      <div class="hero-desc" id="weather-desc">--</div>
-      <div id="weather-icon" class="hero-icon"></div>
-    </div>
 
     <!-- Holiday bar -->
     <div class="holiday-bar" id="holiday-bar" hidden></div>
@@ -81,9 +59,77 @@
     <p class="error-message" id="error-message"></p>
 
     <!-- Doppler character -->
-    <div class="doppler-wrap" id="doppler-wrap">
-      <div class="doppler-character" id="doppler-character"></div>
-    </div>
+    <!-- Doppler character -->
+<div class="doppler-wrap" id="doppler-wrap">
+  <svg id="doppler-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 120" width="60" height="120">
+
+    <!-- Shadow -->
+    <ellipse cx="30" cy="116" rx="16" ry="4" fill="rgba(0,0,0,0.25)"/>
+
+    <!-- Legs -->
+    <rect x="20" y="82" width="9" height="28" rx="4" fill="#2a1a0a"/>
+    <rect x="31" y="82" width="9" height="28" rx="4" fill="#2a1a0a"/>
+
+    <!-- Boots -->
+    <rect x="18" y="104" width="13" height="8" rx="3" fill="#1a0f05"/>
+    <rect x="29" y="104" width="13" height="8" rx="3" fill="#1a0f05"/>
+
+    <!-- Body — overalls -->
+    <rect x="16" y="52" width="28" height="34" rx="6" fill="#4a6a8a"/>
+
+    <!-- Overalls bib -->
+    <rect x="22" y="48" width="16" height="16" rx="3" fill="#4a6a8a"/>
+
+    <!-- Plaid shirt sleeves -->
+    <rect x="6" y="54" width="12" height="20" rx="5" fill="#8a4a3a"/>
+    <rect x="42" y="54" width="12" height="20" rx="5" fill="#8a4a3a"/>
+
+    <!-- Hands -->
+    <ellipse cx="11" cy="75" rx="5" ry="5" fill="#f5c878"/>
+    <ellipse cx="49" cy="75" rx="5" ry="5" fill="#f5c878"/>
+
+    <!-- Neck -->
+    <rect x="26" y="42" width="8" height="10" rx="3" fill="#f5c878"/>
+
+    <!-- Head -->
+    <ellipse cx="30" cy="34" rx="16" ry="18" fill="#f5c878"/>
+
+    <!-- Eyes -->
+    <ellipse cx="24" cy="32" rx="2.5" ry="2.5" fill="#2a1a0a"/>
+    <ellipse cx="36" cy="32" rx="2.5" ry="2.5" fill="#2a1a0a"/>
+
+    <!-- Eye shine -->
+    <ellipse cx="25" cy="31" rx="1" ry="1" fill="white"/>
+    <ellipse cx="37" cy="31" rx="1" ry="1" fill="white"/>
+
+    <!-- Smile -->
+    <path d="M24 38 Q30 44 36 38" fill="none" stroke="#2a1a0a" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- Nose -->
+    <ellipse cx="30" cy="36" rx="2" ry="1.5" fill="#e8a840"/>
+
+    <!-- Ear -->
+    <ellipse cx="14" cy="34" rx="3" ry="4" fill="#f5c878"/>
+    <ellipse cx="46" cy="34" rx="3" ry="4" fill="#f5c878"/>
+
+    <!-- Cap brim -->
+    <rect x="10" y="17" width="40" height="5" rx="2" fill="#2a1a0a"/>
+
+    <!-- Cap body -->
+    <ellipse cx="30" cy="16" rx="18" ry="12" fill="#2a1a0a"/>
+
+    <!-- Cap button -->
+    <ellipse cx="30" cy="6" rx="3" ry="3" fill="#3a2a10"/>
+
+    <!-- Overalls straps -->
+    <rect x="22" y="48" width="4" height="16" rx="2" fill="#3a5a7a"/>
+    <rect x="34" y="48" width="4" height="16" rx="2" fill="#3a5a7a"/>
+
+    <!-- Overall pocket -->
+    <rect x="24" y="62" width="12" height="8" rx="2" fill="#3a5a7a"/>
+
+  </svg>
+</div>
 
     <!-- Detail chips — 4 core stats -->
     <div class="detail-chips" id="detail-chips">

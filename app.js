@@ -33,57 +33,6 @@ function applyBackground() {
 
 applyBackground();
 
-// ── SIDEBAR NAV — Phase 3 ─────────────────────────────────────────────
-function initSideNav() {
-  const items = document.querySelectorAll('.side-nav-item');
-  if (!items.length) return;
-
-  const sections = [
-    'section-today',
-    'section-hourly',
-    'section-forecast',
-    'section-radar'
-  ];
-
-  function updateActiveDot() {
-    const scrollY = window.scrollY + window.innerHeight * 0.4;
-    let current = sections[0];
-
-    for (let i = sections.length - 1; i >= 0; i--) {
-      const el = document.getElementById(sections[i]);
-      if (!el) continue;
-      if (el.offsetTop <= scrollY) {
-        current = sections[i];
-        break;
-      }
-    }
-
-    items.forEach(item => {
-      item.classList.toggle('active', item.dataset.target === current);
-    });
-  }
-
-  items.forEach(item => {
-    item.addEventListener('click', () => {
-      const target = document.getElementById(item.dataset.target);
-      if (!target) return;
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  });
-
-  window.addEventListener('scroll', updateActiveDot, { passive: true });
-  // Fade sidebar when scrolled into dashboard
-  const sideNav = document.getElementById('side-nav');
-  window.addEventListener('scroll', () => {
-    if (!sideNav) return;
-    const scrolled = window.scrollY > window.innerHeight * 0.6;
-    sideNav.classList.toggle('hidden', scrolled);
-  }, { passive: true });
-  updateActiveDot();
-}
-
-initSideNav();
-
 // ── DOM REFERENCES ────────────────────────────────────────────────────
 const cityInput           = document.getElementById('city-input');
 const searchBtn           = document.getElementById('search-btn');

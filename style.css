@@ -295,21 +295,35 @@ body {
 }
 
 
-/* ── 9. DOPPLER CHARACTER ─────────────────────────────────────────── */
+/* ── DOPPLER ──────────────────────────────────────────────────────── */
 .doppler-wrap {
-  position: absolute;
-  bottom: 18%;
+  position: fixed;
+  bottom: 30%;
   left: 14%;
   z-index: var(--z-character);
   pointer-events: none;
+  animation: doppler-walk-x 8s linear infinite;
 }
 
-.doppler-character {
+#doppler-svg {
   width: 80px;
-  height: 120px;
-  filter: drop-shadow(0px 6px 8px rgba(0,0,0,0.35));
+  height: 160px;
+  filter: drop-shadow(0px 8px 12px rgba(0,0,0,0.5));
+  animation: doppler-bob 0.5s ease-in-out infinite alternate;
 }
 
+@keyframes doppler-walk-x {
+  0%   { transform: translateX(0px) scaleX(1); }
+  45%  { transform: translateX(120px) scaleX(1); }
+  50%  { transform: translateX(120px) scaleX(-1); }
+  95%  { transform: translateX(0px) scaleX(-1); }
+  100% { transform: translateX(0px) scaleX(1); }
+}
+
+@keyframes doppler-bob {
+  from { transform: translateY(0px); }
+  to   { transform: translateY(-4px); }
+}
 
 /* ── 10. DETAIL CHIPS ─────────────────────────────────────────────── */
 .detail-chips {
@@ -743,80 +757,7 @@ body {
   color: rgba(255,255,255,0.4) !important;
 }
 
-
-/* ── 20. SIDEBAR NAV ──────────────────────────────────────────────── */
-.side-nav {
-  position: fixed;
-  left: 24px;
-  top: 38%;
-  transform: translateY(-50%);
-  z-index: var(--z-sidebar);
-  pointer-events: all;
-  background: rgba(0,0,0,0.22);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 20px;
-  padding: 14px 12px;
-  border: 1px solid rgba(255,255,255,0.1);
-  transition: opacity 0.4s ease;
-}
-
-.side-nav.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.side-nav-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-start;
-}
-
-.side-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 6px 4px;
-  border-radius: 10px;
-  transition: background 0.2s ease;
-  width: 100%;
-}
-
-.side-nav-item:hover { background: rgba(255,255,255,0.08); }
-
-.side-nav-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.25);
-  border: 1.5px solid rgba(255,255,255,0.45);
-  transition: background 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
-  flex-shrink: 0;
-}
-
-.side-nav-item:hover .side-nav-dot { background: rgba(255,255,255,0.6); transform: scale(1.15); }
-.side-nav-item.active .side-nav-dot { background: #ffffff; border-color: #ffffff; transform: scale(1.25); }
-
-.side-nav-label {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: rgba(255,255,255,0.4);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  padding-bottom: 1px;
-  border-bottom: 1px solid transparent;
-  transition: color 0.3s ease, border-color 0.3s ease;
-}
-
-.side-nav-item:hover .side-nav-label { color: rgba(255,255,255,0.75); }
-.side-nav-item.active .side-nav-label { color: white; border-bottom-color: rgba(255,255,255,0.6); }
-
-
-/* ── 21. SUGGESTIONS DROPDOWN ─────────────────────────────────────── */
+/* ── 20. SUGGESTIONS DROPDOWN ─────────────────────────────────────── */
 .suggestions-dropdown {
   position: absolute;
   top: calc(100% + 4px);
@@ -832,7 +773,7 @@ body {
 }
 
 
-/* ── 22. UTILITY ──────────────────────────────────────────────────── */
+/* ── 21. UTILITY ──────────────────────────────────────────────────── */
 .error-message {
   position: absolute;
   top: 80px;
@@ -845,6 +786,11 @@ body {
   background: rgba(0,0,0,0.3);
   padding: 6px 16px;
   border-radius: 12px;
+  display: none;
+}
+
+.error-message:not(:empty) {
+  display: block;
 }
 
 .holiday-bar {
@@ -855,8 +801,7 @@ body {
   z-index: var(--z-ui);
 }
 
-
-/* ── 23. FOOTER ───────────────────────────────────────────────────── */
+/* ── 22. FOOTER ───────────────────────────────────────────────────── */
 .site-footer {
   padding: 20px 0 16px;
   border-top: 1px solid rgba(255,255,255,0.08);
@@ -921,14 +866,14 @@ body {
 .last-updated { font-size: 0.65rem; color: rgba(255,255,255,0.3); }
 
 
-/* ── 24. ANIMATIONS ───────────────────────────────────────────────── */
+/* ── 23. ANIMATIONS ───────────────────────────────────────────────── */
 @keyframes cardEnter {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 
-/* ── 25. MEDIA QUERIES ────────────────────────────────────────────── */
+/* ── 24. MEDIA QUERIES ────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .side-nav { display: none; }
   .forecast-grid { grid-template-columns: repeat(4, 1fr); }
@@ -936,7 +881,7 @@ body {
   .hero-temp { font-size: 72px; }
 }
 
-/* ── 26. FORECAST CARDS ───────────────────────────────────────────── */
+/* ── 25. FORECAST CARDS ───────────────────────────────────────────── */
 .forecast-card {
   perspective: 600px;
   cursor: pointer;
