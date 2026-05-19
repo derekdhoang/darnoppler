@@ -2999,258 +2999,323 @@
       overflow: hidden;
     }
 
-    /* Radar Banner Preset */
+    /* ═══════════════════════════════════════════════════════════════════
+       PRESET GLASS DESIGN SYSTEM — Darnoppler Signature Style
+       All presets share this glass foundation. Accent color (--preset-accent)
+       drives the border glow and is set per-preset via inline style.
+       ═══════════════════════════════════════════════════════════════════ */
+
+    /* Shared glass base — applied to all preset wrapper divs */
+    .preset-glass {
+      --preset-accent: #60a5fa;
+      background: rgba(8, 18, 36, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 0.5px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
+      border-left: 3px solid var(--preset-accent);
+      box-shadow:
+        0 0 20px rgba(0,0,0,0.5),
+        inset 0 0 0 0.5px rgba(255,255,255,0.06),
+        0 0 16px -6px var(--preset-accent);
+      overflow: hidden;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* ── RADAR BANNER ──────────────────────────────────────────────── */
     .preset-radar-banner {
       display: flex;
       align-items: center;
-      background: rgba(255,255,255,0.95);
-      border-bottom: 4px solid #b91c1c;
-      padding: 8px 20px;
-      gap: 20px;
-      min-width: 500px;
+      padding: 10px 18px;
+      gap: 16px;
+      min-width: 460px;
     }
-
     .preset-radar-banner .banner-logo {
-      height: 40px;
+      height: 34px;
       width: auto;
+      filter: drop-shadow(0 0 6px rgba(96,165,250,0.4));
     }
-
     .preset-radar-banner .banner-title {
       font-family: 'Bebas Neue', Impact, sans-serif;
-      font-size: 2rem;
-      color: #1a1a1a;
-      letter-spacing: 0.05em;
+      font-size: 1.8rem;
+      color: #fff;
+      letter-spacing: 0.06em;
+      text-shadow: 0 0 20px rgba(96,165,250,0.3);
     }
-
+    .preset-radar-banner .banner-subtitles {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .preset-radar-banner .banner-sub {
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
     .preset-radar-banner .banner-data {
       display: flex;
-      gap: 16px;
+      gap: 14px;
       margin-left: auto;
     }
-
     .preset-radar-banner .banner-field {
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 1px;
     }
-
     .preset-radar-banner .banner-field-label {
-      font-size: 0.65rem;
-      color: #666;
+      font-size: 0.52rem;
+      color: rgba(255,255,255,0.32);
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
     }
-
     .preset-radar-banner .banner-field-value {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #1a1a1a;
-    }
-
-    .preset-radar-banner .banner-time {
-      font-family: 'Bebas Neue', Impact, sans-serif;
-      font-size: 2rem;
-      color: #1a1a1a;
-      letter-spacing: 0.02em;
-    }
-
-    /* Conditions Box Preset */
-    .preset-conditions-box {
-      background: rgba(10, 22, 40, 0.95);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 12px;
-      padding: 16px 20px;
-      min-width: 200px;
-      backdrop-filter: blur(10px);
-    }
-
-    .preset-conditions-box .cond-city {
       font-size: 1rem;
       font-weight: 700;
       color: #fff;
+    }
+    .preset-radar-banner .banner-time {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 1.6rem;
+      color: rgba(255,255,255,0.8);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── CONDITIONS BOX ────────────────────────────────────────────── */
+    .preset-conditions-box {
+      padding: 14px 18px;
+      min-width: 180px;
+    }
+    .preset-conditions-box .cond-city {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       margin-bottom: 4px;
     }
-
     .preset-conditions-box .cond-temp {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #fbbf24;
+      font-size: 2.8rem;
+      font-weight: 300;
+      color: #fff;
       line-height: 1;
+      text-shadow: 0 0 30px rgba(251,191,36,0.3);
     }
-
     .preset-conditions-box .cond-desc {
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.7);
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.6);
       margin-top: 4px;
     }
-
     .preset-conditions-box .cond-wind {
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.5);
-      margin-top: 8px;
+      font-size: 0.66rem;
+      color: rgba(255,255,255,0.35);
+      margin-top: 6px;
+      letter-spacing: 0.04em;
+    }
+    .preset-conditions-box .cond-subtitles {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin-top: 4px;
+    }
+    .preset-conditions-box .cond-sub {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.4);
     }
 
-    /* Alert Banner Preset */
+    /* ── ALERT BANNER ──────────────────────────────────────────────── */
     .preset-alert-banner {
-      background: linear-gradient(90deg, #b91c1c, #dc2626, #b91c1c);
-      padding: 12px 30px;
+      padding: 14px 28px;
       text-align: center;
-      min-width: 400px;
+      min-width: 380px;
     }
-
     .preset-alert-banner .alert-title {
       font-family: 'Bebas Neue', Impact, sans-serif;
-      font-size: 1.8rem;
+      font-size: 2rem;
       color: #fff;
       letter-spacing: 0.1em;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      text-shadow: 0 0 24px var(--preset-accent, #e84040);
+      line-height: 1;
     }
-
     .preset-alert-banner .alert-subtitle {
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.9);
-      margin-top: 2px;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.75);
+      margin-top: 4px;
+      letter-spacing: 0.03em;
+    }
+    .preset-alert-banner .alert-subtitles {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 4px;
+    }
+    .preset-alert-banner .alert-sub {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.03em;
     }
 
-    /* Info Banner Preset (MWNS style) */
+    /* ── INFO BANNER ───────────────────────────────────────────────── */
     .preset-info-banner {
-      background: #fff;
-      min-width: 420px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      min-width: 380px;
     }
-
     .info-banner-header {
       display: flex;
       align-items: center;
-      padding: 8px 16px;
-      gap: 12px;
+      padding: 10px 16px;
+      gap: 14px;
     }
-
     .info-banner-logo {
-      width: 50px;
-      height: 50px;
-      object-fit: contain;
-      background: #c00;
-      padding: 4px;
-    }
-
-    .info-banner-titles {
-      flex: 1;
-    }
-
-    .info-banner-title {
-      font-family: 'Bebas Neue', Impact, sans-serif;
-      font-size: 2rem;
-      color: #111;
-      letter-spacing: 0.02em;
-      line-height: 1;
-    }
-
-    .info-banner-subtitle {
-      font-size: 0.9rem;
-      color: #333;
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    .info-banner-posted {
-      background: #111;
-      color: #fff;
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 6px 16px;
-      letter-spacing: 0.05em;
-    }
-
-    /* Location Tag Preset */
-    .preset-location-tag {
-      background: rgba(10, 22, 40, 0.9);
-      border: 2px solid #60a5fa;
-      border-radius: 8px;
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .preset-location-tag .loc-icon {
-      font-size: 1.2rem;
-    }
-
-    .preset-location-tag .loc-name {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    /* ── SEVERITY POTENTIAL PRESET ────────────────────────────────────── */
-    .preset-severity {
-      background: #fff;
-      border-radius: 6px;
-      overflow: hidden;
-      min-width: 340px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-      font-family: Arial Black, Arial, sans-serif;
-    }
-    .preset-severity .sev-header {
-      display: flex;
-      align-items: stretch;
-    }
-    .preset-severity .sev-logo-area {
-      background: #e84040;
-      padding: 8px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 56px;
-    }
-    .preset-severity .sev-logo-img {
       width: 40px;
       height: 40px;
       object-fit: contain;
+      border-radius: 6px;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.12));
+    }
+    .info-banner-titles { flex: 1; }
+    .info-banner-title {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 1.8rem;
+      color: #fff;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      text-shadow: 0 0 18px rgba(255,255,255,0.12);
+    }
+    .info-banner-subtitle {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.5);
+      font-weight: 500;
+      margin-top: 3px;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+    .info-banner-subtitles {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin-top: 3px;
+    }
+    .info-banner-sub {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .info-banner-posted {
+      background: rgba(255,255,255,0.05);
+      border-top: 0.5px solid rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.38);
+      font-size: 0.6rem;
+      font-weight: 600;
+      padding: 5px 16px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    /* ── LOCATION TAG ──────────────────────────────────────────────── */
+    .preset-location-tag {
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .preset-location-tag .loc-icon {
+      font-size: 1.1rem;
+      filter: drop-shadow(0 0 6px rgba(96,165,250,0.5));
+    }
+    .preset-location-tag .loc-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.04em;
+    }
+    .preset-location-tag .loc-subtitles {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .preset-location-tag .loc-sub {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── SEVERITY POTENTIAL PRESET ─────────────────────────────────── */
+    .preset-severity {
+      min-width: 340px;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .preset-severity .sev-header {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      gap: 14px;
+    }
+    .preset-severity .sev-logo-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      flex-shrink: 0;
+    }
+    .preset-severity .sev-logo-img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(232,64,64,0.5));
     }
     .preset-severity .sev-title-area {
       flex: 1;
-      padding: 6px 12px;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
     .preset-severity .sev-title {
-      font-size: 1.4rem;
+      font-size: 1.15rem;
       font-weight: 900;
-      color: #111;
+      color: #fff;
       text-transform: uppercase;
       line-height: 1;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.05em;
     }
     .preset-severity .sev-subtitle {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #555;
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.42);
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.09em;
       margin-top: 2px;
+    }
+    .preset-severity .sev-subtitles {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin-top: 2px;
+    }
+    .preset-severity .sev-sub {
+      font-size: 0.58rem;
+      color: rgba(255,255,255,0.38);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
     }
     .preset-severity .sev-boxes-area {
       display: flex;
       align-items: center;
-      padding: 6px 8px;
       gap: 3px;
       flex-shrink: 0;
     }
     .preset-severity .sev-box {
-      width: 34px;
-      height: 34px;
-      border-radius: 3px;
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 0.9rem;
       font-weight: 900;
       color: #fff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-      flex-shrink: 0;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      box-shadow: 0 0 10px -3px currentColor;
     }
 
     /* Severity field color pickers */
@@ -3265,9 +3330,140 @@
       flex-shrink: 0;
     }
     .preset-field-color::-webkit-color-swatch-wrapper { padding: 0; }
-    .preset-field-color::-webkit-color-swatch { border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); }
+    .preset-field-color::-webkit-color-swatch { border-radius: 3px; border: 0.5px solid rgba(255,255,255,0.2); }
 
-    /* Position classes for broadcast */
+    /* ── WARNING CARD PRESET ───────────────────────────────────────── */
+    .preset-warning-card {
+      min-width: 280px;
+      max-width: 340px;
+    }
+    .preset-warning-card .wc-header {
+      padding: 10px 14px 8px;
+      border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    }
+    .preset-warning-card .wc-type {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      line-height: 1.1;
+    }
+    .preset-warning-card .wc-expires {
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.38);
+      margin-top: 2px;
+    }
+    .preset-warning-card .wc-body {
+      padding: 8px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .preset-warning-card .wc-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preset-warning-card .wc-icon {
+      font-size: 0.9rem;
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .preset-warning-card .wc-label {
+      font-size: 0.54rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.32);
+      width: 46px;
+      flex-shrink: 0;
+    }
+    .preset-warning-card .wc-value {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .preset-warning-card .wc-subtitles {
+      padding: 0 14px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .preset-warning-card .wc-sub {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.48);
+    }
+    .preset-warning-card .wc-footer {
+      padding: 6px 14px 8px;
+      border-top: 0.5px solid rgba(255,255,255,0.06);
+    }
+    .preset-warning-card .wc-counties-label {
+      font-size: 0.52rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.28);
+      margin-bottom: 3px;
+    }
+    .preset-warning-card .wc-counties {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.58);
+      line-height: 1.4;
+    }
+
+    /* ── DYNAMIC SUBTITLE ADD BUTTON ───────────────────────────────── */
+    .preset-subtitle-add-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 5px;
+      padding: 3px 8px;
+      background: rgba(34,197,94,0.12);
+      border: 0.5px solid rgba(34,197,94,0.35);
+      border-radius: 4px;
+      color: #4ade80;
+      font-size: 0.6rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: all 0.15s;
+    }
+    .preset-subtitle-add-btn:hover { background: rgba(34,197,94,0.22); }
+
+    /* Accent color picker row in modal */
+    .preset-accent-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 6px;
+      border: 0.5px solid rgba(255,255,255,0.08);
+    }
+    .preset-accent-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.38);
+      flex: 1;
+    }
+    .preset-accent-picker {
+      width: 36px;
+      height: 24px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 1px;
+      background: transparent;
+    }
+    .preset-accent-picker::-webkit-color-swatch-wrapper { padding: 0; }
+    .preset-accent-picker::-webkit-color-swatch { border-radius: 3px; border: 0.5px solid rgba(255,255,255,0.18); }
+
+        /* Position classes for broadcast */
     .broadcast-preset.pos-top { top: 0; left: 50%; transform: translateX(-50%); }
     .broadcast-preset.pos-bottom { bottom: 60px; left: 50%; transform: translateX(-50%); }
     .broadcast-preset.pos-top-left { top: 60px; left: 20px; }
@@ -5047,7 +5243,7 @@
   // ── CONSTANTS ────────────────────────────────────────────────────────
   const IOWA_CENTER      = [41.878, -93.097];
   const MRMS_PROXY_URL = 'https://mrms-proxy.derekdhoang.workers.dev';
-  const DEFAULT_ZOOM     = 6;
+  const DEFAULT_ZOOM     = 8;
   const STORAGE_KEY      = 'darnoppler-radar-drawings';
   const TEXT_STORAGE_KEY = 'darnoppler-radar-text-labels';
   const IOWA_FIPS        = '19';
@@ -5550,8 +5746,8 @@
     map = L.map('radar-map', {
       center: IOWA_CENTER, zoom: DEFAULT_ZOOM,
       zoomControl: true, scrollWheelZoom: true,
-      minZoom: 8,   // ← can't zoom further out than Iowa + neighbors
-      maxZoom: 12,
+      minZoom: 6,   // ← can't zoom further out than Iowa + neighbors
+      maxZoom: 8,
     });
 
     // Base layer
@@ -6686,6 +6882,7 @@
   const PRESET_TEMPLATES = {
     'radar-banner': {
       name: 'Radar Banner',
+      accentDefault: '#60a5fa',
       fields: [
         { key: 'title', label: 'Title', default: 'RADAR' },
         { key: 'temp', label: 'Temp', default: '', unit: '°' },
@@ -6705,6 +6902,7 @@
     },
     'info-banner': {
       name: 'Info Banner',
+      accentDefault: '#60a5fa',
       fields: [
         { key: 'title', label: 'Title', default: 'WEATHER ALERT' },
         { key: 'subtitle', label: 'Subtitle', default: '' },
@@ -6725,6 +6923,7 @@
     },
     'conditions-box': {
       name: 'Current Conditions',
+      accentDefault: '#fbbf24',
       fields: [
         { key: 'city', label: 'City', default: '' },
         { key: 'temp', label: 'Temp', default: '', unit: '°F' },
@@ -6740,6 +6939,7 @@
     },
     'alert-banner': {
       name: 'Alert Banner',
+      accentDefault: '#e84040',
       fields: [
         { key: 'alertTitle', label: 'Alert', default: 'TORNADO WARNING' },
         { key: 'alertSub', label: 'Details', default: 'Take shelter immediately' },
@@ -6751,6 +6951,7 @@
     },
     'location-tag': {
       name: 'Location Tag',
+      accentDefault: '#60a5fa',
       fields: [
         { key: 'locName', label: 'Location', default: '' },
       ],
@@ -6760,6 +6961,7 @@
     },
     'severity-card': {
       name: 'Severe Potential',
+      accentDefault: '#e84040',
       fields: [
         { key: 'title',    label: 'Title',        default: 'SEVERE POTENTIAL' },
         { key: 'day',      label: 'Day',           default: '' },
@@ -6783,6 +6985,7 @@
     },
     'warning-card': {
       name: 'Warning Card',
+      accentDefault: '#e84040',
       fields: [
         { key: 'warnType',   label: 'Warning Type', default: 'TORNADO WARNING' },
         { key: 'expires',    label: 'Expires',       default: '' },
@@ -7071,6 +7274,13 @@
     template.fields.forEach(f => {
       presetData[f.key] = f.default;
     });
+
+    // Initialize accent color and subtitle slots
+    presetData.accentColor = template.accentDefault || '#60a5fa';
+    presetData.sub1 = '';
+    presetData.sub2 = '';
+    presetData.sub3 = '';
+    presetData.sub4 = '';
     
     // Set current time for radar banner
     if (type === 'radar-banner') {
@@ -7127,7 +7337,7 @@
     // For warning-card: show "Load from Warning" selector at the top
     let warningLoaderHTML = '';
     if (currentPresetType === 'warning-card') {
-      const iowaWarnings = filterWarnings(); // Iowa-only, already filtered
+      const iowaWarnings = filterWarnings();
       if (iowaWarnings.length > 0) {
         const options = iowaWarnings.map((w, i) =>
           `<option value="${i}">${w.event} — ${w.areaDesc?.split(';')[0]?.trim() || 'Unknown'}</option>`
@@ -7148,23 +7358,65 @@
       }
     }
 
-    container.innerHTML = warningLoaderHTML + template.fields.map(f => {
-      if (f.type === 'color') {
-        const val = presetData[f.key] || f.default || '#ffffff';
+    // Count currently active subtitles
+    const activeSubs = ['sub1','sub2','sub3','sub4'].filter(k => presetData[k]);
+    const subCount = activeSubs.length;
+    const maxSubs = 4;
+    const canAddSub = subCount < maxSubs;
+
+    // Build subtitle rows HTML
+    let subRowsHTML = activeSubs.map(key => `
+      <div class="preset-field-row preset-sub-row" data-subkey="${key}">
+        <span class="preset-field-label">+ Subtitle</span>
+        <input type="text" class="preset-field-input preset-sub-input" data-key="${key}"
+               value="${presetData[key] || ''}" placeholder="Additional subtitle...">
+        <button class="preset-field-delete preset-sub-delete" data-subkey="${key}" title="Remove subtitle">×</button>
+      </div>`).join('');
+
+    // Add subtitle button
+    const addSubHTML = canAddSub ? `
+      <button class="preset-subtitle-add-btn" id="add-subtitle-btn">
+        ＋ Add Subtitle
+      </button>` : '';
+
+    container.innerHTML = warningLoaderHTML +
+      // Accent color picker always first
+      `<div class="preset-accent-row">
+        <span class="preset-accent-label">🎨 Accent Color</span>
+        <input type="color" class="preset-accent-picker" id="preset-accent-picker"
+               value="${presetData.accentColor || template.accentDefault || '#60a5fa'}"
+               title="Border glow color">
+      </div>` +
+      // Regular fields
+      template.fields.map(f => {
+        if (f.type === 'color') {
+          const val = presetData[f.key] || f.default || '#ffffff';
+          return `
+            <div class="preset-field-row" data-key="${f.key}">
+              <span class="preset-field-label">${f.label}</span>
+              <input type="color" class="preset-field-color" data-key="${f.key}" value="${val}">
+            </div>`;
+        }
         return `
           <div class="preset-field-row" data-key="${f.key}">
             <span class="preset-field-label">${f.label}</span>
-            <input type="color" class="preset-field-color" data-key="${f.key}" value="${val}">
+            <input type="text" class="preset-field-input" data-key="${f.key}" 
+                   value="${presetData[f.key] || ''}" placeholder="${f.label}...">
+            <button class="preset-field-delete" data-key="${f.key}" title="Clear field">×</button>
           </div>`;
-      }
-      return `
-        <div class="preset-field-row" data-key="${f.key}">
-          <span class="preset-field-label">${f.label}</span>
-          <input type="text" class="preset-field-input" data-key="${f.key}" 
-                 value="${presetData[f.key] || ''}" placeholder="${f.label}...">
-          <button class="preset-field-delete" data-key="${f.key}" title="Clear field">×</button>
-        </div>`;
-    }).join('');
+      }).join('') +
+      // Dynamic subtitle rows + add button
+      subRowsHTML +
+      addSubHTML;
+
+    // Wire accent picker
+    const accentPicker = container.querySelector('#preset-accent-picker');
+    if (accentPicker) {
+      accentPicker.addEventListener('input', (e) => {
+        presetData.accentColor = e.target.value;
+        updatePresetPreview();
+      });
+    }
 
     // Wire "Load Warning" button
     const loadBtn = container.querySelector('#load-warning-btn');
@@ -7177,36 +7429,24 @@
         const w = iowaWarnings[idx];
         if (!w) return;
 
-        // Parse expires
         const expiresDate = w.expires ? new Date(w.expires) : null;
         const expiresStr = expiresDate ? expiresDate.toLocaleString('en-US', {
           hour: 'numeric', minute: '2-digit', hour12: true,
           month: 'numeric', day: 'numeric', year: 'numeric'
         }) : '';
 
-        // Parse wind/hail/motion from NWS parameters
         const params = w.parameters || {};
         const windArr = params.maxWindGust || params.windSpeed || [];
         const hailArr = params.maxHailSize || [];
         const motionArr = params.tornadoDetection || params.stormMotion || [];
 
-        const windStr = windArr.length ? windArr[0] : '';
-        const hailStr = hailArr.length ? `${hailArr[0]} inches` : '';
-        const motionStr = motionArr.length ? motionArr[0] : '';
-
-        // All counties
-        const counties = w.areaDesc
-          ? w.areaDesc.split(';').map(s => s.trim()).filter(Boolean).join('; ')
-          : '';
-
-        // Update presetData and inputs
         const updates = {
           warnType: w.event?.toUpperCase() || 'WARNING',
           expires:  expiresStr,
-          wind:     windStr,
-          hail:     hailStr,
-          motion:   motionStr,
-          counties: counties,
+          wind:     windArr.length ? windArr[0] : '',
+          hail:     hailArr.length ? `${hailArr[0]} inches` : '',
+          motion:   motionArr.length ? motionArr[0] : '',
+          counties: w.areaDesc ? w.areaDesc.split(';').map(s=>s.trim()).filter(Boolean).join('; ') : '',
         };
 
         Object.entries(updates).forEach(([key, val]) => {
@@ -7219,6 +7459,37 @@
         showToast('Warning data loaded!');
       });
     }
+
+    // Wire add subtitle button
+    const addSubBtn = container.querySelector('#add-subtitle-btn');
+    if (addSubBtn) {
+      addSubBtn.addEventListener('click', () => {
+        // Find next empty slot
+        const nextSlot = ['sub1','sub2','sub3','sub4'].find(k => !presetData[k]);
+        if (!nextSlot) return;
+        presetData[nextSlot] = ' '; // placeholder to mark as active
+        renderPresetFields();
+        updatePresetPreview();
+        // Focus the new input
+        setTimeout(() => {
+          const newInput = container.querySelector(`input[data-key="${nextSlot}"]`);
+          if (newInput) { newInput.value = ''; newInput.focus(); }
+        }, 50);
+      });
+    }
+
+    // Wire subtitle delete buttons
+    container.querySelectorAll('.preset-sub-delete').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.subkey;
+        presetData[key] = '';
+        // Compact remaining subs so no gaps
+        const vals = ['sub1','sub2','sub3','sub4'].map(k => presetData[k]).filter(Boolean);
+        ['sub1','sub2','sub3','sub4'].forEach((k, i) => { presetData[k] = vals[i] || ''; });
+        renderPresetFields();
+        updatePresetPreview();
+      });
+    });
 
     // Wire text inputs
     container.querySelectorAll('.preset-field-input').forEach(input => {
@@ -7237,7 +7508,7 @@
     });
 
     // Wire delete buttons
-    container.querySelectorAll('.preset-field-delete').forEach(btn => {
+    container.querySelectorAll('.preset-field-delete:not(.preset-sub-delete)').forEach(btn => {
       btn.addEventListener('click', () => {
         presetData[btn.dataset.key] = '';
         const input = container.querySelector(`input[data-key="${btn.dataset.key}"]`);
@@ -7256,11 +7527,16 @@
     const scale = isPreview ? 'transform: scale(0.8); transform-origin: center;' : '';
     
     switch (type) {
-      case 'radar-banner':
+      case 'radar-banner': {
+        const accentColor = data.accentColor || '#60a5fa';
+        const subs = [data.sub1, data.sub2, data.sub3, data.sub4].filter(Boolean);
         return `
-          <div class="preset-radar-banner" style="${scale}">
+          <div class="preset-glass preset-radar-banner" style="${scale};--preset-accent:${accentColor};">
             <img src="img/darnoppler_radar.png" alt="Logo" class="banner-logo" onerror="this.style.display='none'">
-            <span class="banner-title">${data.title || 'RADAR'}</span>
+            <div>
+              <span class="banner-title">${data.title || 'RADAR'}</span>
+              ${subs.length ? `<div class="banner-subtitles">${subs.map(s=>`<span class="banner-sub">${s}</span>`).join('')}</div>` : ''}
+            </div>
             <div class="banner-data">
               ${data.temp ? `<div class="banner-field"><span class="banner-field-label">TEMP</span><span class="banner-field-value">${data.temp}°</span></div>` : ''}
               ${data.windDir ? `<div class="banner-field"><span class="banner-field-label">WIND</span><span class="banner-field-value">${data.windDir}</span></div>` : ''}
@@ -7270,46 +7546,74 @@
             <span class="banner-time">${data.time || ''}</span>
           </div>
         `;
-      
-      case 'conditions-box':
+      }
+
+      case 'conditions-box': {
+        const accentColor = data.accentColor || '#fbbf24';
+        const subs = [data.sub1, data.sub2, data.sub3, data.sub4].filter(Boolean);
         return `
-          <div class="preset-conditions-box" style="${scale}">
+          <div class="preset-glass preset-conditions-box" style="${scale};--preset-accent:${accentColor};">
             <div class="cond-city">${data.city || 'City'}</div>
             <div class="cond-temp">${data.temp || '--'}°F</div>
             <div class="cond-desc">${data.desc || 'Conditions'}</div>
             <div class="cond-wind">${data.wind || ''}</div>
+            ${subs.length ? `<div class="cond-subtitles">${subs.map(s=>`<div class="cond-sub">${s}</div>`).join('')}</div>` : ''}
           </div>
         `;
-      
-      case 'info-banner':
+      }
+
+      case 'info-banner': {
+        const accentColor = data.accentColor || '#60a5fa';
+        const subs = [data.sub1, data.sub2, data.sub3, data.sub4].filter(Boolean);
         return `
-          <div class="preset-info-banner" style="${scale}">
+          <div class="preset-glass preset-info-banner" style="${scale};--preset-accent:${accentColor};">
             <div class="info-banner-header">
               <img src="img/darnoppler_radar.png" alt="Logo" class="info-banner-logo" onerror="this.style.display='none'">
               <div class="info-banner-titles">
                 <div class="info-banner-title">${data.title || 'WEATHER ALERT'}</div>
                 ${data.subtitle ? `<div class="info-banner-subtitle">${data.subtitle}</div>` : ''}
+                ${subs.length ? `<div class="info-banner-subtitles">${subs.map(s=>`<div class="info-banner-sub">${s}</div>`).join('')}</div>` : ''}
               </div>
             </div>
             ${data.postedTime ? `<div class="info-banner-posted">POSTED: ${data.postedTime}</div>` : ''}
           </div>
         `;
-      
-      case 'alert-banner':
+      }
+
+      case 'alert-banner': {
+        // Auto-detect accent color from warning type
+        const atype = (data.alertTitle || '').toUpperCase();
+        let accentColor = data.accentColor || '#e84040';
+        if (!data.accentColor) {
+          if (atype.includes('TORNADO')) accentColor = '#e84040';
+          else if (atype.includes('SEVERE') || atype.includes('THUNDERSTORM')) accentColor = '#f0a500';
+          else if (atype.includes('FLASH FLOOD') || atype.includes('FLOOD')) accentColor = '#4daf4d';
+          else if (atype.includes('WINTER') || atype.includes('SNOW') || atype.includes('ICE')) accentColor = '#60a5fa';
+          else if (atype.includes('WIND')) accentColor = '#f0f04d';
+        }
+        const subs = [data.sub1, data.sub2, data.sub3, data.sub4].filter(Boolean);
         return `
-          <div class="preset-alert-banner" style="${scale}">
+          <div class="preset-glass preset-alert-banner" style="${scale};--preset-accent:${accentColor};">
             <div class="alert-title">${data.alertTitle || 'ALERT'}</div>
             <div class="alert-subtitle">${data.alertSub || ''}</div>
+            ${subs.length ? `<div class="alert-subtitles">${subs.map(s=>`<div class="alert-sub">${s}</div>`).join('')}</div>` : ''}
           </div>
         `;
-      
-      case 'location-tag':
+      }
+
+      case 'location-tag': {
+        const accentColor = data.accentColor || '#60a5fa';
+        const subs = [data.sub1, data.sub2, data.sub3, data.sub4].filter(Boolean);
         return `
-          <div class="preset-location-tag" style="${scale}">
+          <div class="preset-glass preset-location-tag" style="${scale};--preset-accent:${accentColor};">
             <span class="loc-icon">📍</span>
-            <span class="loc-name">${data.locName || 'Location'}</span>
+            <div>
+              <span class="loc-name">${data.locName || 'Location'}</span>
+              ${subs.length ? `<div class="loc-subtitles">${subs.map(s=>`<div class="loc-sub">${s}</div>`).join('')}</div>` : ''}
+            </div>
           </div>
         `;
+      }
 
       case 'severity-card': {
         const count = Math.min(5, Math.max(1, parseInt(data.boxCount) || 5));
@@ -7323,8 +7627,10 @@
         const boxes = Array.from({ length: count }, (_, i) =>
           `<div class="sev-box" style="background:${colors[i]};">${i + 1}</div>`
         ).join('');
+        const accentColor = data.accentColor || colors[Math.floor(count/2)] || '#e84040';
+        const subs = [data.sub1, data.sub2, data.sub3, data.sub4].filter(Boolean);
         return `
-          <div class="preset-severity" style="${scale}">
+          <div class="preset-glass preset-severity" style="${scale};--preset-accent:${accentColor};">
             <div class="sev-header">
               <div class="sev-logo-area">
                 <img src="img/darnoppler_radar.png" alt="" class="sev-logo-img"
@@ -7333,6 +7639,7 @@
               <div class="sev-title-area">
                 <div class="sev-title">${data.title || 'SEVERE POTENTIAL'}</div>
                 <div class="sev-subtitle">${data.day || ''}</div>
+                ${subs.length ? `<div class="sev-subtitles">${subs.map(s=>`<div class="sev-sub">${s}</div>`).join('')}</div>` : ''}
               </div>
               <div class="sev-boxes-area">${boxes}</div>
             </div>
@@ -7341,26 +7648,29 @@
       }
 
       case 'warning-card': {
-        // Determine border color from warning type
         const wtype = (data.warnType || 'TORNADO WARNING').toUpperCase();
-        let borderColor = '#e84040';
-        if (wtype.includes('TORNADO')) borderColor = '#e84040';
-        else if (wtype.includes('SEVERE')) borderColor = '#e8a032';
-        else if (wtype.includes('FLASH FLOOD') || wtype.includes('FLOOD')) borderColor = '#4daf4d';
-        else if (wtype.includes('WINTER') || wtype.includes('SNOW') || wtype.includes('ICE')) borderColor = '#60a5fa';
-        else if (wtype.includes('WIND')) borderColor = '#f0f04d';
+        let accentColor = data.accentColor || '#e84040';
+        if (!data.accentColor) {
+          if (wtype.includes('TORNADO')) accentColor = '#e84040';
+          else if (wtype.includes('SEVERE') || wtype.includes('THUNDERSTORM')) accentColor = '#f0a500';
+          else if (wtype.includes('FLASH FLOOD') || wtype.includes('FLOOD')) accentColor = '#4daf4d';
+          else if (wtype.includes('WINTER') || wtype.includes('SNOW') || wtype.includes('ICE')) accentColor = '#60a5fa';
+          else if (wtype.includes('WIND')) accentColor = '#f0f04d';
+        }
+        const subs = [data.sub1, data.sub2, data.sub3, data.sub4].filter(Boolean);
         const rows = [
-          data.wind    ? `<div class="wc-row"><span class="wc-icon">💨</span><span class="wc-label">WIND</span><span class="wc-value">${data.wind}</span></div>` : '',
-          data.hail    ? `<div class="wc-row"><span class="wc-icon">🧊</span><span class="wc-label">HAIL</span><span class="wc-value">${data.hail}</span></div>` : '',
-          data.motion  ? `<div class="wc-row"><span class="wc-icon">➡️</span><span class="wc-label">MOTION</span><span class="wc-value">${data.motion}</span></div>` : '',
+          data.wind   ? `<div class="wc-row"><span class="wc-icon">💨</span><span class="wc-label">WIND</span><span class="wc-value">${data.wind}</span></div>` : '',
+          data.hail   ? `<div class="wc-row"><span class="wc-icon">🧊</span><span class="wc-label">HAIL</span><span class="wc-value">${data.hail}</span></div>` : '',
+          data.motion ? `<div class="wc-row"><span class="wc-icon">➡️</span><span class="wc-label">MOTION</span><span class="wc-value">${data.motion}</span></div>` : '',
         ].filter(Boolean).join('');
         return `
-          <div class="preset-warning-card" style="${scale};border-left:4px solid ${borderColor};">
+          <div class="preset-glass preset-warning-card" style="${scale};--preset-accent:${accentColor};">
             <div class="wc-header">
               <div class="wc-type">${wtype}</div>
               ${data.expires ? `<div class="wc-expires">Until ${data.expires}</div>` : ''}
             </div>
             ${rows ? `<div class="wc-body">${rows}</div>` : ''}
+            ${subs.length ? `<div class="wc-subtitles">${subs.map(s=>`<div class="wc-sub">${s}</div>`).join('')}</div>` : ''}
             ${data.counties ? `
               <div class="wc-footer">
                 <div class="wc-counties-label">Affected Counties</div>
