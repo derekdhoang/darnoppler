@@ -96,7 +96,6 @@ body {
   );
 }
 
-
 /* ── 5. APP CONTAINER ─────────────────────────────────────────────── */
 .app {
   position: relative;
@@ -213,7 +212,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   padding: 10px 18px;
   font-size: 0.85rem;
   font-weight: 500;
-  background: rgba(59,130,246,0.7);
+  background: var(--time-accent, rgba(59,130,246,0.7));
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: white;
@@ -317,8 +316,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
 }
 
-
-/* ── DOPPLER ──────────────────────────────────────────────────────── */
+/* ── 9. DOPPLER ──────────────────────────────────────────────────────── */
 .doppler-wrap {
   position: fixed;
   bottom: 33%;
@@ -391,7 +389,6 @@ html::-webkit-scrollbar-track { background: transparent; }
   font-weight: 400;
 }
 
-
 /* ── 11. DARK DASHBOARD ───────────────────────────────────────────── */
 .dashboard {
   position: relative;
@@ -412,7 +409,6 @@ html::-webkit-scrollbar-track { background: transparent; }
   text-transform: uppercase;
   margin-bottom: 16px;
 }
-
 
 /* ── 12. DETAILS GRID ─────────────────────────────────────────────── */
 .dash-details .details-grid {
@@ -440,7 +436,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   font-weight: 300;
 }
 
-/* ── 14. HOURLY CHART ─────────────────────────────────────────────── */
+/* ── 13. HOURLY CHART ─────────────────────────────────────────────── */
 .hourly-nav {
   display: flex;
   align-items: center;
@@ -487,16 +483,14 @@ html::-webkit-scrollbar-track { background: transparent; }
   height: 100% !important;
 }
 
-
-/* ── 15. FORECAST GRID ────────────────────────────────────────────── */
+/* ── 14. FORECAST GRID ────────────────────────────────────────────── */
 .forecast-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
 }
 
-
-/* ── 16. RADAR PANEL ──────────────────────────────────────────────── */
+/* ── 15. RADAR PANEL ──────────────────────────────────────────────── */
 .radar-tab-bar {
   display: flex;
   align-items: center;
@@ -577,8 +571,7 @@ html::-webkit-scrollbar-track { background: transparent; }
 .radar-key-swatch { width: 20px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 .radar-key-item span { font-size: 0.62rem; color: rgba(255,255,255,0.55); white-space: nowrap; }
 
-
-/* ── 17. SPC PANEL ────────────────────────────────────────────────── */
+/* ── 16. SPC PANEL ────────────────────────────────────────────────── */
 .spc-panel {
   background: rgba(255,255,255,0.04);
 }
@@ -647,8 +640,7 @@ html::-webkit-scrollbar-track { background: transparent; }
 
 .spc-link:hover { color: rgba(255,255,255,0.8); }
 
-
-/* ── 18. SPC OUTLOOK MAP ──────────────────────────────────────────── */
+/* ── 17. SPC OUTLOOK MAP ──────────────────────────────────────────── */
 .spc-view-header {
   display: flex;
   align-items: center;
@@ -710,8 +702,7 @@ html::-webkit-scrollbar-track { background: transparent; }
 .spc-key-swatch { width: 20px; height: 8px; border-radius: 2px; }
 .spc-key-item span { font-size: 0.62rem; color: rgba(255,255,255,0.55); white-space: nowrap; }
 
-
-/* ── 19. LEAFLET OVERRIDES ────────────────────────────────────────── */
+/* ── 18. LEAFLET OVERRIDES ────────────────────────────────────────── */
 .leaflet-control-zoom a {
   background: rgba(20,30,48,0.9) !important;
   color: rgba(255,255,255,0.8) !important;
@@ -761,7 +752,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   color: rgba(255,255,255,0.4) !important;
 }
 
-/* ── 20. SUGGESTIONS DROPDOWN ─────────────────────────────────────── */
+/* ── 19. SUGGESTIONS DROPDOWN ─────────────────────────────────────── */
 .suggestion-item {
   display: flex;
   align-items: center;
@@ -805,7 +796,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   letter-spacing: 0.02em;
 }
 
-/* ── 21. UTILITY ──────────────────────────────────────────────────── */
+/* ── 20. UTILITY ──────────────────────────────────────────────────── */
 .error-message {
   position: absolute;
   top: 80px;
@@ -833,7 +824,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   z-index: var(--z-ui);
 }
 
-/* ── 22. FOOTER ───────────────────────────────────────────────────── */
+/* ── 21. FOOTER ───────────────────────────────────────────────────── */
 .site-footer {
   padding: 20px 0 16px;
   border-top: 1px solid rgba(255,255,255,0.08);
@@ -898,14 +889,14 @@ html::-webkit-scrollbar-track { background: transparent; }
 .last-updated { font-size: 0.65rem; color: rgba(255,255,255,0.3); }
 
 
-/* ── 23. ANIMATIONS ───────────────────────────────────────────────── */
+/* ── 22. ANIMATIONS ───────────────────────────────────────────────── */
 @keyframes cardEnter {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 
-/* ── 24. MEDIA QUERIES ────────────────────────────────────────────── */
+/* ── 23. MEDIA QUERIES ────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .side-nav { display: none; }
   .forecast-grid { grid-template-columns: repeat(4, 1fr); }
@@ -913,7 +904,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   .hero-temp { font-size: 72px; }
 }
 
-/* ── 25. FORECAST CARDS ───────────────────────────────────────────── */
+/* ── 24. FORECAST CARDS ───────────────────────────────────────────── */
 .forecast-card {
   perspective: 600px;
   cursor: pointer;
@@ -1044,7 +1035,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   font-weight: 500;
 }
 
-/* ── RADAR ANIMATION PILL ─────────────────────────────────────────── */
+/* ── 25. RADAR ANIMATION PILL ─────────────────────────────────────────── */
 .radar-control-pill {
   position: absolute;
   bottom: 24px;
@@ -1140,4 +1131,104 @@ html::-webkit-scrollbar-track { background: transparent; }
   letter-spacing: 0.02em;
   min-width: 70px;
   text-align: right;
+}
+
+/* ── 26. MEDIA QUERIES ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Hide date pill and wordmark on small screens */
+  .diorama-date,
+  .diorama-wordmark {
+    display: none;
+  }
+
+  /* Search takes full width */
+  .diorama-search {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .diorama-topbar {
+    padding: 12px 16px;
+  }
+
+  /* Smaller hero temp */
+  .hero-temp {
+    font-size: 72px;
+  }
+
+  .diorama-hero {
+    transform: translate(-50%, -52%);
+  }
+
+  /* Doppler smaller on mobile */
+  #doppler-svg {
+    width: 65px;
+    height: auto;
+  }
+
+  /* Chips stack better */
+  .chip {
+    padding: 10px 12px;
+  }
+
+  .chip-label {
+    font-size: 8px;
+  }
+
+  .chip-value {
+    font-size: 13px;
+  }
+
+  /* Dashboard adjustments */
+  .dash-section {
+    padding: 18px 16px;
+  }
+
+  .forecast-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .dash-details .details-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #radar-preview-map {
+  height: 380px;
+  }
+
+  /* Radar pill smaller */
+  .radar-control-pill {
+    min-width: 220px;
+    padding: 8px 14px;
+  }
+
+  /* Footer stack */
+  .footer-links {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 430px) {
+  /* Even smaller phones */
+  .hero-temp {
+    font-size: 60px;
+  }
+
+  .hero-temp-unit {
+    font-size: 20px;
+    margin-top: 12px;
+  }
+
+  .forecast-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  #radar-preview-map {
+  height: 320px;
+  }
+
+  .chip {
+    padding: 8px 8px;
+  }
 }

@@ -12,9 +12,9 @@ function getIowaHour() {
 }
 
 function getTimeOfDay(hour) {
-  if (hour >= 5 && hour < 10) return 'morning';
-  if (hour >= 10 && hour < 19) return 'day';
-  if (hour >= 19 && hour < 21) return 'evening';
+  if (hour >= 6 && hour < 10) return 'morning';
+  if (hour >= 10 && hour < 17) return 'day';
+  if (hour >= 17 && hour < 20) return 'evening';
   return 'night';
 }
 
@@ -29,6 +29,27 @@ function applyBackground() {
 
   bgImage.className = 'bg-image ' + timeOfDay;
   bgOverlay.className = 'bg-overlay ' + timeOfDay;
+
+  // Time-aware UI colors
+  const root = document.documentElement;
+  switch (timeOfDay) {
+    case 'morning':
+      root.style.setProperty('--time-accent', 'rgba(251,191,36,0.8)');
+      root.style.setProperty('--time-kicker', '#fde68a');
+      break;
+    case 'day':
+      root.style.setProperty('--time-accent', 'rgba(59,130,246,0.8)');
+      root.style.setProperty('--time-kicker', 'rgba(255,248,220,0.95)');
+      break;
+    case 'evening':
+      root.style.setProperty('--time-accent', 'rgba(234,88,12,0.8)');
+      root.style.setProperty('--time-kicker', '#fb923c');
+      break;
+    case 'night':
+      root.style.setProperty('--time-accent', 'rgba(99,102,241,0.8)');
+      root.style.setProperty('--time-kicker', '#a5f3fc');
+      break;
+  }
 }
 
 // ── DOPPLER WALK SYSTEM ───────────────────────────────────────────────
