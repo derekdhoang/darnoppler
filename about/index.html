@@ -508,15 +508,41 @@
       color: rgba(255,255,255,0.18);
     }
 
-    /* ── MOBILE ───────────────────────────────────────────────────── */
     @media (max-width: 600px) {
       .about-card { padding: 24px 20px; }
-      .person-card { grid-template-columns: 1fr !important; }
-      .person-avatar-col { display: none; }
-      .about-hero { padding-top: calc(64px + 20px); height: 58vh; min-height: 380px; }
+
+      /* Stack photo above text instead of hiding it */
+      .person-card {
+        grid-template-columns: 1fr !important;
+      }
+      .person-avatar-col {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 8px;
+      }
+
+      /* Shrink avatar on mobile */
+      .person-avatar-col img {
+        width: 80px;
+        height: 80px;
+      }
+
+      /* More hero height to prevent Doppler overlap */
+      .about-hero {
+        padding-top: calc(64px + 20px);
+        height: 70vh;
+        min-height: 460px;
+      }
+
+      /* Smaller mascot on SE */
+      .mascot-wrap img {
+        width: 80px;
+      }
+
       .hero-title { font-size: 2rem; }
       .about-footer { flex-direction: column; text-align: center; gap: 8px; }
     }
+    
   </style>
 </head>
 <body>

@@ -1197,6 +1197,10 @@ html::-webkit-scrollbar-track { background: transparent; }
   height: 380px;
   }
 
+  #spc-outlook-map {
+  height: 380px;
+  }
+
   /* Radar pill smaller */
   .radar-control-pill {
     min-width: 220px;
@@ -1225,6 +1229,10 @@ html::-webkit-scrollbar-track { background: transparent; }
   }
 
   #radar-preview-map {
+  height: 320px;
+  }
+
+  #spc-outlook-map {
   height: 320px;
   }
 
