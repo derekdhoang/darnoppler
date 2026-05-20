@@ -144,6 +144,11 @@ let previewDrawings    = null;
 let hourlyChart        = null;
 let hourlyOffset       = 0;
 let storedHourly       = [];
+let windLayer          = null;
+let windEnabled        = true;
+let windInitialized    = false;
+let lastCityView       = null;
+const WIND_URL         = 'https://tile-proxy.derekdhoang.workers.dev/wind';
 
 
 // ── HOLIDAY DATA ──────────────────────────────────────────────────────
@@ -1315,9 +1320,62 @@ function initRadarControls() {
   }
 
   loadRadarFrames();
+  initWindLayer();
 }
 
+
 setInterval(refreshRadarPreview, 2 * 60 * 1000);
+
+// ── WIND PARTICLES ────────────────────────────────────────────────────
+async function initWindLayer() {
+  if (!previewMap) return;
+  try {
+    const res = await fetch(WIND_URL);
+    if (!res.ok) throw new Error(`Wind fetch failed: ${res.status}`);
+    const data = await res.json();
+
+    windLayer = L.velocityLayer({
+      displayValues:      false,
+      data:               data,
+      maxVelocity:        20,
+      colorScale:         ['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.7)', 'rgba(255,255,255,0.95)'],
+      velocityScale:      0.005,
+      particleAge:        64,
+      lineWidth:          1.2,
+      particleMultiplier: 0.0008,
+      frameRate:          16,
+    });
+
+    if (windEnabled) windLayer.addTo(previewMap);
+    windInitialized = true;
+
+    // Restore city view if one was already set (prevents leaflet-velocity from shifting view)
+    if (lastCityView) {
+      setTimeout(() => {
+        previewMap.setView([lastCityView.lat, lastCityView.lon], lastCityView.zoom);
+      }, 150);
+    }
+
+    console.log('✓ Wind layer loaded');
+  } catch (err) {
+    console.warn('Wind layer unavailable:', err.message);
+  }
+}
+
+function toggleWind() {
+  if (!previewMap) return;
+  windEnabled = !windEnabled;
+
+  const btn = document.getElementById('wind-toggle-btn');
+
+  if (windEnabled) {
+    if (windLayer) windLayer.addTo(previewMap);
+    if (btn) btn.classList.remove('wind-off');
+  } else {
+    if (windLayer) previewMap.removeLayer(windLayer);
+    if (btn) btn.classList.add('wind-off');
+  }
+}
 
 function updatePreviewCityMarker(cityName, lat, lon) {
   if (!previewMap) return;
@@ -1334,6 +1392,7 @@ function updatePreviewCityMarker(cityName, lat, lon) {
     weight: 2.5, opacity: 1, fillOpacity: 0.9, zIndex: 500,
   }).addTo(previewMap);
 
+  lastCityView = { lat, lon, zoom: zoomLevel };
   previewMap.setView([lat, lon], zoomLevel);
 }
 
@@ -1550,3 +1609,5 @@ async function loadSPCOutlookLayer(day) {
 // ── INIT ──────────────────────────────────────────────────────────────
 fetchWeather(null, null, localStorage.getItem('lastCity') || config.defaultCity);
 initRadarTabs();
+
+document.getElementById('wind-toggle-btn')?.addEventListener('click', toggleWind);

@@ -1133,6 +1133,32 @@ html::-webkit-scrollbar-track { background: transparent; }
   text-align: right;
 }
 
+.wind-toggle-pill {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.wind-toggle-pill:hover {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+.wind-toggle-pill.wind-off {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.3);
+}
+
 /* ── 26. MEDIA QUERIES ────────────────────────────────────────────── */
 @media (max-width: 768px) {
 
