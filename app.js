@@ -147,25 +147,61 @@ let storedHourly       = [];
 
 
 // ── HOLIDAY DATA ──────────────────────────────────────────────────────
-const HOLIDAYS = {
-  '01-01': { name: "New Year's Day",    emoji: '🎆' },
-  '01-15': { name: 'MLK Day',           emoji: '✊' },
-  '02-14': { name: "Valentine's Day",   emoji: '❤️' },
-  '03-17': { name: "St. Patrick's Day", emoji: '🍀' },
-  '04-01': { name: "April Fools'",      emoji: '🤡' },
-  '04-05': { name: "Easter",            emoji: '🐰' },
-  '05-05': { name: 'Cinco de Mayo',     emoji: '🌮' },
-  '05-26': { name: 'Memorial Day',      emoji: '🎖️' },
-  '06-19': { name: 'Juneteenth',        emoji: '✊' },
-  '07-04': { name: 'Independence Day',  emoji: '🎇' },
-  '09-01': { name: 'Labor Day',         emoji: '🔨' },
-  '10-31': { name: 'Halloween',         emoji: '🎃' },
-  '11-11': { name: 'Veterans Day',      emoji: '🎖️' },
-  '11-27': { name: 'Thanksgiving',      emoji: '🦃' },
-  '12-24': { name: 'Christmas Eve',     emoji: '🎄' },
-  '12-25': { name: 'Christmas Day',     emoji: '🎁' },
-  '12-31': { name: "New Year's Eve",    emoji: '🥂' },
-};
+
+// Returns nth occurrence of a weekday in a given month/year.
+// weekday: 0=Sun, 1=Mon ... 6=Sat. nth: 1-based. Use -1 for last.
+function nthWeekday(year, month, weekday, nth) {
+  if (nth === -1) {
+    // Last occurrence: start from end of month
+    const last = new Date(year, month + 1, 0); // last day of month
+    const diff = (last.getDay() - weekday + 7) % 7;
+    return new Date(year, month, last.getDate() - diff);
+  }
+  const first = new Date(year, month, 1);
+  const diff = (weekday - first.getDay() + 7) % 7;
+  return new Date(year, month, 1 + diff + (nth - 1) * 7);
+}
+
+// Easter (Anonymous Gregorian algorithm)
+function getEaster(year) {
+  const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+  const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+  const day   = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(year, month, day);
+}
+
+function getHolidaysForYear(year) {
+  const fmt = d => `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const holidays = {};
+
+  // Fixed-date holidays
+  holidays['01-01'] = "New Year's Day";
+  holidays['02-14'] = "Valentine's Day";
+  holidays['03-17'] = "St. Patrick's Day";
+  holidays['04-01'] = "April Fools'";
+  holidays['05-05'] = 'Cinco de Mayo';
+  holidays['06-19'] = 'Juneteenth';
+  holidays['07-04'] = 'Independence Day';
+  holidays['10-31'] = 'Halloween';
+  holidays['11-11'] = 'Veterans Day';
+  holidays['12-24'] = 'Christmas Eve';
+  holidays['12-25'] = 'Christmas Day';
+  holidays['12-31'] = "New Year's Eve";
+
+  // Floating holidays
+  holidays[fmt(nthWeekday(year, 0, 1, 3))]  = 'MLK Day';           // 3rd Mon in Jan
+  holidays[fmt(getEaster(year))]              = 'Easter';            // Easter Sunday
+  holidays[fmt(nthWeekday(year, 4, 1, -1))]  = 'Memorial Day';      // Last Mon in May
+  holidays[fmt(nthWeekday(year, 8, 1, 1))]   = 'Labor Day';         // 1st Mon in Sep
+  holidays[fmt(nthWeekday(year, 10, 4, 4))]  = 'Thanksgiving';      // 4th Thu in Nov
+
+  return holidays;
+}
 
 
 // ── SPC DATA ──────────────────────────────────────────────────────────
@@ -227,11 +263,36 @@ function getIconDescription(icon) {
 }
 
 
-// ── UTILITY FUNCTIONS ─────────────────────────────────────────────────
+// ── DOPPLER OUTFIT SWAP ───────────────────────────────────────────────
+function updateDopplerOutfit(icon, tempF, windSpeedMph) {
+  const el = document.getElementById('doppler-svg');
+  if (!el) return;
+
+  let outfit = 'doppler-base.png';
+
+  // Priority order: cold > rainy/storm > windy > sunny > night > base
+  if (tempF < 35) {
+    outfit = 'doppler-cold.png';
+  } else if (icon === 'thunderstorm' || icon === 'rain' || icon === 'drizzle' || icon === 'sleet') {
+    outfit = 'doppler-rainy.png';
+  } else if (windSpeedMph > 20) {
+    outfit = 'doppler-windy.png';
+  } else if (icon === 'clear-day' || icon === 'partly-cloudy-day') {
+    outfit = 'doppler-sunny.png';
+  } else if (icon === 'clear-night' || icon === 'partly-cloudy-night') {
+    outfit = 'doppler-night.png';
+  }
+
+  el.src = `img/${outfit}`;
+}
+
 function getHoliday(date) {
+  const year  = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day   = String(date.getDate()).padStart(2, '0');
-  return HOLIDAYS[`${month}-${day}`] || null;
+  const holidays = getHolidaysForYear(year);
+  const name = holidays[`${month}-${day}`];
+  return name ? { name } : null;
 }
 
 function formatDayLabel(date) {
@@ -488,7 +549,7 @@ function renderCurrent(current, today, hourlyData, city, state, country, lat, lo
 
   const todayHoliday = getHoliday(new Date());
   if (todayHoliday) {
-    holidayBar.textContent = `${todayHoliday.emoji} ${todayHoliday.name}`;
+    holidayBar.textContent = todayHoliday.name;
     holidayBar.hidden = false;
   } else {
     holidayBar.hidden = true;
@@ -511,6 +572,8 @@ function renderCurrent(current, today, hourlyData, city, state, country, lat, lo
   dewPoint.textContent    = Math.round(current.dewPoint) + '°F';
   todayHigh.textContent   = Math.round(today.temperatureHigh) + '°F';
   todayLow.textContent    = Math.round(today.temperatureLow)  + '°F';
+
+  updateDopplerOutfit(icon, Math.round(current.temperature), Math.round(current.windSpeed));
 
   // Sunrise / Sunset
   const sunriseEl = document.getElementById('sunrise');
@@ -650,7 +713,7 @@ function buildForecastCard(day, index, hourlyData) {
   card.innerHTML = `
     <div class="forecast-card-inner">
       <div class="forecast-card-front">
-        ${holiday ? `<div class="holiday-badge">${holiday.emoji} ${holiday.name}</div>` : ''}
+        ${holiday ? `<div class="holiday-badge">${holiday.name}</div>` : ''}
         <div class="forecast-day">${dayLabel}</div>
         <div class="forecast-date">${dateLabel}</div>
         <div class="forecast-icon-wrap">
