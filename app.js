@@ -282,7 +282,7 @@ function updateDopplerOutfit(icon, tempF, windSpeedMph) {
     outfit = 'doppler-rainy.png';
   } else if (windSpeedMph > 20) {
     outfit = 'doppler-windy.png';
-  } else if (icon === 'clear-day' || icon === 'partly-cloudy-day') {
+  } else if (tempF >= 80 && (icon === 'clear-day' || icon === 'partly-cloudy-day')) {
     outfit = 'doppler-sunny.png';
   } else if (icon === 'clear-night' || icon === 'partly-cloudy-night') {
     outfit = 'doppler-night.png';
@@ -578,29 +578,392 @@ function renderCurrent(current, today, hourlyData, city, state, country, lat, lo
   todayHigh.textContent   = Math.round(today.temperatureHigh) + '°F';
   todayLow.textContent    = Math.round(today.temperatureLow)  + '°F';
 
+  // Wind Gusts
+  const windGustEl = document.getElementById('wind-gust');
+  if (windGustEl) {
+    const gust = current.windGust || today.windGust;
+    windGustEl.textContent = gust ? Math.round(gust) + ' mph' : 'N/A';
+  }
+
+  // Barometric Pressure
+  const pressureEl = document.getElementById('pressure');
+  if (pressureEl) {
+    pressureEl.textContent = current.pressure ? current.pressure.toFixed(1) + ' mb' : 'N/A';
+  }
+
   updateDopplerOutfit(icon, Math.round(current.temperature), Math.round(current.windSpeed));
 
-  // Sunrise / Sunset
-  const sunriseEl = document.getElementById('sunrise');
-  const sunsetEl  = document.getElementById('sunset');
-  if (sunriseEl && today.sunriseTime) {
-    sunriseEl.textContent = new Date(today.sunriseTime * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  }
-  if (sunsetEl && today.sunsetTime) {
-    sunsetEl.textContent = new Date(today.sunsetTime * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  renderTodayPrecipHint(today);
+  renderLiveDigest(current, today, hourlyData);
+  renderHourlyChart(hourlyData);
+}
+
+
+// ── LIVE DIGEST STRIP ────────────────────────────────────────────────
+function renderLiveDigest(current, today, hourlyData) {
+  const kickerEl   = document.getElementById('live-digest-kicker');
+  const summaryEl  = document.getElementById('live-digest-summary');
+  const sunriseEl  = document.getElementById('digest-sunrise');
+  const sunsetEl   = document.getElementById('digest-sunset');
+  if (!kickerEl) return;
+
+  const tod    = getTimeOfDay(getIowaHour());
+  const icon   = current.icon;
+  const high   = Math.round(today.temperatureHigh);
+  const low    = Math.round(today.temperatureLow);
+  const wind   = Math.round(current.windSpeed || 0);
+  const windD  = getWindDirection(current.windBearing || 0);
+  const gust   = Math.round(current.windGust || wind);
+  const pop    = Math.round((today.precipProbability || 0) * 100);
+  const humid  = Math.round((current.humidity || 0) * 100);
+  const uv     = Math.round(current.uvIndex || 0);
+
+  const labels = {
+    morning: 'This Morning',
+    day:     'This Afternoon',
+    evening: 'This Evening',
+    night:   'Tonight',
+  };
+  const kicker = labels[tod];
+  kickerEl.textContent = kicker;
+
+  const isNight = tod === 'night' || tod === 'evening';
+  let summary = '';
+
+  if (isNight) {
+    if (icon.includes('thunder')) summary = `Storms possible through the overnight hours`;
+    else if (icon.includes('snow')) summary = `Snow conditions heading into the night`;
+    else if (icon.includes('rain') || icon.includes('drizzle')) summary = `Wet conditions overnight — keep the umbrella close`;
+    else if (icon.includes('clear')) summary = `Clear skies will hold through the overnight hours`;
+    else if (icon.includes('cloudy')) summary = `Cloudy skies overnight`;
+    else summary = `Conditions tonight look ${getIconDescription(icon).toLowerCase()}`;
+
+    if (low <= 32) summary += `. Temperatures plunge to a frigid ${low}°`;
+    else if (low <= 45) summary += `. Temperatures will cool into the ${low}s`;
+    else summary += `. Overnight low settles around ${low}°`;
+
+    if (pop >= 50) summary += ` with a ${pop}% chance of precipitation`;
+    if (wind >= 20) summary += `. Winds ${wind} mph ${windD}`;
+    else if (wind <= 5) summary += `. Calm winds overnight`;
+  } else {
+    if (icon.includes('thunder')) summary = `Thunderstorm risk in the area — stay weather aware`;
+    else if (icon.includes('snow')) summary = `Snow expected today`;
+    else if (icon.includes('rain') || icon.includes('drizzle')) summary = `A wet one today`;
+    else if (icon.includes('clear')) summary = `Beautiful clear conditions today`;
+    else if (icon.includes('cloudy')) summary = `Mostly cloudy skies today`;
+    else summary = `Conditions today look ${getIconDescription(icon).toLowerCase()}`;
+
+    if (high >= 90) summary += `. Hot — high of ${high}°, stay hydrated`;
+    else if (high >= 80) summary += `. A warm high of ${high}°`;
+    else if (high <= 32) summary += `. Frigid — high of only ${high}°`;
+    else summary += `. High of ${high}°, low tonight around ${low}°`;
+
+    if (pop >= 50) summary += ` with a ${pop}% chance of rain`;
+    if (wind >= 25) { summary += `. Very windy at ${wind} mph ${windD}`; if (gust > wind + 5) summary += `, gusting to ${gust} mph`; }
+    else if (wind >= 15) summary += `. Winds ${wind} mph out of the ${windD}`;
+    else if (wind <= 5) summary += `. Calm winds keep things comfortable`;
+    if (uv >= 8 && !isNight) summary += `. High UV index of ${uv} — sunscreen recommended`;
+    if (humid >= 80 && high >= 75) summary += `. Feels muggy at ${humid}% humidity`;
   }
 
-  renderTodayPrecipHint(today);
-  renderHourlyChart(hourlyData);
+  summaryEl.textContent = summary + '.';
+
+  if (today.sunriseTime && sunriseEl) {
+    sunriseEl.textContent = new Date(today.sunriseTime * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+  if (today.sunsetTime && sunsetEl) {
+    sunsetEl.textContent = new Date(today.sunsetTime * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
 }
 
 
 // ── RENDER FORECAST ───────────────────────────────────────────────────
 function renderForecast(dailyData, hourlyData) {
   forecastGrid.innerHTML = '';
+
+  // Compute week-wide temp range for sparklines
+  const allHighs = dailyData.map(d => Math.round(d.temperatureHigh));
+  const allLows  = dailyData.map(d => Math.round(d.temperatureLow));
+  const weekMin  = Math.min(...allLows);
+  const weekMax  = Math.max(...allHighs);
+  const weekRange = weekMax - weekMin || 1;
+
+  // Drawer element — shared, appended once
+  const drawer = document.createElement('div');
+  drawer.className = 'forecast-drawer-wrap';
+  drawer.innerHTML = `<div class="forecast-drawer-inner">
+    <div class="forecast-drawer-text">
+      <div class="forecast-drawer-kicker" id="drawer-kicker"></div>
+      <div class="forecast-drawer-summary" id="drawer-summary"></div>
+    </div>
+    <div class="forecast-drawer-matrix" id="drawer-matrix"></div>
+  </div>`;
+
+  let activeCol = null;
+
   dailyData.forEach((day, index) => {
-    forecastGrid.appendChild(buildForecastCard(day, index, hourlyData));
+    forecastGrid.appendChild(
+      buildForecastCol(day, index, hourlyData, weekMin, weekRange, drawer, () => activeCol, (c) => { activeCol = c; })
+    );
   });
+
+  forecastGrid.appendChild(drawer);
+}
+
+
+// ── TIME-AWARE DRAWER TEXT ────────────────────────────────────────────
+function getDrawerContent(day, hourlyData, dateStr, isToday) {
+  const high  = Math.round(day.temperatureHigh);
+  const low   = Math.round(day.temperatureLow);
+  const pop   = Math.round((day.precipProbability || 0) * 100);
+  const wind  = Math.round(day.windSpeed || 0);
+  const windD = getWindDirection(day.windBearing || 0);
+  const gust  = Math.round(day.windGust || wind);
+  const humid = Math.round((day.humidity || 0) * 100);
+  const uv    = Math.round(day.uvIndex || 0);
+
+  // ── TODAY TEMPLATE: time-aware ────────────────────────────────────
+  if (isToday) {
+    const tod = getTimeOfDay(getIowaHour());
+    const periods = {
+      morning: { label: 'This Morning',   hour: 8  },
+      day:     { label: 'This Afternoon', hour: 13 },
+      evening: { label: 'This Evening',   hour: 18 },
+      night:   { label: 'Tonight',        hour: 22 },
+    };
+    const { label, hour: targetHour } = periods[tod];
+    const entry = getHourlyCondition(hourlyData, dateStr, targetHour);
+    const isNightPeriod = tod === 'night' || tod === 'evening';
+    const icon = entry ? entry.icon : (isNightPeriod
+      ? day.icon.replace('clear-day','clear-night').replace('partly-cloudy-day','partly-cloudy-night')
+      : day.icon);
+    const desc = shortenSummary(day.summary, icon, icon);
+    const condLower = desc.toLowerCase();
+
+    let summary = '';
+    if (isNightPeriod) {
+      if (icon.includes('thunder'))                        summary = `${label} could bring thunderstorm activity`;
+      else if (icon.includes('snow'))                      summary = `${label}, snow is possible overnight`;
+      else if (icon.includes('rain')||icon.includes('drizzle')) summary = `${label} will be wet with ${condLower} moving through`;
+      else if (icon.includes('clear'))                     summary = `Expect clear, crisp skies heading into the overnight hours`;
+      else if (icon.includes('cloudy'))                    summary = `${label} will stay ${condLower} with clouds hanging around`;
+      else                                                 summary = `${label}, conditions look ${condLower}`;
+
+      if (low <= 32)      summary += `. Temperatures will drop to a frigid ${low}° overnight`;
+      else if (low <= 45) summary += `. Temperatures will cool into the ${low}s overnight`;
+      else                summary += `. Temperatures will settle comfortably around ${low}° overnight`;
+
+      if (pop >= 70)      summary += `. Rain is likely through the night at ${pop}%`;
+      else if (pop >= 30) summary += ` with a ${pop}% chance of overnight precipitation`;
+
+      if (wind >= 25) { summary += `. Breezy overnight — winds ${wind} mph ${windD}`; if (gust > wind+5) summary += `, gusting to ${gust} mph`; }
+      else if (wind <= 5) summary += `. Calm winds overnight`;
+    } else {
+      if (icon.includes('thunder'))                        summary = `${label} brings a risk of thunderstorms`;
+      else if (icon.includes('snow'))                      summary = `${label}, expect snow conditions`;
+      else if (icon.includes('rain')||icon.includes('drizzle')) summary = `${label} looks wet with ${condLower}`;
+      else if (icon.includes('clear'))                     summary = `${label} is shaping up to be a beautiful clear day`;
+      else if (icon.includes('cloudy'))                    summary = `${label} will be mostly ${condLower}`;
+      else                                                 summary = `${label}, expect ${condLower}`;
+
+      if (high >= 90)      summary += `. Hot out there — high of ${high}°, stay hydrated`;
+      else if (high >= 80) summary += `. A warm high of ${high}°, low tonight around ${low}°`;
+      else if (high <= 32) summary += `. Frigid — high of only ${high}°, bundle up`;
+      else if (high <= 50) summary += `. A cool day with a high of ${high}° and a low of ${low}°`;
+      else                 summary += `. High of ${high}°, low of ${low}°`;
+
+      if (pop >= 70)      summary += `. Rain is likely at ${pop}%`;
+      else if (pop >= 30) summary += ` with a ${pop}% chance of precipitation`;
+
+      if (wind >= 30)      { summary += `. Very windy — sustained ${wind} mph ${windD}`; if (gust > wind+5) summary += `, gusting to ${gust} mph`; }
+      else if (wind >= 15) summary += `. Winds ${wind} mph out of the ${windD}`;
+      else if (wind <= 5)  summary += `. Calm winds will keep things pleasant`;
+
+      if (uv >= 8)        summary += `. UV index is high at ${uv} — sunscreen recommended`;
+      else if (uv >= 6)   summary += `. Moderate UV index of ${uv}`;
+
+      if (humid >= 80 && high >= 75) summary += `. Feels muggy with ${humid}% humidity`;
+    }
+    summary += '.';
+
+    // 4-col matrix for today
+    const slots = [
+      { label: 'Morning',   h: 8  },
+      { label: 'Afternoon', h: 13 },
+      { label: 'Evening',   h: 18 },
+      { label: 'Night',     h: 22 },
+    ];
+    const hasHourly = slots.some(s => getHourlyCondition(hourlyData, dateStr, s.h) !== null);
+    const matrixHTML = hasHourly ? slots.map(slot => {
+      const e   = getHourlyCondition(hourlyData, dateStr, slot.h);
+      const ico = e ? e.icon : day.icon;
+      const tmp = e ? Math.round(e.temperature) : '--';
+      return `<div class="forecast-matrix-col">
+        <div class="forecast-matrix-label">${slot.label}</div>
+        <img class="forecast-matrix-icon" src="${getIconPath(ico)}" alt="${ico}">
+        <div class="forecast-matrix-temp">${tmp}°</div>
+      </div>`;
+    }).join('') : '';
+
+    return { kicker: label, summary, matrixHTML };
+  }
+
+  // ── FUTURE DAY TEMPLATE: daily digest ────────────────────────────
+  const rawDate  = new Date(day.time * 1000);
+  const dateObj  = new Date(rawDate.toLocaleDateString('en-US'));
+  const dayName  = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+
+  const dayIcon     = (() => { const e = getHourlyCondition(hourlyData, dateStr, 13); return e ? e.icon : day.icon; })();
+  const nightIcon   = (() => { const e = getHourlyCondition(hourlyData, dateStr, 21); return e ? e.icon : day.icon.replace('clear-day','clear-night').replace('partly-cloudy-day','partly-cloudy-night'); })();
+  const dayDesc     = shortenSummary(day.summary, dayIcon, nightIcon);
+  const nightDesc   = shortenSummary(null, nightIcon, nightIcon);
+  const dayEntry    = getHourlyCondition(hourlyData, dateStr, 13);
+  const nightEntry  = getHourlyCondition(hourlyData, dateStr, 21);
+  const dayTemp     = dayEntry   ? Math.round(dayEntry.temperature)   : high;
+  const nightTemp   = nightEntry ? Math.round(nightEntry.temperature) : low;
+
+  // Heading into the evening note — kept brief since DAY/NIGHT icons show explicit conditions
+  const overallStable = !dayIcon.includes('thunder') && !dayIcon.includes('rain') && !dayIcon.includes('snow');
+  const isWarm  = high >= 80;
+  const isCool  = high <= 55;
+  const isWindy = wind >= 20;
+
+  let summary = '';
+
+  // Narrative context — atmospheric, not redundant with the icons
+  if (dayIcon.includes('thunder')) {
+    summary = `An unsettled pattern sets up for ${dayName}. Monitor conditions closely as storms could affect travel and outdoor plans`;
+  } else if (dayIcon.includes('rain') || dayIcon.includes('drizzle')) {
+    summary = `A low pressure system keeps ${dayName} unsettled. Plan for wet conditions and reduced visibility at times`;
+  } else if (dayIcon.includes('snow')) {
+    summary = `Winter conditions arrive for ${dayName}. Allow extra travel time and monitor road conditions throughout the day`;
+  } else if (overallStable && isWarm) {
+    summary = `High pressure brings pleasant, settled weather to the region for ${dayName}. Conditions look favorable for travel and outdoor plans`;
+  } else if (overallStable && isCool) {
+    summary = `A cool but quiet day for ${dayName}. High pressure keeps conditions stable with no significant weather expected`;
+  } else if (overallStable) {
+    summary = `Quiet weather holds for ${dayName} with no significant systems in the area. A routine day across the region`;
+  } else {
+    summary = `Mixed conditions expected for ${dayName}. Check back for updates as conditions evolve`;
+  }
+
+  if (isWindy) summary += `. Winds will be a factor at ${wind} mph ${windD}`;
+  if (pop >= 50) summary += `. Precipitation chances are elevated at ${pop}%`;
+  summary += '.';
+
+  // DAY / NIGHT binary matrix
+  const matrixHTML = `
+    <div class="forecast-matrix-col forecast-matrix-col--lg">
+      <div class="forecast-matrix-label">Day</div>
+      <img class="forecast-matrix-icon forecast-matrix-icon--lg" src="${getIconPath(dayIcon)}" alt="${dayIcon}">
+      <div class="forecast-matrix-temp forecast-matrix-temp--high">${dayTemp}°</div>
+      <div class="forecast-matrix-desc">${dayDesc}</div>
+    </div>
+    <div class="forecast-matrix-col forecast-matrix-col--lg">
+      <div class="forecast-matrix-label">Night</div>
+      <img class="forecast-matrix-icon forecast-matrix-icon--lg" src="${getIconPath(nightIcon)}" alt="${nightIcon}">
+      <div class="forecast-matrix-temp">${nightTemp}°</div>
+      <div class="forecast-matrix-desc">${nightDesc}</div>
+    </div>`;
+
+  const kicker   = `${dayName} Outlook`;
+
+  return { kicker, summary, matrixHTML };
+}
+
+
+// ── BUILD FORECAST COLUMN ─────────────────────────────────────────────
+function buildForecastCol(day, index, hourlyData, weekMin, weekRange, drawer, getActive, setActive) {
+  const raw      = new Date(day.time * 1000);
+  const date     = new Date(raw.toLocaleDateString('en-US'));
+  const dateStr  = raw.toISOString().split('T')[0];
+  const today    = new Date();
+  const isToday  = date.toDateString() === today.toDateString();
+  const dayLabel = formatDayLabel(date);
+  const dateLbl  = formatDateLabel(date);
+  const high     = Math.round(day.temperatureHigh);
+  const low      = Math.round(day.temperatureLow);
+  const pop      = Math.round((day.precipProbability || 0) * 100);
+  const holiday  = getHoliday(date);
+
+  const middayEntry  = getHourlyCondition(hourlyData, dateStr, 12);
+  const eveningEntry = getHourlyCondition(hourlyData, dateStr, 20);
+  const middayIcon   = middayEntry  ? middayEntry.icon  : day.icon;
+  const eveningIcon  = eveningEntry ? eveningEntry.icon : day.icon;
+  const middayPath   = getIconPath(middayIcon);
+  const desc         = shortenSummary(day.summary, middayIcon, eveningIcon);
+
+  // Sparkline position
+  const sparkLeft  = ((low  - weekMin) / weekRange * 100).toFixed(1);
+  const sparkWidth = ((high - low)     / weekRange * 100).toFixed(1);
+
+  // Condition glow color
+  const glowMap = {
+    'thunderstorm':        'rgba(139,92,246,0.5)',
+    'rain':                'rgba(59,130,246,0.4)',
+    'drizzle':             'rgba(96,165,250,0.3)',
+    'sleet':               'rgba(148,163,184,0.3)',
+    'snow':                'rgba(186,230,253,0.35)',
+    'clear-day':           'rgba(251,191,36,0.35)',
+    'partly-cloudy-day':   'rgba(251,191,36,0.2)',
+    'clear-night':         'rgba(99,102,241,0.3)',
+    'partly-cloudy-night': 'rgba(99,102,241,0.2)',
+    'wind':                'rgba(148,163,184,0.25)',
+    'fog':                 'rgba(148,163,184,0.2)',
+  };
+  const glow = glowMap[middayIcon] || 'rgba(255,255,255,0.08)';
+
+  const precipType = day.precipType || '';
+  const isSnow = precipType === 'snow' || precipType === 'sleet';
+
+  const col = document.createElement('div');
+  col.className = 'forecast-col';
+  col.style.animationDelay = `${index * 60}ms`;
+  col.style.setProperty('--col-glow', glow);
+  col.style.setProperty('--spark-left',  `${sparkLeft}%`);
+  col.style.setProperty('--spark-width', `${sparkWidth}%`);
+
+  col.innerHTML = `
+    ${holiday ? `<div class="holiday-badge">${holiday.name}</div>` : ''}
+    <div class="forecast-day">${dayLabel}</div>
+    <div class="forecast-date">${dateLbl}</div>
+    <img class="forecast-icon" src="${middayPath}" alt="${desc}" loading="lazy">
+    <div class="forecast-description">${desc}</div>
+    <div class="forecast-sparkline"><div class="forecast-sparkline-fill"></div></div>
+    <div class="forecast-temps">
+      <span class="forecast-low">${low}°</span>
+      <span class="forecast-high">${high}°</span>
+    </div>
+    ${pop > 0 ? `<div class="forecast-precip">${isSnow ? '❄️' : '💧'} ${pop}%</div>` : '<div class="forecast-precip"></div>'}
+  `;
+
+  col.addEventListener('click', () => {
+    const isAlreadyActive = col.classList.contains('fc-active');
+
+    // Deactivate previous
+    const prev = getActive();
+    if (prev) prev.classList.remove('fc-active');
+
+    if (isAlreadyActive) {
+      // Toggle off
+      setActive(null);
+      drawer.classList.remove('open');
+    } else {
+      col.classList.add('fc-active');
+      setActive(col);
+
+      // Populate drawer
+      const { kicker, summary, matrixHTML } = getDrawerContent(day, hourlyData, dateStr, isToday);
+      document.getElementById('drawer-kicker').textContent  = kicker;
+      document.getElementById('drawer-summary').textContent = summary;
+      const matrixEl = document.getElementById('drawer-matrix');
+      matrixEl.innerHTML = matrixHTML;
+      matrixEl.style.display = matrixHTML ? 'grid' : 'none';
+      drawer.classList.add('open');
+    }
+  });
+
+  return col;
 }
 
 
@@ -679,93 +1042,6 @@ function getHourlyCondition(hourlyData, dateStr, targetHour) {
 
 
 // ── BUILD FORECAST CARD ───────────────────────────────────────────────
-function buildForecastCard(day, index, hourlyData) {
-  const raw       = new Date(day.time * 1000);
-  const date      = new Date(raw.toLocaleDateString('en-US'));
-  const dateStr   = raw.toISOString().split('T')[0];
-  const dayLabel  = formatDayLabel(date);
-  const dateLabel = formatDateLabel(date);
-  const high      = Math.round(day.temperatureHigh);
-  const low       = Math.round(day.temperatureLow);
-  const pop       = Math.round((day.precipProbability || 0) * 100);
-  const holiday   = getHoliday(date);
-
-  // Extra data for flip card back
-  const windSpeed = Math.round(day.windSpeed || 0);
-  const windDir   = getWindDirection(day.windBearing || 0);
-  const uvIdx     = Math.round(day.uvIndex || 0);
-  const humidPct  = Math.round((day.humidity || 0) * 100);
-
-  const middayEntry  = getHourlyCondition(hourlyData, dateStr, 12);
-  const eveningEntry = getHourlyCondition(hourlyData, dateStr, 20);
-  const middayIcon   = middayEntry  ? middayEntry.icon  : day.icon;
-  const eveningIcon  = eveningEntry ? eveningEntry.icon : day.icon;
-  const showNightIndicator = middayIcon !== eveningIcon;
-  const middayPath   = getIconPath(middayIcon);
-  const eveningPath  = getIconPath(eveningIcon);
-  
-  // Use daytime condition for description
-  const desc         = shortenSummary(day.summary, middayIcon, eveningIcon);
-  
-  const precipType   = day.precipType || '';
-  const isSnow       = precipType === 'snow' || precipType === 'sleet';
-  const isRain       = precipType === 'rain';
-
-  const card = document.createElement('div');
-  card.className = 'forecast-card';
-  card.style.animationDelay = `${index * 70}ms`;
-
-  card.innerHTML = `
-    <div class="forecast-card-inner">
-      <div class="forecast-card-front">
-        ${holiday ? `<div class="holiday-badge">${holiday.name}</div>` : ''}
-        <div class="forecast-day">${dayLabel}</div>
-        <div class="forecast-date">${dateLabel}</div>
-        <div class="forecast-icon-wrap">
-          ${showNightIndicator ? `<img class="forecast-night-indicator" src="${eveningPath}" alt="Night: ${eveningIcon}" title="Tonight">` : ''}
-          <img class="forecast-icon" src="${middayPath}" alt="${desc}" loading="lazy">
-        </div>
-        <div class="forecast-description">${desc}</div>
-        <div class="forecast-temps">
-          <span class="forecast-high">${high}°</span>
-          <span class="forecast-sep">/</span>
-          <span class="forecast-low">${low}°</span>
-        </div>
-        ${pop > 0 && isSnow
-          ? `<div class="forecast-precip">❄️ ${pop}%</div>`
-          : pop > 0 && isRain
-            ? `<div class="forecast-precip">💧 ${pop}%</div>`
-            : pop > 0
-              ? `<div class="forecast-precip">🌂 ${pop}%</div>`
-              : `<div class="forecast-precip-empty"></div>`
-        }
-      </div>
-      <div class="forecast-card-back">
-        <div class="forecast-day">${dayLabel}</div>
-        <div class="forecast-back-item">
-          <span class="forecast-back-label">Wind</span>
-          <span class="forecast-back-value">${windSpeed} mph ${windDir}</span>
-        </div>
-        <div class="forecast-back-item">
-          <span class="forecast-back-label">UV Index</span>
-          <span class="forecast-back-value">${uvIdx}</span>
-        </div>
-        <div class="forecast-back-item">
-          <span class="forecast-back-label">Humidity</span>
-          <span class="forecast-back-value">${humidPct}%</span>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Flip on click
-  card.addEventListener('click', () => {
-    card.classList.toggle('flipped');
-  });
-
-  return card;
-}
-
 // Wind direction helper
 function getWindDirection(degrees) {
   const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
