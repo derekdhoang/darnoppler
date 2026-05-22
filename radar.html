@@ -1223,6 +1223,160 @@
       color: rgba(255,255,255,0.7);
     }
 
+    /* ═══════════════════════════════════════════════════════════════════
+       PORTRAIT — show rotate prompt on tablets (phones too narrow anyway)
+       ═══════════════════════════════════════════════════════════════════ */
+    @media (max-width: 1366px) and (orientation: portrait) {
+      /* Show a "rotate your device" overlay for portrait mode */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: rgba(8,18,36,0.97);
+        z-index: 99999;
+      }
+      body::after {
+        content: 'Rotate to Landscape';
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 100000;
+        color: rgba(255,255,255,0.7);
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        white-space: nowrap;
+      }
+      #portrait-rotate-hint {
+        display: flex !important;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       LANDSCAPE TABLET / MOBILE LAYOUT
+       Catches phones (all orientations ≤ 900px wide) and
+       iPads in landscape (1024–1366px)
+       ═══════════════════════════════════════════════════════════════════ */
+    @media (max-width: 1366px) and (orientation: landscape),
+           (max-width: 900px) {
+
+      /* Hide desktop-only tools and panels */
+      .sidebar,
+      .sidebar-toggle,
+      #view-tab-spc,
+      .edit-mode-toggle,
+      #screenshot-btn {
+        display: none !important;
+      }
+
+      /* Topbar: compact */
+      .topbar {
+        padding: 0 12px;
+        height: 50px;
+        gap: 8px;
+      }
+      .topbar-brand img { height: 26px; }
+      .topbar-subtitle { display: none; }
+
+      /* Map fills remaining screen height */
+      #radar-map {
+        height: calc(100vh - 50px - 56px) !important;
+      }
+
+      /* Warnings sidebar becomes bottom sheet */
+      #warnings-sidebar {
+        position: fixed !important;
+        bottom: 56px;
+        left: 0;
+        right: 0;
+        width: 100% !important;
+        height: 45vh;
+        z-index: 500;
+        border-radius: 16px 16px 0 0;
+        border-top: 1px solid rgba(255,255,255,0.12);
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+      }
+      #warnings-sidebar.mobile-open {
+        transform: translateY(0);
+      }
+      #warnings-sidebar.collapsed {
+        transform: translateY(100%);
+      }
+
+      /* Mobile bottom action bar */
+      #mobile-bottom-bar {
+        display: flex !important;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        height: 56px;
+        background: rgba(8,18,36,0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 0.5px solid rgba(255,255,255,0.1);
+        z-index: 600;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0 8px;
+      }
+
+      .mobile-bar-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        padding: 6px 14px;
+        border: none;
+        background: transparent;
+        color: rgba(255,255,255,0.55);
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.15s;
+      }
+      .mobile-bar-btn svg { width: 22px; height: 22px; }
+      .mobile-bar-btn span {
+        font-size: 0.52rem;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.4);
+      }
+      .mobile-bar-btn.active { color: #60a5fa; background: rgba(96,165,250,0.12); }
+      .mobile-bar-btn.active span { color: #60a5fa; }
+
+      /* Preset modal: full-width bottom sheet */
+      #preset-modal-overlay { align-items: flex-end; }
+      #preset-modal-overlay .preset-modal {
+        width: 100%;
+        max-width: 100%;
+        max-height: 92vh;
+        border-radius: 16px 16px 0 0;
+        margin: 0;
+      }
+
+      /* Legends hidden — too cluttered */
+      #map-legend, #spc-legend { display: none !important; }
+
+      /* Hide desktop expand button */
+      #warnings-expand-btn { display: none !important; }
+
+      /* View tabs hidden */
+      .view-tabs { display: none !important; }
+    }
+
+    /* Desktop only: hide mobile elements */
+    @media (min-width: 1367px) {
+      #mobile-bottom-bar { display: none !important; }
+      #portrait-rotate-hint { display: none !important; }
+    }
+
     /* ── BROADCAST OVERLAY FRAMES ─────────────────────────────────────── */
     .broadcast-overlay-frame {
       position: absolute;
@@ -4012,16 +4166,16 @@
 
     <!-- View tabs: immediately next to brand -->
     <div class="view-tabs">
-      <button class="view-tab active" id="view-tab-radar">🌧️ Radar</button>
-      <button class="view-tab" id="view-tab-spc">⚡ SPC Outlook</button>
+      <button class="view-tab active" id="view-tab-radar">Radar</button>
+      <button class="view-tab" id="view-tab-spc">SPC Outlook</button>
     </div>
 
     <!-- Spacer pushes actions to far right -->
     <div style="flex:1;"></div>
 
     <div class="topbar-actions">
-      <button class="topbar-btn" id="btn-screenshot" title="Screenshot map (Ctrl+Shift+S)">📸 Screenshot</button>
-      <a href="https://www.spc.noaa.gov" target="_blank" class="topbar-btn amber">⚡ SPC</a>
+      <button class="topbar-btn" id="btn-screenshot" title="Screenshot map (Ctrl+Shift+S)">Screenshot</button>
+      <a href="https://www.spc.noaa.gov" target="_blank" class="topbar-btn amber">SPC</a>
       <a href="index.html" class="topbar-btn blue">← Back</a>
     </div>
   </div>
@@ -4163,6 +4317,22 @@
                   <div class="toggle-thumb"></div>
                 </label>
               </div>
+              <div class="filter-row">
+                <span class="filter-label">Radar Legend</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="toggle-radar-legend" checked>
+                  <div class="toggle-track"></div>
+                  <div class="toggle-thumb"></div>
+                </label>
+              </div>
+              <div class="filter-row">
+                <span class="filter-label">SPC Legend</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="toggle-spc-legend" checked>
+                  <div class="toggle-track"></div>
+                  <div class="toggle-thumb"></div>
+                </label>
+              </div>
             </div>
 
             <div class="panel-section">
@@ -4189,10 +4359,10 @@
                 </div>
                 <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.4);margin-top:4px;margin-bottom:2px;">Outlook Type</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
-                  <button class="spc-type-btn active" data-type="cat">⚡ Categorical</button>
-                  <button class="spc-type-btn" data-type="torn">🌪️ Tornado</button>
-                  <button class="spc-type-btn" data-type="wind">💨 Wind</button>
-                  <button class="spc-type-btn" data-type="hail">🧊 Hail</button>
+                  <button class="spc-type-btn active" data-type="cat">Categorical</button>
+                  <button class="spc-type-btn" data-type="torn">Tornado</button>
+                  <button class="spc-type-btn" data-type="wind">Wind</button>
+                  <button class="spc-type-btn" data-type="hail">Hail</button>
                 </div>
               </div>
             </div>
@@ -4202,9 +4372,15 @@
               <div class="county-groups" id="county-groups">
                 <button class="county-group-btn active" data-region="all">All</button>
                 <button class="county-group-btn" data-region="north">North</button>
-                <button class="county-group-btn" data-region="south">South</button>
+                <button class="county-group-btn" data-region="northeast">NE</button>
                 <button class="county-group-btn" data-region="east">East</button>
+                <button class="county-group-btn" data-region="southeast">SE</button>
+                <button class="county-group-btn" data-region="south">South</button>
+                <button class="county-group-btn" data-region="southwest">SW</button>
                 <button class="county-group-btn" data-region="west">West</button>
+                <button class="county-group-btn" data-region="northwest">NW</button>
+                <button class="county-group-btn" data-region="northcentral">NC</button>
+                <button class="county-group-btn" data-region="southcentral">SC</button>
                 <button class="county-group-btn" data-region="central">Central</button>
               </div>
             </div>
@@ -4278,7 +4454,7 @@
  
               <!-- Error + retry -->
               <div class="forecast-error" id="forecast-error" hidden>
-                <span>⚠️ Forecast data unavailable</span>
+                <span>Forecast data unavailable</span>
                 <button class="forecast-retry-btn" id="forecast-retry-btn" type="button">Retry</button>
               </div>
             </div>
@@ -4855,7 +5031,7 @@
 
       <!-- Legend -->
       <div class="map-legend" id="map-legend">
-        <div class="legend-section-title">📡 Reflectivity</div>
+        <div class="legend-section-title">Reflectivity</div>
         <div class="legend-row"><div class="legend-swatch" style="background:#04e9e7;"></div><span class="legend-text">Light Rain</span><span class="legend-dbz">20 dBZ</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#02fd02;"></div><span class="legend-text">Moderate Rain</span><span class="legend-dbz">35 dBZ</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#008e00;"></div><span class="legend-text">Heavy Rain</span><span class="legend-dbz">45 dBZ</span></div>
@@ -4865,7 +5041,7 @@
         <div class="legend-row"><div class="legend-swatch" style="background:#bc00bc;"></div><span class="legend-text">Violent / Tornado</span><span class="legend-dbz">75 dBZ</span></div>
         <!-- SIG Hatch Intensity -->
         <div class="spc-legend-intensity" style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.1);padding-top:6px;">
-          <div class="legend-section-title" style="margin-bottom:5px;">⬛ SIG Intensity</div>
+          <div class="legend-section-title" style="margin-bottom:5px;">SIG Intensity</div>
           <div class="spc-legend-intensity-row">
             <div class="spc-legend-intensity-swatch">
               <svg width="28" height="16" xmlns="http://www.w3.org/2000/svg"><rect width="28" height="16" fill="white"/><line x1="0" y1="5" x2="5" y2="0" stroke="#000" stroke-width="1.1"/><line x1="0" y1="11" x2="11" y2="0" stroke="#000" stroke-width="1.1"/><line x1="0" y1="17" x2="17" y2="0" stroke="#000" stroke-width="1.1"/><line x1="6" y1="16" x2="16" y2="6" stroke="#000" stroke-width="1.1"/><line x1="12" y1="16" x2="22" y2="6" stroke="#000" stroke-width="1.1"/><line x1="18" y1="16" x2="28" y2="6" stroke="#000" stroke-width="1.1"/></svg>
@@ -4889,7 +5065,7 @@
 
       <!-- SPC Risk Level Legend (visible in SPC view) -->
       <div class="map-legend spc-legend" id="spc-legend">
-        <div class="legend-section-title">⚡ Risk Level</div>
+        <div class="legend-section-title">Risk Level</div>
         <div class="legend-row"><div class="legend-swatch" style="background:#c5e8c5;"></div><span class="legend-text">General Thunder</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#4daf4d;"></div><span class="legend-text">Marginal</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#f0f04d;"></div><span class="legend-text">Slight</span></div>
@@ -4950,6 +5126,60 @@
 
       <div class="warnings-last-updated" id="warnings-last-updated">Never updated</div>
     </div>
+  </div>
+
+  <!-- PORTRAIT ROTATE HINT — shown via CSS in portrait mode -->
+  <div id="portrait-rotate-hint" style="display:none;position:fixed;inset:0;z-index:100000;background:rgba(8,18,36,0.98);flex-direction:column;align-items:center;justify-content:center;gap:20px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" style="width:56px;height:56px;animation:rotatehint 2s ease-in-out infinite;">
+      <rect x="4" y="2" width="16" height="20" rx="2"/>
+      <path d="M8 22h8" stroke-width="1"/>
+    </svg>
+    <div style="color:rgba(255,255,255,0.65);font-size:0.95rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;">Rotate to Landscape</div>
+    <div style="color:rgba(255,255,255,0.3);font-size:0.72rem;letter-spacing:0.05em;">Darnoppler Studio works best in landscape mode</div>
+  </div>
+  <style>
+    @keyframes rotatehint {
+      0%, 100% { transform: rotate(0deg); }
+      40% { transform: rotate(90deg); }
+      60% { transform: rotate(90deg); }
+    }
+    @media (max-width: 1366px) and (orientation: portrait) {
+      #portrait-rotate-hint { display: flex !important; }
+    }
+  </style>
+
+  <!-- MOBILE BOTTOM BAR — hidden on desktop via CSS -->
+  <div id="mobile-bottom-bar" style="display:none;">
+    <button class="mobile-bar-btn" id="mobile-warnings-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <span>Warnings</span>
+    </button>
+    <button class="mobile-bar-btn" id="mobile-preset-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <line x1="12" y1="8" x2="12" y2="16"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+      <span>Preset</span>
+    </button>
+    <button class="mobile-bar-btn" id="mobile-screenshot-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+      <span>Screenshot</span>
+    </button>
+    <button class="mobile-bar-btn" id="mobile-radar-toggle-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="2"/>
+        <path d="M16.24 7.76a6 6 0 010 8.49m-8.48-.01a6 6 0 010-8.49m11.31-2.82a10 10 0 010 14.14m-14.14 0a10 10 0 010-14.14"/>
+      </svg>
+      <span>Radar</span>
+    </button>
   </div>
 
   <!-- Save indicator -->
@@ -5428,12 +5658,37 @@
 
   // Iowa county FIPS by region (approximate)
   const IOWA_REGIONS = {
-    north: ['Lyon', 'Osceola', 'Dickinson', 'Emmet', 'Kossuth', 'Winnebago', 'Worth', 'Mitchell', 'Howard', 'Winneshiek', 'Allamakee', 'Sioux', "O'Brien", 'Clay', 'Palo Alto', 'Hancock', 'Cerro Gordo', 'Floyd', 'Chickasaw', 'Bremer', 'Fayette', 'Clayton', 'Franklin', 'Butler', 'Wright', 'Humboldt', 'Pocahontas'],
-    west: ['Plymouth', 'Cherokee', 'Buena Vista', 'Woodbury', 'Ida', 'Sac', 'Monona', 'Crawford', 'Carroll', 'Harrison', 'Shelby', 'Audubon', 'Pottawattamie', 'Cass', 'Mills', 'Montgomery', 'Fremont', 'Page', 'Guthrie', 'Greene', 'Calhoun'],
-    central: ['Polk', 'Dallas', 'Story', 'Boone', 'Marshall', 'Jasper', 'Marion', 'Warren', 'Madison', 'Hamilton', 'Hardin', 'Grundy', 'Tama', 'Poweshiek', 'Webster'],
-    east: ['Black Hawk', 'Buchanan', 'Delaware', 'Dubuque', 'Benton', 'Linn', 'Jones', 'Jackson', 'Iowa', 'Johnson', 'Cedar', 'Clinton', 'Scott', 'Muscatine', 'Washington', 'Louisa'],
-    south: ['Adair', 'Adams', 'Union', 'Clarke', 'Lucas', 'Monroe', 'Wapello', 'Jefferson', 'Henry', 'Des Moines', 'Taylor', 'Ringgold', 'Decatur', 'Wayne', 'Appanoose', 'Davis', 'Van Buren', 'Lee', 'Keokuk', 'Mahaska']
+    north:        ['Lyon', 'Osceola', 'Dickinson', 'Emmet', 'Kossuth', 'Winnebago', 'Worth', 'Mitchell',
+                   'Howard', 'Winneshiek', 'Allamakee', 'Sioux', "O'Brien", 'Clay', 'Palo Alto'],
+    northeast:    ['Howard', 'Winneshiek', 'Allamakee', 'Chickasaw', 'Fayette', 'Clayton',
+                   'Bremer', 'Buchanan', 'Delaware', 'Dubuque', 'Black Hawk', 'Linn', 'Jones', 'Jackson'],
+    east:         ['Black Hawk', 'Buchanan', 'Delaware', 'Dubuque', 'Benton', 'Linn', 'Jones',
+                   'Jackson', 'Iowa', 'Johnson', 'Cedar', 'Clinton', 'Scott', 'Muscatine', 'Washington', 'Louisa'],
+    southeast:    ['Iowa', 'Johnson', 'Cedar', 'Clinton', 'Scott', 'Muscatine', 'Washington',
+                   'Louisa', 'Keokuk', 'Mahaska', 'Jefferson', 'Henry', 'Des Moines', 'Van Buren',
+                   'Wapello', 'Davis', 'Lee'],
+    south:        ['Adair', 'Adams', 'Union', 'Clarke', 'Lucas', 'Monroe', 'Wapello', 'Jefferson',
+                   'Henry', 'Des Moines', 'Taylor', 'Ringgold', 'Decatur', 'Wayne', 'Appanoose',
+                   'Davis', 'Van Buren', 'Lee', 'Keokuk', 'Mahaska'],
+    southwest:    ['Fremont', 'Page', 'Montgomery', 'Mills', 'Cass', 'Pottawattamie', 'Shelby',
+                   'Audubon', 'Adair', 'Adams', 'Taylor', 'Ringgold', 'Union', 'Clarke'],
+    west:         ['Plymouth', 'Cherokee', 'Buena Vista', 'Woodbury', 'Ida', 'Sac', 'Monona',
+                   'Crawford', 'Carroll', 'Harrison', 'Shelby', 'Audubon', 'Pottawattamie',
+                   'Cass', 'Mills', 'Montgomery', 'Fremont', 'Page', 'Guthrie', 'Greene', 'Calhoun'],
+    northwest:    ['Lyon', 'Sioux', 'Plymouth', 'Osceola', "O'Brien", 'Cherokee', 'Woodbury',
+                   'Dickinson', 'Clay', 'Buena Vista', 'Ida', 'Monona', 'Crawford'],
+    northcentral: ['Emmet', 'Kossuth', 'Winnebago', 'Worth', 'Hancock', 'Cerro Gordo', 'Floyd',
+                   'Wright', 'Franklin', 'Butler', 'Bremer', 'Humboldt', 'Pocahontas', 'Webster',
+                   'Hamilton', 'Hardin'],
+    southcentral: ['Polk', 'Dallas', 'Madison', 'Warren', 'Marion', 'Mahaska', 'Monroe', 'Wapello',
+                   'Lucas', 'Clarke', 'Union', 'Ringgold', 'Decatur', 'Wayne', 'Appanoose',
+                   'Adams', 'Adair'],
+    central:      ['Polk', 'Dallas', 'Story', 'Boone', 'Marshall', 'Jasper', 'Marion', 'Warren',
+                   'Madison', 'Hamilton', 'Hardin', 'Grundy', 'Tama', 'Poweshiek', 'Webster'],
   };
+
+  // Multi-region selection — Set of active region keys (empty = all)
+  let activeRegions = new Set();
 
   let activeColor    = '#3b82f6';  // default blue - unified color palette
   let activeLabel    = null;
@@ -5850,6 +6105,7 @@
     initBroadcastMode();
     initWarnings();
     initScreenshot();
+    initMobileUI();
   }
   
   // Arrow markers
@@ -6151,12 +6407,22 @@
       const states = getWarningStates(w);
       return states.has('IA');
     });
-    
+
+    // Filter by active county regions
+    if (activeRegions.size > 0) {
+      const selectedCounties = getCountiesInActiveRegions();
+      result = result.filter(w => {
+        if (!w.areaDesc) return false;
+        const warnCounties = w.areaDesc.split(';').map(s => s.trim().split(',')[0].trim());
+        return warnCounties.some(c => selectedCounties.has(c));
+      });
+    }
+
     // Filter by category
     if (currentWarningFilter !== 'all') {
       result = result.filter(w => getWarningStyle(w.event).category === currentWarningFilter);
     }
-    
+
     return result;
   }
 
@@ -6241,8 +6507,8 @@
     
     // Header — emoji + warning type
     const emojiMap = {
-      'Tornado Warning': '🌪️',
-      'Tornado Watch': '🌪️',
+      'Tornado Warning': '',
+      'Tornado Watch': '',
       'Severe Thunderstorm Warning': '⛈️',
       'Severe Thunderstorm Watch': '⛈️',
       'Flash Flood Warning': '🌊',
@@ -6250,30 +6516,30 @@
       'Flood Warning': '🌊',
       'Flood Watch': '🌊',
       'Flood Advisory': '🌊',
-      'Blizzard Warning': '❄️',
-      'Winter Storm Warning': '❄️',
-      'Winter Storm Watch': '❄️',
-      'Winter Weather Advisory': '❄️',
-      'Ice Storm Warning': '🧊',
-      'Excessive Heat Warning': '🔥',
-      'Heat Advisory': '🔥',
+      'Blizzard Warning': '',
+      'Winter Storm Warning': '',
+      'Winter Storm Watch': '',
+      'Winter Weather Advisory': '',
+      'Ice Storm Warning': '',
+      'Excessive Heat Warning': '',
+      'Heat Advisory': '',
       'Extreme Cold Warning': '🥶',
       'Wind Chill Advisory': '🥶',
       'Freeze Warning': '🥶',
       'Frost Advisory': '🥶',
-      'High Wind Warning': '💨',
-      'Wind Advisory': '💨',
-      'Red Flag Warning': '🔥',
-      'Fire Weather Watch': '🔥',
+      'High Wind Warning': '',
+      'Wind Advisory': '',
+      'Red Flag Warning': '',
+      'Fire Weather Watch': '',
     };
-    const emoji = emojiMap[warning.event] || '⚠️';
+    const emoji = emojiMap[warning.event] || '';
     parts.push(`${emoji} ${warning.event.toUpperCase()} ${emoji}`);
     parts.push('');
     
     // Affected counties/areas
     if (warning.areaDesc) {
       const areas = warning.areaDesc.split(';').map(s => s.trim()).filter(Boolean);
-      parts.push('📍 AFFECTED AREAS:');
+      parts.push('AFFECTED AREAS:');
       areas.forEach(a => parts.push(`  • ${a}`));
       parts.push('');
     }
@@ -6305,7 +6571,7 @@
     }
     
     // Footer
-    parts.push('📡 Source: National Weather Service');
+    parts.push('Source: National Weather Service');
     parts.push('Stay tuned to Darnoppler\'s Forecast for updates!');
     
     return parts.join('\n');
@@ -7348,7 +7614,7 @@
               <option value="">— Select active Iowa warning —</option>
               ${options}
             </select>
-            <button class="load-warning-btn" id="load-warning-btn">⚡ Load Warning Data</button>
+            <button class="load-warning-btn" id="load-warning-btn">Load Warning Data</button>
           </div>`;
       } else {
         warningLoaderHTML = `
@@ -7382,7 +7648,7 @@
     container.innerHTML = warningLoaderHTML +
       // Accent color picker always first
       `<div class="preset-accent-row">
-        <span class="preset-accent-label">🎨 Accent Color</span>
+        <span class="preset-accent-label">Accent Color</span>
         <input type="color" class="preset-accent-picker" id="preset-accent-picker"
                value="${presetData.accentColor || template.accentDefault || '#60a5fa'}"
                title="Border glow color">
@@ -7606,7 +7872,7 @@
         const subs = [data.sub1, data.sub2, data.sub3, data.sub4].filter(Boolean);
         return `
           <div class="preset-glass preset-location-tag" style="${scale};--preset-accent:${accentColor};">
-            <span class="loc-icon">📍</span>
+            
             <div>
               <span class="loc-name">${data.locName || 'Location'}</span>
               ${subs.length ? `<div class="loc-subtitles">${subs.map(s=>`<div class="loc-sub">${s}</div>`).join('')}</div>` : ''}
@@ -7659,9 +7925,9 @@
         }
         const subs = [data.sub1, data.sub2, data.sub3, data.sub4].filter(Boolean);
         const rows = [
-          data.wind   ? `<div class="wc-row"><span class="wc-icon">💨</span><span class="wc-label">WIND</span><span class="wc-value">${data.wind}</span></div>` : '',
-          data.hail   ? `<div class="wc-row"><span class="wc-icon">🧊</span><span class="wc-label">HAIL</span><span class="wc-value">${data.hail}</span></div>` : '',
-          data.motion ? `<div class="wc-row"><span class="wc-icon">➡️</span><span class="wc-label">MOTION</span><span class="wc-value">${data.motion}</span></div>` : '',
+          data.wind   ? `<div class="wc-row"><span class="wc-label">WIND</span><span class="wc-value">${data.wind}</span></div>` : '',
+          data.hail   ? `<div class="wc-row"><span class="wc-label">HAIL</span><span class="wc-value">${data.hail}</span></div>` : '',
+          data.motion ? `<div class="wc-row"><span class="wc-label">MOTION</span><span class="wc-value">${data.motion}</span></div>` : '',
         ].filter(Boolean).join('');
         return `
           <div class="preset-glass preset-warning-card" style="${scale};--preset-accent:${accentColor};">
@@ -8058,11 +8324,11 @@
 
       const lagText = lag_minutes < 10
         ? `${Math.round(lag_minutes)}m ago`
-        : `⚠️ ${Math.round(lag_minutes)}m ago`;
-      document.getElementById('radar-timestamp').textContent = `📡 MRMS · ${lagText}`;
+        : `${Math.round(lag_minutes)}m ago`;
+      document.getElementById('radar-timestamp').textContent = `MRMS · ${lagText}`;
     } catch (err) {
       console.error('MRMS loadRadar failed:', err);
-      document.getElementById('radar-timestamp').textContent = '📡 MRMS · unavailable';
+      document.getElementById('radar-timestamp').textContent = 'MRMS · unavailable';
     }
   }
 
@@ -8126,10 +8392,10 @@
           if (!editMode || !countyFillMode) return;
           
           // Check if region filter is active and this county is filtered out
-          if (currentRegion !== 'all') {
+          if (activeRegions.size > 0) {
             const countyName = f.properties?.NAME || f.properties?.name || '';
-            const inRegion = IOWA_REGIONS[currentRegion]?.includes(countyName);
-            if (!inRegion) return; // Don't allow clicking filtered-out counties
+            const selectedCounties = getCountiesInActiveRegions();
+            if (!selectedCounties?.has(countyName)) return;
           }
           
           // Check if color is selected (only for filling, not unfilling)
@@ -8624,7 +8890,7 @@
 
     if (spcCurrentType === 'cat') {
       legend.innerHTML = `
-        <div class="legend-section-title">⚡ Risk Level</div>
+        <div class="legend-section-title">Risk Level</div>
         <div class="legend-row"><div class="legend-swatch" style="background:#c5e8c5;"></div><span class="legend-text">General Thunder</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#4daf4d;"></div><span class="legend-text">Marginal</span></div>
         <div class="legend-row"><div class="legend-swatch" style="background:#f0f04d;"></div><span class="legend-text">Slight</span></div>
@@ -8633,7 +8899,7 @@
         <div class="legend-row"><div class="legend-swatch" style="background:#ff40ff;"></div><span class="legend-text">High</span></div>
       `;
     } else {
-      const typeLabel = { torn: '🌪️ Tornado', wind: '💨 Damaging Wind', hail: '🧊 Large Hail' };
+      const typeLabel = { torn: 'Tornado', wind: 'Damaging Wind', hail: 'Large Hail' };
       const sigLabel  = { torn: 'Sig Tornado (EF2+)', wind: 'Sig Wind (75+mph)', hail: 'Sig Hail (2"+)' };
       legend.innerHTML = `
         <div class="legend-section-title">${typeLabel[spcCurrentType]} Prob.</div>
@@ -8667,13 +8933,13 @@
       `;
     } else {
       const labels = {
-        torn: { label: '🌪️ TORNADO', probs: ['2%','5%','10%','15%','30%','45%','60%'],
+        torn: { label: 'TORNADO', probs: ['2%','5%','10%','15%','30%','45%','60%'],
                 colors: ['#4daf4d','#8b5a2b','#f0f04d','#e8a032','#e84040','#ff40ff','#9400d3'],
                 sig: 'SIG TORN', sigDesc: '10%+ EF2+' },
-        wind: { label: '💨 WIND', probs: ['5%','15%','30%','45%','60%'],
+        wind: { label: 'WIND', probs: ['5%','15%','30%','45%','60%'],
                 colors: ['#4daf4d','#f0f04d','#e8a032','#e84040','#ff40ff'],
                 sig: 'SIG WIND', sigDesc: '10%+ 75mph+' },
-        hail: { label: '🧊 HAIL', probs: ['5%','15%','30%','45%','60%'],
+        hail: { label: 'HAIL', probs: ['5%','15%','30%','45%','60%'],
                 colors: ['#4daf4d','#f0f04d','#e8a032','#e84040','#ff40ff'],
                 sig: 'SIG HAIL', sigDesc: '10%+ 2"+' },
       };
@@ -8891,6 +9157,18 @@
       }
     });
 
+    // Radar Legend toggle
+    document.getElementById('toggle-radar-legend')?.addEventListener('change', (e) => {
+      const el = document.getElementById('map-legend');
+      if (el) el.style.display = e.target.checked ? '' : 'none';
+    });
+
+    // SPC Legend toggle
+    document.getElementById('toggle-spc-legend')?.addEventListener('change', (e) => {
+      const el = document.getElementById('spc-legend');
+      if (el) el.style.display = e.target.checked ? '' : 'none';
+    });
+
     // Radar opacity slider and presets
     const opacitySlider = document.getElementById('radar-opacity-slider');
     const opacityValue = document.getElementById('radar-opacity-value');
@@ -9013,7 +9291,7 @@
         statusBadge.textContent = `${Math.round(ageHours)}h old`;
         statusBadge.classList.add('stale');
       } else {
-        statusBadge.textContent = `⚠️ ${Math.round(ageHours)}h old`;
+        statusBadge.textContent = `${Math.round(ageHours)}h old`;
         statusBadge.classList.add('very-stale');
       }
     }
@@ -9260,39 +9538,57 @@
     document.querySelectorAll('.county-group-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const clickedRegion = btn.dataset.region;
-        
-        // Toggle behavior: if clicking the active region, go back to 'all'
-        if (currentRegion === clickedRegion && clickedRegion !== 'all') {
-          currentRegion = 'all';
-          document.querySelectorAll('.county-group-btn').forEach(b => b.classList.remove('active'));
-          document.querySelector('.county-group-btn[data-region="all"]').classList.add('active');
-        } else {
-          currentRegion = clickedRegion;
+
+        if (clickedRegion === 'all') {
+          activeRegions.clear();
           document.querySelectorAll('.county-group-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
+        } else {
+          if (activeRegions.has(clickedRegion)) {
+            activeRegions.delete(clickedRegion);
+          } else {
+            activeRegions.add(clickedRegion);
+          }
+          const allBtn = document.querySelector('.county-group-btn[data-region="all"]');
+          if (activeRegions.size === 0) {
+            allBtn.classList.add('active');
+          } else {
+            allBtn.classList.remove('active');
+          }
+          document.querySelectorAll('.county-group-btn:not([data-region="all"])').forEach(b => {
+            b.classList.toggle('active', activeRegions.has(b.dataset.region));
+          });
         }
-        
-        filterCountiesByRegion(currentRegion);
+
+        filterCountiesByRegion();
+        renderWarningsList();
       });
     });
   }
 
-  function filterCountiesByRegion(region) {
+  function getCountiesInActiveRegions() {
+    if (activeRegions.size === 0) return null; // null = show all
+    const counties = new Set();
+    activeRegions.forEach(r => (IOWA_REGIONS[r] || []).forEach(c => counties.add(c)));
+    return counties;
+  }
+
+  function filterCountiesByRegion() {
     if (!iowaCountiesLayer) return;
+    const selectedCounties = getCountiesInActiveRegions();
     iowaCountiesLayer.eachLayer(layer => {
       const fips       = String(layer.feature?.id || layer.feature?.properties?.GEO_ID || '');
       const countyName = layer.feature?.properties?.NAME || layer.feature?.properties?.name || '';
-      if (region === 'all') {
+      if (!selectedCounties) {
         layer.setStyle({ opacity: 1, fillOpacity: filledCounties[fips] ? 0.45 : 0, weight: 0.8 });
         layer.bindTooltip(countyName + ' County', { sticky: true });
       } else {
-        const inRegion = IOWA_REGIONS[region]?.includes(countyName);
+        const inRegion = selectedCounties.has(countyName);
         layer.setStyle({
           opacity:     inRegion ? 1 : 0.15,
           fillOpacity: inRegion ? (filledCounties[fips] ? 0.45 : 0) : 0,
           weight:      inRegion ? 0.8 : 0.3,
         });
-        // Only show tooltip for counties in the active region
         if (inRegion) {
           layer.bindTooltip(countyName + ' County', { sticky: true });
         } else {
@@ -10217,6 +10513,95 @@
 
 
     // ── INIT STUDIO IMMEDIATELY ──────────────────────────────────────────
+  // ── MOBILE UI ─────────────────────────────────────────────────────────
+  function initMobileUI() {
+    const isMobileLandscape = () =>
+      (window.innerWidth <= 1366 && window.matchMedia('(orientation: landscape)').matches) ||
+      window.innerWidth <= 900;
+
+    if (!isMobileLandscape()) return;
+
+    const sidebar = document.getElementById('warnings-sidebar');
+    const mobileWarningsBtn = document.getElementById('mobile-warnings-btn');
+    const mobilePresetBtn   = document.getElementById('mobile-preset-btn');
+    const mobileScreenshot  = document.getElementById('mobile-screenshot-btn');
+
+    let warningsOpen = false;
+
+    // Warnings — slide up bottom sheet
+    mobileWarningsBtn?.addEventListener('click', () => {
+      warningsOpen = !warningsOpen;
+      sidebar?.classList.toggle('mobile-open', warningsOpen);
+      mobileWarningsBtn.classList.toggle('active', warningsOpen);
+    });
+
+    // Preset — open picker grid
+    mobilePresetBtn?.addEventListener('click', () => showMobilePresetPicker());
+
+    // Screenshot — delegate to existing handler
+    mobileScreenshot?.addEventListener('click', () => {
+      document.getElementById('screenshot-btn')?.click();
+    });
+
+    // Tap map to dismiss warnings sheet
+    document.getElementById('radar-map')?.addEventListener('click', () => {
+      if (warningsOpen) {
+        warningsOpen = false;
+        sidebar?.classList.remove('mobile-open');
+        mobileWarningsBtn?.classList.remove('active');
+      }
+    });
+  }
+
+  function showMobilePresetPicker() {
+    const existing = document.getElementById('mobile-preset-picker');
+    if (existing) { existing.remove(); return; }
+
+    const types = [
+      { key: 'alert-banner',  label: 'Alert Banner'  },
+      { key: 'warning-card',  label: 'Warning Card'  },
+      { key: 'info-banner',   label: 'Info Banner'   },
+      { key: 'radar-banner',  label: 'Radar Banner'  },
+      { key: 'location-tag',  label: 'Location Tag'  },
+      { key: 'severity-card', label: 'Severity Card' },
+    ];
+
+    const picker = document.createElement('div');
+    picker.id = 'mobile-preset-picker';
+    picker.style.cssText = `
+      position:fixed;bottom:56px;left:0;right:0;z-index:700;
+      background:rgba(8,18,36,0.97);backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      border-top:0.5px solid rgba(255,255,255,0.12);
+      border-radius:16px 16px 0 0;padding:16px 16px 8px;
+    `;
+    picker.innerHTML = `
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.38);margin-bottom:12px;">Add Preset</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${types.map(t => `
+          <button data-preset="${t.key}" style="
+            padding:14px 12px;background:rgba(255,255,255,0.06);
+            border:0.5px solid rgba(255,255,255,0.1);border-radius:8px;
+            color:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;text-align:left;
+          ">${t.label}</button>`).join('')}
+      </div>
+      <button id="close-mobile-picker" style="
+        width:100%;margin-top:10px;padding:11px;
+        background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);
+        border-radius:8px;color:rgba(255,255,255,0.38);font-size:0.75rem;cursor:pointer;
+      ">Cancel</button>
+    `;
+    document.body.appendChild(picker);
+
+    picker.querySelectorAll('[data-preset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        picker.remove();
+        openPresetModal(btn.dataset.preset);
+      });
+    });
+    document.getElementById('close-mobile-picker')?.addEventListener('click', () => picker.remove());
+  }
+
   initStudio();
 
   // Handle orientation changes and window resizes (important for iPad)
