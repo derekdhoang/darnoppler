@@ -1060,38 +1060,43 @@ function renderHourlyChart(hourlyData, offset = 0) {
   storedHourly = hourlyData;
 
   const now   = new Date();
+
+  // Window starts at current hour + offset * 12 hours
   const start = new Date(now);
   start.setMinutes(0, 0, 0);
-
-  // Each offset = 24 hours forward from current hour
-  start.setHours(start.getHours() + offset * 24);
+  start.setHours(start.getHours() + offset * 12);
   const end = new Date(start);
-  end.setHours(end.getHours() + 24);
+  end.setHours(end.getHours() + 12);
 
-  // Nav labels
   const navLabel = document.getElementById('hourly-nav-label');
   const prevBtn  = document.getElementById('hourly-prev');
   const nextBtn  = document.getElementById('hourly-next');
 
-  if (offset === 0) {
-    navLabel.textContent = 'Today';
-  } else if (offset === 1) {
-    navLabel.textContent = 'Tomorrow';
-  } else {
-    // Day after tomorrow — show the actual weekday name
-    const windowDate = new Date(now);
-    windowDate.setDate(windowDate.getDate() + offset);
-    navLabel.textContent = windowDate.toLocaleDateString('en-US', { weekday: 'long' });
-  }
+  // Format time window label e.g. "TODAY · 2PM – 2AM"
+  const fmtHour = (d) => d.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }).replace(' ', '').toLowerCase().replace(':00', '');
+  const startLbl = fmtHour(start);
+  // End label = last actual hour shown (start + 11hrs)
+  const lastHour = new Date(start);
+  lastHour.setHours(lastHour.getHours() + 11);
+  const endLbl   = fmtHour(lastHour);
+
+  const isToday    = start.toDateString() === now.toDateString();
+  const isTomorrow = (() => {
+    const tom = new Date(now);
+    tom.setDate(tom.getDate() + 1);
+    return start.toDateString() === tom.toDateString();
+  })();
+
+  const dayName  = start.toLocaleDateString('en-US', { weekday: 'long' });
+  navLabel.textContent = `${dayName} · ${startLbl} – ${endLbl}`;
 
   prevBtn.disabled = offset === 0;
-  nextBtn.disabled = offset >= 1; // max 2 clicks = 3 pages total
+  nextBtn.disabled = offset >= 3; // 4 pages: now, +12, +24, +36
 
   const hours = hourlyData.filter(h => {
     const t = new Date(h.time * 1000);
     return t >= start && t < end;
   });
-
   if (!hours.length) return;
 
   const nowHour   = now.getHours();
@@ -1101,18 +1106,38 @@ function renderHourlyChart(hourlyData, offset = 0) {
   const pops      = hours.map(h => Math.round((h.precipProbability || 0) * 100));
   const types     = hours.map(h => h.precipType || 'rain');
   const summaries = hours.map(h => h.summary || '');
+  const icons     = hours.map(h => h.icon || '');
 
-  // Current-hour dot only on Today view
-  const currentIdx = offset === 0
-    ? hours.findIndex(h => new Date(h.time * 1000).getHours() === nowHour)
-    : -1;
+  const currentIdx = offset === 0 ? 0 : -1;
 
-  // Period labels — find closest hour to each period target
+  // ── Build card strip ────────────────────────────────────────────
+  const strip = document.getElementById('hourly-card-strip');
+  if (strip) {
+    strip.innerHTML = '';
+    hours.forEach((h, i) => {
+      const hDate  = new Date(h.time * 1000);
+      const isNow  = i === currentIdx;
+      const timeStr = isNow ? 'Now' : fmtHour(hDate);
+      const pop    = pops[i];
+      const icon   = icons[i] || 'partly-cloudy-day';
+      const iconPath = getIconPath(icon);
+
+      const card = document.createElement('div');
+      card.className = 'hourly-card' + (isNow ? ' is-now' : '');
+      card.innerHTML = `
+        <div class="hourly-card-time">${timeStr}</div>
+        <img class="hourly-card-icon" src="${iconPath}" alt="${icon}" loading="lazy">
+        <div class="hourly-card-temp">${temps[i]}°</div>
+        <div class="hourly-card-pop">${pop > 5 ? (types[i] === 'snow' ? '❄ ' : '💧 ') + pop + '%' : ''}</div>
+      `;
+      strip.appendChild(card);
+    });
+  }
+
   const findPeriodTemp = (targetHour) => {
     const entry = hours.find(h => new Date(h.time * 1000).getHours() >= targetHour);
     return entry ? Math.round(entry.temperature) + '°F' : '--';
   };
-
   if (periodMorn)  periodMorn.textContent  = findPeriodTemp(6);
   if (periodAftn)  periodAftn.textContent  = findPeriodTemp(12);
   if (periodEve)   periodEve.textContent   = findPeriodTemp(18);
@@ -1123,203 +1148,171 @@ function renderHourlyChart(hourlyData, offset = 0) {
   const canvas = document.getElementById('hourly-chart');
   const ctx    = canvas.getContext('2d');
 
-  // Horizontal temp gradient: blue (cold) → amber (warm)
-  function createTempGradient(chart) {
+  const minT   = Math.min(...temps);
+  const maxT   = Math.max(...temps);
+  const range  = maxT - minT || 1;
+  const isWarm = maxT >= 75;
+  const isCold = maxT <= 45;
+
+  function createLineGradient(chart) {
     const { ctx: c, chartArea } = chart;
     if (!chartArea) return '#93c5fd';
-    const g     = c.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
-    const minT  = Math.min(...temps);
-    const maxT  = Math.max(...temps);
-    const range = maxT - minT || 1;
+    const g = c.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
+    // Use absolute scale: 32°F = cold blue, 95°F = warm orange
+    const absMin = 32, absMax = 95, absRange = absMax - absMin;
     hours.forEach((h, i) => {
-      const ratio = (Math.round(h.temperature) - minT) / range;
-      const pos   = i / (hours.length - 1);
-      const r  = Math.round(147 + (251 - 147) * ratio);
-      const gv = Math.round(197 + (191 - 197) * ratio);
-      const b  = Math.round(253 + (36  - 253) * ratio);
-      g.addColorStop(Math.min(pos, 1), `rgb(${r},${gv},${b})`);
+      const ratio = Math.max(0, Math.min(1, (Math.round(h.temperature) - absMin) / absRange));
+      const pos   = Math.min(i / (hours.length - 1 || 1), 1);
+      // cold: #93c5fd (147,197,253) → warm: #f97316 (249,115,22)
+      const r  = Math.round(147 + (249 - 147) * ratio);
+      const gv = Math.round(197 + (115 - 197) * ratio);
+      const b  = Math.round(253 + (22  - 253) * ratio);
+      g.addColorStop(pos, `rgb(${r},${gv},${b})`);
     });
     return g;
   }
 
+  function createAreaGradient(chart) {
+    const { ctx: c, chartArea } = chart;
+    if (!chartArea) return 'transparent';
+    const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+    if (isWarm) {
+      g.addColorStop(0,   'rgba(249,115,22,0.18)');
+      g.addColorStop(0.6, 'rgba(249,115,22,0.04)');
+      g.addColorStop(1,   'rgba(249,115,22,0)');
+    } else if (isCold) {
+      g.addColorStop(0,   'rgba(147,197,253,0.2)');
+      g.addColorStop(0.6, 'rgba(147,197,253,0.05)');
+      g.addColorStop(1,   'rgba(147,197,253,0)');
+    } else {
+      g.addColorStop(0,   'rgba(167,210,255,0.16)');
+      g.addColorStop(0.6, 'rgba(147,197,253,0.04)');
+      g.addColorStop(1,   'rgba(147,197,253,0)');
+    }
+    return g;
+  }
+
+  // Precip bar plugin — full height columns, opacity = precip intensity
   hourlyChart = new Chart(ctx, {
     type: 'line',
     data: {
       labels,
       datasets: [
+        // ── Precip bars — secondary Y axis, drawn first (behind temp line)
         {
-          label: 'Actual',
-          data:                      temps,
-          tension:                   0.4,
-          borderWidth:               2.5,
-          borderColor:               '#93c5fd',
-          pointRadius:               (ctx) => ctx.dataIndex === currentIdx ? 7 : 3,
-          pointHoverRadius:          7,
-          pointBackgroundColor:      (ctx) => ctx.dataIndex === currentIdx ? '#ffffff' : 'rgba(255,255,255,0.4)',
+          label:              'Precip',
+          data:               pops,
+          type:               'bar',
+          yAxisID:            'yPrecip',
+          order:              2,
+          backgroundColor:    pops.map((p, i) => {
+            const isSnow = types[i] === 'snow';
+            return isSnow
+              ? `rgba(186,230,253,${0.05 + (p / 100) * 0.12})`
+              : `rgba(56,189,248,${0.05 + (p / 100) * 0.12})`;
+          }),
+          borderColor:        pops.map((p, i) => {
+            const isSnow = types[i] === 'snow';
+            return isSnow
+              ? `rgba(186,230,253,${0.08 + (p / 100) * 0.15})`
+              : `rgba(56,189,248,${0.08 + (p / 100) * 0.15})`;
+          }),
+          borderWidth:        1,
+          borderRadius:       { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
+          borderRadius:       { topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0 },
+          barPercentage:      0.7,
+          categoryPercentage: 1.0,
+        },
+        // ── Actual temp line — primary Y axis, drawn on top
+        {
+          label:            'Actual',
+          data:             temps,
+          type:             'line',
+          yAxisID:          'y',
+          order:            0,
+          tension:          0.4,
+          borderWidth:      2.5,
+          borderColor:      '#93c5fd',
+          pointRadius:      (ctx) => ctx.dataIndex === currentIdx ? 8 : 2.5,
+          pointHoverRadius: 6,
+          pointBackgroundColor:      (ctx) => ctx.dataIndex === currentIdx ? '#fbbf24' : 'rgba(255,255,255,0.3)',
           pointHoverBackgroundColor: '#ffffff',
-          pointBorderColor:          (ctx) => ctx.dataIndex === currentIdx ? '#fbbf24' : 'rgba(255,255,255,0.2)',
+          pointBorderColor:          (ctx) => ctx.dataIndex === currentIdx ? '#ffffff' : 'rgba(255,255,255,0.12)',
           pointHoverBorderColor:     '#fbbf24',
           pointBorderWidth:          2,
-          pointHoverBorderWidth:     2,
-          fill:                      true,
-          backgroundColor:           (ctx) => {
-            const { chartArea } = ctx.chart;
-            if (!chartArea) return 'transparent';
-            const grad = ctx.chart.ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            grad.addColorStop(0, 'rgba(147,197,253,0.18)');
-            grad.addColorStop(1, 'rgba(147,197,253,0)');
-            return grad;
-          },
+          fill:             true,
+          backgroundColor:  'transparent',
         },
+        // ── Feels Like dashed overlay
         {
-          label: 'Feels Like',
-          data:            feelsLike,
-          tension:         0.4,
-          borderWidth:     1.5,
-          borderColor:     'rgba(251,191,36,0.5)',
-          borderDash:      [5, 5],
-          pointRadius:     0,
-          pointHoverRadius: 5,
+          label:            'Feels Like',
+          data:             feelsLike,
+          type:             'line',
+          yAxisID:          'y',
+          order:            1,
+          tension:          0.4,
+          borderWidth:      1.5,
+          borderColor:      'rgba(251,191,36,0.4)',
+          borderDash:       [5, 4],
+          pointRadius:      0,
+          pointHoverRadius: 4,
           pointBackgroundColor: '#fbbf24',
-          fill:            false,
-        }
+          fill:             false,
+        },
       ]
     },
     options: {
       responsive:          true,
       maintainAspectRatio: false,
+      animation:           { duration: 250 },
       interaction:         { mode: 'index', intersect: false },
-      layout:              { padding: { top: 18 } },
+      layout:              { padding: { top: 24, bottom: 4 } },
       plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            title: (items) => {
-              const idx      = items[0].dataIndex;
-              const hour     = new Date(hours[idx].time * 1000);
-              const isToday2 = hour.toDateString() === now.toDateString();
-              const prefix   = isToday2 ? '' :
-                hour.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + ' · ';
-              return prefix + formatHourLabel(hour) + (idx === currentIdx ? ' · Now' : '');
-            },
-            label: (ctx) => {
-              const idx = ctx.dataIndex;
-              if (ctx.datasetIndex === 0) {
-                // Actual temp dataset - use bullet points with spacing
-                const lines = [];
-                lines.push('');  // Empty line for spacing after title
-                lines.push('  — Actual: ' + ctx.raw + '°F');
-                
-                const feelsLikeTemp = feelsLike[idx];
-                if (feelsLikeTemp !== ctx.raw) {
-                  lines.push('  - - Feels like: ' + feelsLikeTemp + '°F');
-                }
-                
-                const summary = summaries[idx] || getIconDescription(hours[idx].icon || '');
-                if (summary) {
-                  lines.push('');  // Spacing
-                  lines.push('  • ' + summary);
-                }
-                
-                if (pops[idx] > 0) {
-                  const emoji = types[idx] === 'snow' ? '❄️' : '💧';
-                  lines.push('  • ' + emoji + ' ' + pops[idx] + '% chance');
-                }
-                
-                return lines;
-              }
-              // Skip feels like dataset label (we show it inline above)
-              return null;
-            },
-          },
-          filter: (item) => item.datasetIndex === 0, // Only show tooltip for actual temp
-          backgroundColor: 'rgba(10,22,40,0.95)',
-          titleColor:      '#fbbf24',
-          titleFont:       { size: 13, weight: 'bold' },
-          bodyColor:       'rgba(255,255,255,0.85)',
-          bodyFont:        { size: 12 },
-          bodySpacing:     4,
-          borderColor:     'rgba(255,255,255,0.15)',
-          borderWidth:     1,
-          padding:         { top: 10, bottom: 12, left: 14, right: 14 },
-          displayColors:   false,
+        legend:  { display: false },
+        tooltip: { enabled: false },
+      },
+      onHover: (_evt, elements) => {
+        const cards = document.querySelectorAll('.hourly-card');
+        cards.forEach(c => c.classList.remove('is-highlighted'));
+        if (elements.length) {
+          const idx = elements[0].index;
+          if (cards[idx]) cards[idx].classList.add('is-highlighted');
         }
       },
       scales: {
         x: {
-          grid:  { color: 'rgba(255,255,255,0.05)' },
-          ticks: {
-            color:       'rgba(255,255,255,0.35)',
-            font:        { size: 10 },
-            maxRotation: 0,
-            // Every 3rd tick on a 24hr span gives clean readable spacing
-            callback: (val, idx) => {
-              if (idx % 3 !== 0) return '';
-              const h = new Date(hours[idx].time * 1000);
-              // At midnight show the weekday name instead of 12am
-              return h.getHours() === 0
-                ? h.toLocaleDateString('en-US', { weekday: 'short' })
-                : labels[idx];
-            },
-          }
+          display: false,
+          grid:    { display: false },
         },
         y: {
           position: 'left',
-          grid:     { color: 'rgba(255,255,255,0.05)' },
+          grid:     { color: 'rgba(255,255,255,0.04)' },
           ticks: {
-            color:         'rgba(255,255,255,0.35)',
+            color:         'rgba(255,255,255,0.25)',
             font:          { size: 10 },
             callback:      (val) => `${val}°`,
-            maxTicksLimit: 5,
+            maxTicksLimit: 4,
           },
-          grace: '10%',
-        }
+          grace: '25%',
+        },
+        yPrecip: {
+          position: 'right',
+          min:      0,
+          max:      100,
+          display:  false,
+          grid:     { display: false },
+        },
       }
-    }
+    },
   });
 
-  // Apply gradient then draw midnight divider — both via rAF so
-  // chartArea is guaranteed to exist before we measure anything.
+  // Apply gradients after chartArea is ready
   requestAnimationFrame(() => {
     if (!hourlyChart) return;
-    hourlyChart.data.datasets[0].borderColor = createTempGradient(hourlyChart);
+    // Dataset 0 = precip bars, dataset 1 = temp line
+    hourlyChart.data.datasets[1].borderColor     = createLineGradient(hourlyChart);
+    hourlyChart.data.datasets[1].backgroundColor = createAreaGradient(hourlyChart);
     hourlyChart.update('none');
-
-    requestAnimationFrame(() => {
-      if (!hourlyChart) return;
-      const c = hourlyChart.ctx;
-      const x = hourlyChart.scales.x;
-      const y = hourlyChart.scales.y;
-      if (!x || !y) return;
-
-      hours.forEach((h, i) => {
-        const hour = new Date(h.time * 1000);
-        if (hour.getHours() !== 0) return;
-
-        const xPos = x.getPixelForIndex(i);
-
-        // Dashed vertical line
-        c.save();
-        c.beginPath();
-        c.setLineDash([4, 4]);
-        c.strokeStyle = 'rgba(255,255,255,0.2)';
-        c.lineWidth   = 1;
-        c.moveTo(xPos, y.top);
-        c.lineTo(xPos, y.bottom);
-        c.stroke();
-
-        // Day label above the line
-        const dayStr = hour.toLocaleDateString('en-US', {
-          weekday: 'short', month: 'numeric', day: 'numeric'
-        });
-        c.setLineDash([]);
-        c.fillStyle = 'rgba(255,255,255,0.4)';
-        c.font      = '10px system-ui, sans-serif';
-        c.textAlign = 'center';
-        c.fillText(dayStr, xPos, y.top - 4);
-        c.restore();
-      });
-    });
   });
 }
 
@@ -1743,7 +1736,7 @@ document.getElementById('hourly-prev').addEventListener('click', () => {
 });
 
 document.getElementById('hourly-next').addEventListener('click', () => {
-  if (hourlyOffset < 2) { hourlyOffset++; renderHourlyChart(storedHourly, hourlyOffset); }
+  if (hourlyOffset < 3) { hourlyOffset++; renderHourlyChart(storedHourly, hourlyOffset); }
 });
 
 
