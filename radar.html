@@ -4326,9 +4326,9 @@
                 </label>
               </div>
               <div class="filter-row">
-                <span class="filter-label">SPC Legend</span>
+                <span class="filter-label">Wind Particles</span>
                 <label class="toggle-switch">
-                  <input type="checkbox" id="toggle-spc-legend" checked>
+                  <input type="checkbox" id="toggle-wind-layer" checked>
                   <div class="toggle-track"></div>
                   <div class="toggle-thumb"></div>
                 </label>
@@ -4345,7 +4345,7 @@
             </div>
 
             <!-- SPC Outlook Controls -->
-            <div class="panel-section" id="spc-settings-section">
+            <div class="panel-section" id="spc-settings-section" style="display:none;">
               <div class="panel-section-title" id="spc-settings-toggle" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;" title="Click to expand/collapse">
                 SPC Outlook
                 <svg id="spc-settings-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
@@ -4363,6 +4363,14 @@
                   <button class="spc-type-btn" data-type="torn">Tornado</button>
                   <button class="spc-type-btn" data-type="wind">Wind</button>
                   <button class="spc-type-btn" data-type="hail">Hail</button>
+                </div>
+                <div class="filter-row" style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.08);padding-top:8px;">
+                  <span class="filter-label">SPC Legend</span>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-spc-legend" checked>
+                    <div class="toggle-track"></div>
+                    <div class="toggle-thumb"></div>
+                  </label>
                 </div>
               </div>
             </div>
@@ -5465,6 +5473,7 @@
   </svg>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="https://unpkg.com/leaflet-velocity@2.1.0/dist/leaflet-velocity.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@3.4.1/dist/dom-to-image-more.min.js"></script>
   <script src="config.js"></script>
 
@@ -5707,6 +5716,9 @@
   let iowaOutlineLayer  = null;
   let surroundingStatesLayer = null;
   let radarLayer    = null;
+  let windLayer     = null;
+  let windEnabled   = true;
+  const WIND_URL    = 'https://tile-proxy.derekdhoang.workers.dev/wind';
   let baseLayer     = null;
   let labelsLayer   = null;
   let spcMap        = null;
@@ -6002,7 +6014,7 @@
       center: IOWA_CENTER, zoom: DEFAULT_ZOOM,
       zoomControl: true, scrollWheelZoom: true,
       minZoom: 6,   // ← can't zoom further out than Iowa + neighbors
-      maxZoom: 8,
+      maxZoom: 12,
     });
 
     // Base layer
@@ -6105,6 +6117,7 @@
     initBroadcastMode();
     initWarnings();
     initScreenshot();
+    initWindLayer();
     initMobileUI();
   }
   
@@ -8773,7 +8786,11 @@
       if (spcLegend) spcLegend.classList.remove('visible');
       timestamp.style.display = 'block';
       setTimeout(() => map.invalidateSize(), 50);
-      
+
+      // Hide SPC settings section when on Radar tab
+      const spcSection = document.getElementById('spc-settings-section');
+      if (spcSection) spcSection.style.display = 'none';
+
       // Switch overlay if SPC overlay was active
       const spcOverlay = document.getElementById('broadcast-spc-overlay');
       const radarOverlay = document.getElementById('broadcast-radar-overlay');
@@ -8796,7 +8813,11 @@
       if (spcLegend) spcLegend.classList.add('visible');
       timestamp.style.display = 'none';
       initSPCMap();
-      
+
+      // Show SPC settings section when on SPC tab
+      const spcSection = document.getElementById('spc-settings-section');
+      if (spcSection) spcSection.style.display = '';
+
       // Switch overlay if radar overlay was active
       const spcOverlay = document.getElementById('broadcast-spc-overlay');
       const radarOverlay = document.getElementById('broadcast-radar-overlay');
@@ -9161,6 +9182,17 @@
     document.getElementById('toggle-radar-legend')?.addEventListener('change', (e) => {
       const el = document.getElementById('map-legend');
       if (el) el.style.display = e.target.checked ? '' : 'none';
+    });
+
+    // Wind Particles toggle
+    document.getElementById('toggle-wind-layer')?.addEventListener('change', (e) => {
+      windEnabled = e.target.checked;
+      if (!windLayer) return;
+      if (windEnabled) {
+        windLayer.addTo(map);
+      } else {
+        map.removeLayer(windLayer);
+      }
     });
 
     // SPC Legend toggle
@@ -10513,6 +10545,35 @@
 
 
     // ── INIT STUDIO IMMEDIATELY ──────────────────────────────────────────
+  // ── WIND PARTICLES ────────────────────────────────────────────────────
+  async function initWindLayer() {
+    try {
+      const res = await fetch(WIND_URL);
+      if (!res.ok) throw new Error(`Wind fetch failed: ${res.status}`);
+      const data = await res.json();
+
+      windLayer = L.velocityLayer({
+        displayValues:      false,
+        data:               data,
+        maxVelocity:        20,
+        colorScale:         ['rgba(255,255,255,0.25)', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.9)'],
+        velocityScale:      0.005,
+        particleAge:        64,
+        lineWidth:          1.2,
+        particleMultiplier: 0.0050,
+        frameRate:          16,
+      });
+
+      if (windEnabled) windLayer.addTo(map);
+      console.log('Wind layer loaded');
+    } catch (err) {
+      console.warn('Wind layer unavailable:', err.message);
+      // Silently fail — wind is optional
+      const toggle = document.getElementById('toggle-wind-layer');
+      if (toggle) { toggle.checked = false; toggle.disabled = true; }
+    }
+  }
+
   // ── MOBILE UI ─────────────────────────────────────────────────────────
   function initMobileUI() {
     const isMobileLandscape = () =>
