@@ -51,11 +51,9 @@
           <div class="hero-precip" id="temp-precip-hint"></div>
         </div>
         <div class="hero-desc" id="weather-desc">--</div>
+        <div class="holiday-bar" id="holiday-bar" hidden></div>
         <div id="weather-icon" class="hero-icon" style="display:none;"></div>
       </div>
-
-    <!-- Holiday bar -->
-    <div class="holiday-bar" id="holiday-bar" hidden></div>
 
     <!-- Error message -->
     <p class="error-message" id="error-message"></p>
@@ -119,6 +117,9 @@
       <div class="hourly-card-strip" id="hourly-card-strip"></div>
       <div class="hourly-chart-wrap">
         <canvas id="hourly-chart"></canvas>
+        <div class="hourly-feels-legend" id="hourly-feels-legend" hidden>
+          <span class="hourly-feels-dash">- -</span> Feels Like
+        </div>
       </div>
     </div>
 

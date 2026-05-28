@@ -519,10 +519,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   transition: background 0.2s, border-color 0.2s;
 }
 
-.hourly-nav-btn:hover    {
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.25);
-}
+.hourly-nav-btn:hover    { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); }
 .hourly-nav-btn:disabled { opacity: 0.25; cursor: default; }
 
 .hourly-nav-label {
@@ -576,12 +573,8 @@ html::-webkit-scrollbar-track { background: transparent; }
   box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.18);
   transition: background 0.1s, box-shadow 0.1s;
 }
-.hourly-card.is-highlighted .hourly-card-time {
-  color: rgba(255,255,255,0.7);
-}
-.hourly-card.is-highlighted .hourly-card-temp {
-  color: #ffffff;
-}
+.hourly-card.is-highlighted .hourly-card-time { color: rgba(255,255,255,0.7); }
+.hourly-card.is-highlighted .hourly-card-temp { color: #ffffff; }
 
 .hourly-card-time {
   font-size: 0.6rem;
@@ -590,9 +583,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   text-transform: uppercase;
   color: rgba(255,255,255,0.38);
 }
-.hourly-card.is-now .hourly-card-time {
-  color: #fbbf24;
-}
+.hourly-card.is-now .hourly-card-time { color: #fbbf24; }
 
 .hourly-card-icon {
   width: 26px;
@@ -606,10 +597,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   font-weight: 600;
   color: rgba(255,255,255,0.8);
 }
-.hourly-card.is-now .hourly-card-temp {
-  color: #ffffff;
-  font-weight: 700;
-}
+.hourly-card.is-now .hourly-card-temp { color: #ffffff; font-weight: 700; }
 
 .hourly-card-pop {
   font-size: 0.58rem;
@@ -627,16 +615,9 @@ html::-webkit-scrollbar-track { background: transparent; }
 .hourly-chart-wrap::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg,
-    transparent,
-    rgba(255,255,255,0.06) 20%,
-    rgba(255,255,255,0.06) 80%,
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.06) 80%, transparent);
   z-index: 2;
   pointer-events: none;
 }
@@ -646,6 +627,7 @@ html::-webkit-scrollbar-track { background: transparent; }
   height: 100% !important;
   cursor: crosshair;
 }
+
 
 /* ── 14. FORECAST GRID ────────────────────────────────────────────── */
 /* ── HORIZON TIMELINE 7-DAY ──────────────────────────────────────── */
@@ -778,11 +760,16 @@ html::-webkit-scrollbar-track { background: transparent; }
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 700;
-  color: #ffb703;
-  background: rgba(255,183,3,0.1);
+  color: #ffffff;
+  background: rgba(59,130,246,0.15);
+  background: color-mix(in srgb, var(--time-accent, rgba(59,130,246,1)) 20%, transparent);
+  border: 0.5px solid rgba(255,255,255,0.25);
+  border-color: color-mix(in srgb, var(--time-accent, rgba(59,130,246,1)) 50%, transparent);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   padding: 2px 8px;
-  border-radius: 4px;
-  margin-bottom: 4px;
+  border-radius: 20px;
+  margin-bottom: 6px;
   display: inline-block;
   white-space: nowrap;
   max-width: 100%;
@@ -1221,11 +1208,44 @@ html::-webkit-scrollbar-track { background: transparent; }
 }
 
 .holiday-bar {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: rgba(59,130,246,0.2);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--time-accent, rgba(59,130,246,1)) 25%, transparent),
+    color-mix(in srgb, var(--time-accent, rgba(59,130,246,1)) 15%, transparent)
+  );
+  border: 0.5px solid rgba(255,255,255,0.3);
+  border-color: color-mix(in srgb, var(--time-accent, rgba(59,130,246,1)) 60%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-top: 10px;
+  display: inline-block;
+  text-align: center;
+}
+
+.holiday-bar[hidden] { display: none !important; }
+
+.hourly-feels-legend {
   position: absolute;
-  top: 72px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: var(--z-ui);
+  top: 8px;
+  right: 10px;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(251,191,36,0.7);
+  pointer-events: none;
+  z-index: 2;
+}
+.hourly-feels-legend[hidden] { display: none !important; }
+.hourly-feels-dash {
+  color: rgba(251,191,36,0.5);
+  letter-spacing: 2px;
 }
 
 /* ── 21. FOOTER ───────────────────────────────────────────────────── */
@@ -1552,20 +1572,6 @@ html::-webkit-scrollbar-track { background: transparent; }
     font-size: 20px;
     margin-top: 12px;
   }
-
-  .hourly-card {
-    min-width: 58px;
-    padding: 8px 2px 6px;
-  }
-
-  .hourly-card-icon {
-    width: 22px;
-    height: 22px;
-  }
-
-  .hourly-card-temp { font-size: 0.75rem; }
-  .hourly-card-time { font-size: 0.55rem; }
-  .hourly-chart-wrap { height: 130px; }
 
   .forecast-grid {
     grid-template-columns: repeat(7, minmax(80px, 1fr));

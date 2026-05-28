@@ -1103,6 +1103,9 @@ function renderHourlyChart(hourlyData, offset = 0) {
   const labels    = hours.map(h => formatHourLabel(new Date(h.time * 1000)));
   const temps     = hours.map(h => Math.round(h.temperature));
   const feelsLike = hours.map(h => Math.round(h.apparentTemperature || h.temperature));
+  const feelsDiffers = feelsLike.some((fl, i) => fl !== temps[i]);
+  const feelsLegend = document.getElementById('hourly-feels-legend');
+  if (feelsLegend) feelsLegend.hidden = !feelsDiffers;
   const pops      = hours.map(h => Math.round((h.precipProbability || 0) * 100));
   const types     = hours.map(h => h.precipType || 'rain');
   const summaries = hours.map(h => h.summary || '');
@@ -1611,7 +1614,7 @@ async function initWindLayer() {
       velocityScale:      0.005,
       particleAge:        64,
       lineWidth:          1.2,
-      particleMultiplier: 0.0008,
+      particleMultiplier: 0.0015,
       frameRate:          16,
     });
 
