@@ -18,17 +18,32 @@ function getTimeOfDay(hour) {
   return 'night';
 }
 
-function applyBackground() {
+function applyBackground(icon = '') {
   const hour = getIowaHour();
   const timeOfDay = getTimeOfDay(hour);
 
-  const bgImage = document.getElementById('bg-image');
+  const bgImage   = document.getElementById('bg-image');
   const bgOverlay = document.getElementById('bg-overlay');
-
   if (!bgImage || !bgOverlay) return;
 
-  bgImage.className = 'bg-image ' + timeOfDay;
   bgOverlay.className = 'bg-overlay ' + timeOfDay;
+
+  // Determine if weather is rainy/stormy
+  const isWet = icon.includes('rain') || icon.includes('drizzle') ||
+                icon.includes('thunder') || icon.includes('sleet') ||
+                icon.includes('hail');
+
+  // Pick the right background image
+  const bgMap = {
+    morning: { clear: 'img/bg-morning.png', wet: 'img/bg-morning-rain.png' },
+    day:     { clear: 'img/bg-day.png',     wet: 'img/bg-day-rain.png'     },
+    evening: { clear: 'img/bg-evening.png', wet: 'img/bg-evening-rain.png' },
+    night:   { clear: 'img/bg-night.png',   wet: 'img/bg-night-rain.png'   },
+  };
+
+  const chosen = bgMap[timeOfDay][isWet ? 'wet' : 'clear'];
+  bgImage.style.backgroundImage = `url('${chosen}')`;
+  bgImage.className = 'bg-image ' + timeOfDay + (isWet ? ' wet' : '');
 
   // Time-aware UI colors
   const root = document.documentElement;
@@ -51,7 +66,6 @@ function applyBackground() {
       break;
   }
 }
-
 // ── DOPPLER WALK SYSTEM ───────────────────────────────────────────────
 function initDoppler() {
   const wrap = document.getElementById('doppler-wrap');
@@ -592,6 +606,7 @@ function renderCurrent(current, today, hourlyData, city, state, country, lat, lo
   }
 
   updateDopplerOutfit(icon, Math.round(current.temperature), Math.round(current.windSpeed));
+  applyBackground(icon);
 
   renderTodayPrecipHint(today);
   renderLiveDigest(current, today, hourlyData);

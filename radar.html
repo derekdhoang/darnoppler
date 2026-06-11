@@ -5183,10 +5183,11 @@
     </button>
     <button class="mobile-bar-btn" id="mobile-radar-toggle-btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="2"/>
-        <path d="M16.24 7.76a6 6 0 010 8.49m-8.48-.01a6 6 0 010-8.49m11.31-2.82a10 10 0 010 14.14m-14.14 0a10 10 0 010-14.14"/>
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/>
+        <path d="M15.54 8.46a5 5 0 010 7.07M8.46 8.46a5 5 0 000 7.07"/>
       </svg>
-      <span>Radar</span>
+      <span>Layers</span>
     </button>
   </div>
 
@@ -10411,6 +10412,9 @@
         doScreenshot();
       }
     });
+
+    // Expose for mobile button
+    window.captureScreenshot = doScreenshot;
   }
 
   // ── CIRCLE DRAG (edit mode only) ──────────────────────────────────────
@@ -10576,16 +10580,12 @@
 
   // ── MOBILE UI ─────────────────────────────────────────────────────────
   function initMobileUI() {
-    const isMobileLandscape = () =>
-      (window.innerWidth <= 1366 && window.matchMedia('(orientation: landscape)').matches) ||
-      window.innerWidth <= 900;
-
-    if (!isMobileLandscape()) return;
-
-    const sidebar = document.getElementById('warnings-sidebar');
-    const mobileWarningsBtn = document.getElementById('mobile-warnings-btn');
-    const mobilePresetBtn   = document.getElementById('mobile-preset-btn');
-    const mobileScreenshot  = document.getElementById('mobile-screenshot-btn');
+    // Always wire mobile button handlers — CSS controls visibility based on screen size.
+    // Don't gate on window.innerWidth at load time since orientation can change after init.
+    const sidebar            = document.getElementById('warnings-sidebar');
+    const mobileWarningsBtn  = document.getElementById('mobile-warnings-btn');
+    const mobilePresetBtn    = document.getElementById('mobile-preset-btn');
+    const mobileScreenshot   = document.getElementById('mobile-screenshot-btn');
 
     let warningsOpen = false;
 
@@ -10599,9 +10599,9 @@
     // Preset — open picker grid
     mobilePresetBtn?.addEventListener('click', () => showMobilePresetPicker());
 
-    // Screenshot — delegate to existing handler
+    // Screenshot — call captureScreenshot directly (desktop btn is hidden on mobile)
     mobileScreenshot?.addEventListener('click', () => {
-      document.getElementById('screenshot-btn')?.click();
+      captureScreenshot();
     });
 
     // Tap map to dismiss warnings sheet
@@ -10611,6 +10611,21 @@
         sidebar?.classList.remove('mobile-open');
         mobileWarningsBtn?.classList.remove('active');
       }
+    });
+
+    // Radar button — opens quick settings panel
+    const mobileRadarBtn = document.getElementById('mobile-radar-toggle-btn');
+    mobileRadarBtn?.addEventListener('click', () => showMobileQuickSettings());
+
+    // Re-check layout on orientation change
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => {
+        if (map) map.invalidateSize();
+        // Close warnings sheet on rotation
+        warningsOpen = false;
+        sidebar?.classList.remove('mobile-open');
+        mobileWarningsBtn?.classList.remove('active');
+      }, 300);
     });
   }
 
@@ -10661,6 +10676,117 @@
       });
     });
     document.getElementById('close-mobile-picker')?.addEventListener('click', () => picker.remove());
+  }
+
+  function showMobileQuickSettings() {
+    const existing = document.getElementById('mobile-quick-settings');
+    if (existing) { existing.remove(); return; }
+
+    // Current states
+    const radarCurrentlyOn   = radarLayer ? (parseFloat(radarLayer.options.opacity ?? 1) > 0) : true;
+    const windCurrentlyOn    = windEnabled;
+    const legendCurrentlyOn  = document.getElementById('map-legend')?.style.display !== 'none';
+    const warningToggle      = document.getElementById('filter-warnings');
+    const warningsCurrentlyOn = warningToggle ? warningToggle.checked : true;
+
+    const panel = document.createElement('div');
+    panel.id = 'mobile-quick-settings';
+    panel.style.cssText = `
+      position:fixed;bottom:56px;left:0;right:0;z-index:700;
+      background:rgba(8,18,36,0.97);backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      border-top:0.5px solid rgba(255,255,255,0.12);
+      border-radius:16px 16px 0 0;padding:16px 16px 12px;
+    `;
+
+    const row = (id, label, isOn) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,0.07);">
+        <span style="font-size:0.85rem;font-weight:600;color:${isOn ? '#fff' : 'rgba(255,255,255,0.4)'};">${label}</span>
+        <div id="qs-${id}" data-on="${isOn}" style="
+          width:44px;height:24px;border-radius:12px;cursor:pointer;transition:all 0.2s;
+          background:${isOn ? '#3b82f6' : 'rgba(255,255,255,0.12)'};
+          position:relative;flex-shrink:0;
+        ">
+          <div style="
+            position:absolute;top:3px;left:${isOn ? '22px' : '3px'};
+            width:18px;height:18px;border-radius:50%;background:#fff;
+            transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3);
+          "></div>
+        </div>
+      </div>`;
+
+    panel.innerHTML = `
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.38);margin-bottom:4px;">Quick Settings</div>
+      ${row('radar',   'Radar',        radarCurrentlyOn)}
+      ${row('wind',    'Wind Particles', windCurrentlyOn)}
+      ${row('warnings','Live Warnings', warningsCurrentlyOn)}
+      ${row('legend',  'Radar Legend',  legendCurrentlyOn)}
+      <button id="close-quick-settings" style="
+        width:100%;margin-top:12px;padding:11px;
+        background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);
+        border-radius:8px;color:rgba(255,255,255,0.38);font-size:0.75rem;cursor:pointer;
+      ">Close</button>
+    `;
+
+    document.body.appendChild(panel);
+
+    // Wire each toggle
+    function wireToggle(id, onFn, offFn) {
+      const el = document.getElementById(`qs-${id}`);
+      if (!el) return;
+      el.addEventListener('click', () => {
+        const isOn = el.dataset.on === 'true';
+        const nowOn = !isOn;
+        el.dataset.on = nowOn;
+        // Update pill appearance
+        el.style.background = nowOn ? '#3b82f6' : 'rgba(255,255,255,0.12)';
+        el.querySelector('div').style.left = nowOn ? '22px' : '3px';
+        // Update label color
+        const label = el.closest('div[style]').querySelector('span');
+        if (label) label.style.color = nowOn ? '#fff' : 'rgba(255,255,255,0.4)';
+        nowOn ? onFn() : offFn();
+      });
+    }
+
+    // Radar
+    wireToggle('radar',
+      () => { if (radarLayer) radarLayer.setOpacity(1); },
+      () => { if (radarLayer) radarLayer.setOpacity(0); }
+    );
+
+    // Wind
+    wireToggle('wind',
+      () => { windEnabled = true;  if (windLayer) windLayer.addTo(map); document.getElementById('toggle-wind-layer') && (document.getElementById('toggle-wind-layer').checked = true); },
+      () => { windEnabled = false; if (windLayer) map.removeLayer(windLayer); document.getElementById('toggle-wind-layer') && (document.getElementById('toggle-wind-layer').checked = false); }
+    );
+
+    // Live Warnings
+    wireToggle('warnings',
+      () => {
+        const sidebar = document.getElementById('warnings-sidebar');
+        const expandBtn = document.getElementById('warnings-expand-btn');
+        if (sidebar) sidebar.style.display = '';
+        if (expandBtn) expandBtn.style.display = '';
+        if (warningToggle) warningToggle.checked = true;
+        if (map) setTimeout(() => map.invalidateSize(), 260);
+      },
+      () => {
+        const sidebar = document.getElementById('warnings-sidebar');
+        const expandBtn = document.getElementById('warnings-expand-btn');
+        if (sidebar) sidebar.style.display = 'none';
+        if (expandBtn) expandBtn.style.display = 'none';
+        if (warningToggle) warningToggle.checked = false;
+        if (map) setTimeout(() => map.invalidateSize(), 260);
+      }
+    );
+
+    // Radar Legend
+    wireToggle('legend',
+      () => { const el = document.getElementById('map-legend'); if (el) el.style.display = ''; document.getElementById('toggle-radar-legend') && (document.getElementById('toggle-radar-legend').checked = true); },
+      () => { const el = document.getElementById('map-legend'); if (el) el.style.display = 'none'; document.getElementById('toggle-radar-legend') && (document.getElementById('toggle-radar-legend').checked = false); }
+    );
+
+    document.getElementById('close-quick-settings')?.addEventListener('click', () => panel.remove());
   }
 
   initStudio();
