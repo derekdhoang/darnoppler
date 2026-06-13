@@ -44,6 +44,15 @@ body {
   pointer-events: none;
 }
 
+.nature-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
 .bg-image {
   position: absolute;
   inset: 0;
@@ -598,6 +607,13 @@ html::-webkit-scrollbar-track { background: transparent; }
   color: rgba(255,255,255,0.8);
 }
 .hourly-card.is-now .hourly-card-temp { color: #ffffff; font-weight: 700; }
+
+.hourly-card-fl {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: rgba(251,191,36,0.75);
+  margin-left: 2px;
+}
 
 .hourly-card-pop {
   font-size: 0.58rem;

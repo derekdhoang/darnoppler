@@ -89,6 +89,250 @@ function initDoppler() {
 initDoppler();
 applyBackground();
 
+// ── NATURE ANIMATIONS ─────────────────────────────────────────────────
+let natureAnimFrame = null;
+let currentNatureMode = null;
+
+function stopNature() {
+  if (natureAnimFrame) { cancelAnimationFrame(natureAnimFrame); natureAnimFrame = null; }
+  const canvas = document.getElementById('nature-canvas');
+  if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  currentNatureMode = null;
+}
+
+function startNature(mode) {
+  stopNature();
+  currentNatureMode = mode;
+  const canvas = document.getElementById('nature-canvas');
+  if (!canvas) return;
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  window.addEventListener('resize', () => {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }, { once: true });
+  if (mode === 'fireflies') runFireflies(canvas);
+  else if (mode === 'birds') runBirds(canvas);
+  else if (mode === 'rain')  runRain(canvas);
+}
+
+function runFireflies(canvas) {
+  const ctx   = canvas.getContext('2d');
+  const COUNT = 28;
+  const flies = Array.from({ length: COUNT }, () => ({
+    x:     Math.random() * canvas.width,
+    y:     canvas.height * 0.45 + Math.random() * canvas.height * 0.5,
+    r:     1.2 + Math.random() * 1.4,
+    alpha: 0,
+    vx:    (Math.random() - 0.5) * 0.18,
+    vy:    (Math.random() - 0.5) * 0.08,
+    timer: Math.random() * 400,
+    onFor: 120 + Math.random() * 200,
+    offFor:300 + Math.random() * 500,
+    on:    false,
+  }));
+
+  function tick() {
+    if (currentNatureMode !== 'fireflies') return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    flies.forEach(f => {
+      f.timer--;
+      if (f.timer <= 0) {
+        f.on    = !f.on;
+        f.timer = f.on ? f.onFor : f.offFor;
+        if (f.on && Math.random() < 0.3) {
+          f.x = Math.random() * canvas.width;
+          f.y = canvas.height * 0.45 + Math.random() * canvas.height * 0.5;
+        }
+      }
+      const target = f.on ? 0.55 + Math.random() * 0.3 : 0;
+      f.alpha += (target - f.alpha) * 0.04;
+      if (f.on) {
+        f.x += f.vx;
+        f.y += f.vy;
+        if (f.x < 0 || f.x > canvas.width)  f.vx *= -1;
+        if (f.y < canvas.height * 0.4 || f.y > canvas.height * 0.98) f.vy *= -1;
+      }
+      if (f.alpha < 0.01) return;
+      const glow = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r * 7);
+      glow.addColorStop(0,   `rgba(200,255,120,${f.alpha * 0.35})`);
+      glow.addColorStop(0.4, `rgba(180,240,80,${f.alpha * 0.12})`);
+      glow.addColorStop(1,   'rgba(180,240,80,0)');
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r * 7, 0, Math.PI * 2);
+      ctx.fillStyle = glow;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(220,255,160,${f.alpha})`;
+      ctx.fill();
+    });
+    natureAnimFrame = requestAnimationFrame(tick);
+  }
+  natureAnimFrame = requestAnimationFrame(tick);
+}
+
+function runBirds(canvas) {
+  const ctx    = canvas.getContext('2d');
+  const flocks = [];
+  let lastSpawn = 0;
+
+  function spawnFlock() {
+    const fromLeft = Math.random() < 0.5;
+    const startX   = fromLeft ? -120 : canvas.width + 120;
+    const dir      = fromLeft ? 1 : -1;
+    const baseY    = canvas.height * (0.06 + Math.random() * 0.2);
+    const speed    = 0.5 + Math.random() * 0.4;
+    const scale    = 0.7 + Math.random() * 0.5;
+    const armCount = 2 + Math.floor(Math.random() * 3); // birds per arm (2-4)
+    const spacing  = 28 * scale; // wingspan spacing
+
+    // Build V formation: leader + left arm + right arm
+    const birds = [{ ox: 0, oy: 0, phase: 0, wSpeed: 0.025 }]; // leader
+    for (let i = 1; i <= armCount; i++) {
+      // Left arm
+      birds.push({
+        ox:     -i * spacing * dir,
+        oy:      i * spacing * 0.55,
+        phase:   i * 0.4,
+        wSpeed:  0.025 + i * 0.002,
+      });
+      // Right arm (mirror)
+      birds.push({
+        ox:      i * spacing * dir,
+        oy:      i * spacing * 0.55,
+        phase:   i * 0.4 + 0.2,
+        wSpeed:  0.025 + i * 0.002,
+      });
+    }
+
+    flocks.push({ x: startX, y: baseY, dir, speed, scale, birds, alpha: 0 });
+  }
+
+  function drawBird(x, y, phase, scale, dir) {
+    const w  = 11 * scale;
+    const h  = Math.sin(phase) * 5 * scale; // wing beat height
+    ctx.beginPath();
+    // Left wing — curves up on upstroke
+    ctx.moveTo(x, y);
+    ctx.quadraticCurveTo(x - w * 0.55, y - h * 0.6, x - w, y - h);
+    // Right wing
+    ctx.moveTo(x, y);
+    ctx.quadraticCurveTo(x + w * 0.55, y - h * 0.6, x + w, y - h);
+    ctx.strokeStyle = 'rgba(15,15,25,0.65)';
+    ctx.lineWidth   = 1.5 * scale;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+    ctx.stroke();
+  }
+
+  // First flock after a natural delay
+  setTimeout(() => spawnFlock(), 6000 + Math.random() * 8000);
+
+  function tick(ts) {
+    if (currentNatureMode !== 'birds') return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Spawn next flock periodically
+    if (lastSpawn > 0 && ts - lastSpawn > 30000 + Math.random() * 25000) {
+      spawnFlock();
+      lastSpawn = ts;
+    }
+    if (lastSpawn === 0 && flocks.length > 0) lastSpawn = ts;
+
+    for (let fi = flocks.length - 1; fi >= 0; fi--) {
+      const flock = flocks[fi];
+      flock.x += flock.speed * flock.dir;
+
+      const offscreen = flock.dir > 0
+        ? flock.x > canvas.width + 150
+        : flock.x < -150;
+      if (offscreen) { flocks.splice(fi, 1); continue; }
+
+      // Fade in/out near edges
+      const distFromEdge = flock.dir > 0
+        ? Math.min(flock.x + 150, canvas.width - flock.x + 150)
+        : Math.min(canvas.width - flock.x + 150, flock.x + 150);
+      flock.alpha = Math.min(1, distFromEdge / 150);
+
+      ctx.globalAlpha = flock.alpha * 0.9;
+      flock.birds.forEach(b => {
+        b.phase += b.wSpeed;
+        drawBird(
+          flock.x + b.ox,
+          flock.y + b.oy + Math.sin(b.phase * 0.15) * 4,
+          b.phase,
+          flock.scale,
+          flock.dir
+        );
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    natureAnimFrame = requestAnimationFrame(tick);
+  }
+  natureAnimFrame = requestAnimationFrame(tick);
+}
+
+function runRain(canvas) {
+  const ctx    = canvas.getContext('2d');
+  const COUNT  = 200;
+  const angle  = 0.3;
+
+  const drops = Array.from({ length: COUNT }, () => ({
+    x:     Math.random() * (canvas.width + 200) - 100,
+    y:     Math.random() * canvas.height,
+    len:   14 + Math.random() * 22,
+    speed: 7 + Math.random() * 9,
+    alpha: 0.12 + Math.random() * 0.18,
+  }));
+
+  function tick() {
+    if (currentNatureMode !== 'rain') return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drops.forEach(d => {
+      d.x += Math.sin(angle) * d.speed * 0.5;
+      d.y += Math.cos(angle) * d.speed;
+
+      if (d.y > canvas.height + 20) {
+        d.y = -20;
+        d.x = Math.random() * (canvas.width + 200) - 100;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(
+        d.x + Math.sin(angle) * d.len * 0.5,
+        d.y - Math.cos(angle) * d.len
+      );
+      ctx.strokeStyle = `rgba(200,225,255,${d.alpha})`;
+      ctx.lineWidth   = 1;
+      ctx.lineCap     = 'round';
+      ctx.stroke();
+    });
+
+    natureAnimFrame = requestAnimationFrame(tick);
+  }
+  natureAnimFrame = requestAnimationFrame(tick);
+}
+
+function updateNature(icon, timeOfDay) {
+  const isWet   = icon.includes('rain') || icon.includes('drizzle') ||
+                  icon.includes('thunder') || icon.includes('sleet');
+  const isClear = !isWet && !icon.includes('fog');
+
+  if (isWet) {
+    if (currentNatureMode !== 'rain') startNature('rain');
+  } else if (timeOfDay === 'night' && isClear) {
+    if (currentNatureMode !== 'fireflies') startNature('fireflies');
+  } else if (timeOfDay !== 'night' && isClear) {
+    if (currentNatureMode !== 'birds') startNature('birds');
+  } else {
+    stopNature();
+  }
+}
+
 // ── DOM REFERENCES ────────────────────────────────────────────────────
 const cityInput           = document.getElementById('city-input');
 const searchBtn           = document.getElementById('search-btn');
@@ -607,6 +851,7 @@ function renderCurrent(current, today, hourlyData, city, state, country, lat, lo
 
   updateDopplerOutfit(icon, Math.round(current.temperature), Math.round(current.windSpeed));
   applyBackground(icon);
+  updateNature(icon, getTimeOfDay(getIowaHour()));
 
   renderTodayPrecipHint(today);
   renderLiveDigest(current, today, hourlyData);
@@ -1291,10 +1536,30 @@ function renderHourlyChart(hourlyData, offset = 0) {
       },
       onHover: (_evt, elements) => {
         const cards = document.querySelectorAll('.hourly-card');
-        cards.forEach(c => c.classList.remove('is-highlighted'));
+        cards.forEach((c, i) => {
+          c.classList.remove('is-highlighted');
+          // Reset temp display to original
+          const tempEl = c.querySelector('.hourly-card-temp');
+          if (tempEl) tempEl.innerHTML = `${temps[i]}°`;
+        });
         if (elements.length) {
           const idx = elements[0].index;
-          if (cards[idx]) cards[idx].classList.add('is-highlighted');
+          if (cards[idx]) {
+            cards[idx].classList.add('is-highlighted');
+            // Show feels like in the card if it differs
+            if (feelsDiffers) {
+              const fl      = feelsLike[idx];
+              const act     = temps[idx];
+              const tempEl  = cards[idx].querySelector('.hourly-card-temp');
+              if (tempEl) {
+                if (fl !== act) {
+                  tempEl.innerHTML = `${act}° <span class="hourly-card-fl">FL ${fl}°</span>`;
+                } else {
+                  tempEl.innerHTML = `${act}°`;
+                }
+              }
+            }
+          }
         }
       },
       scales: {
