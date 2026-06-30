@@ -100,7 +100,7 @@ function stopNature() {
   currentNatureMode = null;
 }
 
-function startNature(mode) {
+function startNature(mode, icon = '') {
   stopNature();
   currentNatureMode = mode;
   const canvas = document.getElementById('nature-canvas');
@@ -112,31 +112,38 @@ function startNature(mode) {
     canvas.height = window.innerHeight;
   }, { once: true });
   if (mode === 'fireflies') runFireflies(canvas);
-  else if (mode === 'birds') runBirds(canvas);
-  else if (mode === 'rain')  runRain(canvas);
+  else if (mode === 'birds')  runBirds(canvas);
+  else if (mode === 'rain')   runRain(canvas);
+  else if (mode === 'clouds') runClouds(canvas, icon);
 }
 
 function runFireflies(canvas) {
   const ctx   = canvas.getContext('2d');
   const COUNT = 28;
+  const TARGET_FPS = 60;
   const flies = Array.from({ length: COUNT }, () => ({
-    x:     Math.random() * canvas.width,
-    y:     canvas.height * 0.45 + Math.random() * canvas.height * 0.5,
-    r:     1.2 + Math.random() * 1.4,
-    alpha: 0,
-    vx:    (Math.random() - 0.5) * 0.18,
-    vy:    (Math.random() - 0.5) * 0.08,
-    timer: Math.random() * 400,
-    onFor: 120 + Math.random() * 200,
-    offFor:300 + Math.random() * 500,
-    on:    false,
+    x:      Math.random() * canvas.width,
+    y:      canvas.height * 0.45 + Math.random() * canvas.height * 0.5,
+    r:      1.2 + Math.random() * 1.4,
+    alpha:  0,
+    vx:     (Math.random() - 0.5) * 0.18,
+    vy:     (Math.random() - 0.5) * 0.08,
+    timer:  Math.random() * 6000,   // ms
+    onFor:  2000 + Math.random() * 3000,
+    offFor: 4000 + Math.random() * 8000,
+    on:     false,
   }));
 
-  function tick() {
+  let lastTs = null;
+  function tick(ts) {
     if (currentNatureMode !== 'fireflies') return;
+    if (!lastTs) lastTs = ts;
+    const dt = Math.min(ts - lastTs, 50); // cap at 50ms to prevent jumps
+    lastTs = ts;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     flies.forEach(f => {
-      f.timer--;
+      f.timer -= dt;
       if (f.timer <= 0) {
         f.on    = !f.on;
         f.timer = f.on ? f.onFor : f.offFor;
@@ -146,10 +153,11 @@ function runFireflies(canvas) {
         }
       }
       const target = f.on ? 0.55 + Math.random() * 0.3 : 0;
-      f.alpha += (target - f.alpha) * 0.04;
+      f.alpha += (target - f.alpha) * (1 - Math.pow(0.96, dt / (1000/TARGET_FPS)));
       if (f.on) {
-        f.x += f.vx;
-        f.y += f.vy;
+        const scale = dt / (1000 / TARGET_FPS);
+        f.x += f.vx * scale;
+        f.y += f.vy * scale;
         if (f.x < 0 || f.x > canvas.width)  f.vx *= -1;
         if (f.y < canvas.height * 0.4 || f.y > canvas.height * 0.98) f.vy *= -1;
       }
@@ -176,47 +184,31 @@ function runBirds(canvas) {
   const ctx    = canvas.getContext('2d');
   const flocks = [];
   let lastSpawn = 0;
+  let lastTs    = null;
 
   function spawnFlock() {
     const fromLeft = Math.random() < 0.5;
     const startX   = fromLeft ? -120 : canvas.width + 120;
     const dir      = fromLeft ? 1 : -1;
     const baseY    = canvas.height * (0.06 + Math.random() * 0.2);
-    const speed    = 0.5 + Math.random() * 0.4;
+    const speed    = 30 + Math.random() * 25; // px per second
     const scale    = 0.7 + Math.random() * 0.5;
-    const armCount = 2 + Math.floor(Math.random() * 3); // birds per arm (2-4)
-    const spacing  = 28 * scale; // wingspan spacing
-
-    // Build V formation: leader + left arm + right arm
-    const birds = [{ ox: 0, oy: 0, phase: 0, wSpeed: 0.025 }]; // leader
+    const armCount = 2 + Math.floor(Math.random() * 3);
+    const spacing  = 28 * scale;
+    const birds    = [{ ox: 0, oy: 0, phase: 0, wSpeed: 1.5 }];
     for (let i = 1; i <= armCount; i++) {
-      // Left arm
-      birds.push({
-        ox:     -i * spacing * dir,
-        oy:      i * spacing * 0.55,
-        phase:   i * 0.4,
-        wSpeed:  0.025 + i * 0.002,
-      });
-      // Right arm (mirror)
-      birds.push({
-        ox:      i * spacing * dir,
-        oy:      i * spacing * 0.55,
-        phase:   i * 0.4 + 0.2,
-        wSpeed:  0.025 + i * 0.002,
-      });
+      birds.push({ ox: -i * spacing * dir, oy: i * spacing * 0.55, phase: i * 0.4, wSpeed: 1.5 + i * 0.1 });
+      birds.push({ ox:  i * spacing * dir, oy: i * spacing * 0.55, phase: i * 0.4 + 0.2, wSpeed: 1.5 + i * 0.1 });
     }
-
     flocks.push({ x: startX, y: baseY, dir, speed, scale, birds, alpha: 0 });
   }
 
-  function drawBird(x, y, phase, scale, dir) {
-    const w  = 11 * scale;
-    const h  = Math.sin(phase) * 5 * scale; // wing beat height
+  function drawBird(x, y, phase, scale) {
+    const w = 11 * scale;
+    const h = Math.sin(phase) * 5 * scale;
     ctx.beginPath();
-    // Left wing — curves up on upstroke
     ctx.moveTo(x, y);
     ctx.quadraticCurveTo(x - w * 0.55, y - h * 0.6, x - w, y - h);
-    // Right wing
     ctx.moveTo(x, y);
     ctx.quadraticCurveTo(x + w * 0.55, y - h * 0.6, x + w, y - h);
     ctx.strokeStyle = 'rgba(15,15,25,0.65)';
@@ -226,90 +218,179 @@ function runBirds(canvas) {
     ctx.stroke();
   }
 
-  // First flock after a natural delay
   setTimeout(() => spawnFlock(), 6000 + Math.random() * 8000);
 
   function tick(ts) {
     if (currentNatureMode !== 'birds') return;
+    if (!lastTs) lastTs = ts;
+    const dt = Math.min(ts - lastTs, 50);
+    lastTs = ts;
+    const dtSec = dt / 1000;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Spawn next flock periodically
     if (lastSpawn > 0 && ts - lastSpawn > 30000 + Math.random() * 25000) {
-      spawnFlock();
-      lastSpawn = ts;
+      spawnFlock(); lastSpawn = ts;
     }
     if (lastSpawn === 0 && flocks.length > 0) lastSpawn = ts;
 
     for (let fi = flocks.length - 1; fi >= 0; fi--) {
       const flock = flocks[fi];
-      flock.x += flock.speed * flock.dir;
+      flock.x += flock.speed * flock.dir * dtSec;
 
-      const offscreen = flock.dir > 0
-        ? flock.x > canvas.width + 150
-        : flock.x < -150;
+      const offscreen = flock.dir > 0 ? flock.x > canvas.width + 150 : flock.x < -150;
       if (offscreen) { flocks.splice(fi, 1); continue; }
 
-      // Fade in/out near edges
-      const distFromEdge = flock.dir > 0
-        ? Math.min(flock.x + 150, canvas.width - flock.x + 150)
-        : Math.min(canvas.width - flock.x + 150, flock.x + 150);
+      const distFromEdge = Math.min(
+        Math.abs(flock.x + 150),
+        Math.abs(canvas.width - flock.x + 150)
+      );
       flock.alpha = Math.min(1, distFromEdge / 150);
 
       ctx.globalAlpha = flock.alpha * 0.9;
       flock.birds.forEach(b => {
-        b.phase += b.wSpeed;
+        b.phase += b.wSpeed * dtSec;
         drawBird(
           flock.x + b.ox,
           flock.y + b.oy + Math.sin(b.phase * 0.15) * 4,
-          b.phase,
-          flock.scale,
-          flock.dir
+          b.phase, flock.scale, flock.dir
         );
       });
       ctx.globalAlpha = 1;
     }
-
     natureAnimFrame = requestAnimationFrame(tick);
   }
   natureAnimFrame = requestAnimationFrame(tick);
 }
 
 function runRain(canvas) {
-  const ctx    = canvas.getContext('2d');
-  const COUNT  = 200;
-  const angle  = 0.3;
+  const ctx   = canvas.getContext('2d');
+  const COUNT = 200;
+  const angle = 0.3;
+  let lastTs  = null;
 
   const drops = Array.from({ length: COUNT }, () => ({
     x:     Math.random() * (canvas.width + 200) - 100,
     y:     Math.random() * canvas.height,
     len:   14 + Math.random() * 22,
-    speed: 7 + Math.random() * 9,
+    speed: 500 + Math.random() * 350, // px per second
     alpha: 0.12 + Math.random() * 0.18,
   }));
 
-  function tick() {
+  function tick(ts) {
     if (currentNatureMode !== 'rain') return;
+    if (!lastTs) lastTs = ts;
+    const dt    = Math.min(ts - lastTs, 50);
+    lastTs = ts;
+    const dtSec = dt / 1000;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     drops.forEach(d => {
-      d.x += Math.sin(angle) * d.speed * 0.5;
-      d.y += Math.cos(angle) * d.speed;
-
+      d.x += Math.sin(angle) * d.speed * dtSec * 0.5;
+      d.y += Math.cos(angle) * d.speed * dtSec;
       if (d.y > canvas.height + 20) {
         d.y = -20;
         d.x = Math.random() * (canvas.width + 200) - 100;
       }
-
       ctx.beginPath();
       ctx.moveTo(d.x, d.y);
-      ctx.lineTo(
-        d.x + Math.sin(angle) * d.len * 0.5,
-        d.y - Math.cos(angle) * d.len
-      );
+      ctx.lineTo(d.x + Math.sin(angle) * d.len * 0.5, d.y - Math.cos(angle) * d.len);
       ctx.strokeStyle = `rgba(200,225,255,${d.alpha})`;
       ctx.lineWidth   = 1;
       ctx.lineCap     = 'round';
       ctx.stroke();
+    });
+    natureAnimFrame = requestAnimationFrame(tick);
+  }
+  natureAnimFrame = requestAnimationFrame(tick);
+}
+
+function runClouds(canvas, icon) {
+  const ctx   = canvas.getContext('2d');
+  let lastTs  = null;
+
+  // Scale density based on condition
+  const isOvercast     = icon.includes('cloudy') && !icon.includes('partly');
+  const isFog          = icon.includes('fog');
+  const COUNT          = isFog ? 6 : isOvercast ? 7 : 4;
+  const baseAlpha      = isFog ? 0.22 : isOvercast ? 0.2 : 0.13;
+  const alphaVariance  = isFog ? 0.14 : isOvercast ? 0.14 : 0.1;
+  const baseScale      = isFog ? 1.6  : isOvercast ? 1.4  : 1.1;
+
+  const clouds = Array.from({ length: COUNT }, (_, i) => ({
+    x:     (canvas.width / COUNT) * i + Math.random() * (canvas.width / COUNT),
+    y:     canvas.height * (0.03 + Math.random() * (isFog ? 0.45 : 0.28)),
+    scale: baseScale + Math.random() * 0.8,
+    speed: (isFog ? 4 : isOvercast ? 7 : 10) + Math.random() * 8,
+    dir:   Math.random() < 0.5 ? 1 : -1,
+    alpha: baseAlpha + Math.random() * alphaVariance,
+    puffs: isOvercast ? 4 + Math.floor(Math.random() * 2) : 3 + Math.floor(Math.random() * 2),
+  }));
+
+  function drawCloud(x, y, scale, alpha, puffs) {
+    const r = 28 * scale;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    // Build cloud from overlapping circles
+    const offsets = [
+      { ox: 0,        oy: 0    },
+      { ox: -r * 0.6, oy: r * 0.2 },
+      { ox:  r * 0.6, oy: r * 0.2 },
+      { ox: -r * 1.1, oy: r * 0.5 },
+      { ox:  r * 1.1, oy: r * 0.5 },
+    ].slice(0, puffs + 1);
+
+    // Shadow/depth layer
+    offsets.forEach(o => {
+      const grad = ctx.createRadialGradient(
+        x + o.ox, y + o.oy + 6, 0,
+        x + o.ox, y + o.oy, r * 1.1
+      );
+      grad.addColorStop(0,   'rgba(180,190,200,0.18)');
+      grad.addColorStop(1,   'rgba(180,190,200,0)');
+      ctx.beginPath();
+      ctx.arc(x + o.ox, y + o.oy, r * 1.1, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+    });
+
+    // Main cloud puffs
+    offsets.forEach(o => {
+      const grad = ctx.createRadialGradient(
+        x + o.ox - r * 0.2, y + o.oy - r * 0.2, 0,
+        x + o.ox, y + o.oy, r
+      );
+      grad.addColorStop(0,   'rgba(240,245,255,0.55)');
+      grad.addColorStop(0.5, 'rgba(220,228,240,0.35)');
+      grad.addColorStop(1,   'rgba(200,210,225,0)');
+      ctx.beginPath();
+      ctx.arc(x + o.ox, y + o.oy, r, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+    });
+
+    ctx.restore();
+  }
+
+  function tick(ts) {
+    if (currentNatureMode !== 'clouds') return;
+    if (!lastTs) lastTs = ts;
+    const dt    = Math.min(ts - lastTs, 50);
+    lastTs = ts;
+    const dtSec = dt / 1000;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    clouds.forEach(c => {
+      c.x += c.speed * c.dir * dtSec;
+
+      // Wrap around when off screen
+      const maxX = canvas.width + 200;
+      if (c.x > maxX)            c.x = -200;
+      if (c.x < -200)            c.x = maxX;
+
+      drawCloud(c.x, c.y, c.scale, c.alpha, c.puffs);
     });
 
     natureAnimFrame = requestAnimationFrame(tick);
@@ -320,13 +401,17 @@ function runRain(canvas) {
 function updateNature(icon, timeOfDay) {
   const isWet   = icon.includes('rain') || icon.includes('drizzle') ||
                   icon.includes('thunder') || icon.includes('sleet');
-  const isClear = !isWet && !icon.includes('fog');
+  const isCloudy = icon.includes('cloudy') || icon.includes('fog');
+  const isClear  = !isWet && !isCloudy;
+  const isDaytime = timeOfDay === 'day' || timeOfDay === 'morning' || timeOfDay === 'evening';
 
   if (isWet) {
     if (currentNatureMode !== 'rain') startNature('rain');
+  } else if (isCloudy && isDaytime) {
+    if (currentNatureMode !== 'clouds') startNature('clouds', icon);
   } else if (timeOfDay === 'night' && isClear) {
     if (currentNatureMode !== 'fireflies') startNature('fireflies');
-  } else if (timeOfDay !== 'night' && isClear) {
+  } else if (isDaytime && isClear) {
     if (currentNatureMode !== 'birds') startNature('birds');
   } else {
     stopNature();
@@ -759,6 +844,7 @@ async function fetchWeather(lat, lon, city, state, country) {
       initRadarPreview();
       updatePreviewCityMarker(city, lat, lon);
       loadDrawingsOntoPreview();
+      fetchActiveAlerts(lat, lon);
 
       if (isInIowa(lat, lon)) {
         fetchSPCOutlook(lat, lon);
@@ -767,6 +853,7 @@ async function fetchWeather(lat, lon, city, state, country) {
       }
     } else {
       spcPanel.hidden = true;
+      hideAdvisoryStripe();
     }
 
   } catch (err) {
@@ -1546,6 +1633,16 @@ function renderHourlyChart(hourlyData, offset = 0) {
           const idx = elements[0].index;
           if (cards[idx]) {
             cards[idx].classList.add('is-highlighted');
+            // Auto-scroll card strip to keep hovered card in view
+            const strip = document.getElementById('hourly-card-strip');
+            if (strip) {
+              const card     = cards[idx];
+              const cardLeft = card.offsetLeft;
+              const cardW    = card.offsetWidth;
+              const stripW   = strip.offsetWidth;
+              const target   = cardLeft - (stripW / 2) + (cardW / 2);
+              strip.scrollTo({ left: target, behavior: 'smooth' });
+            }
             // Show feels like in the card if it differs
             if (feelsDiffers) {
               const fl      = feelsLike[idx];
@@ -1618,6 +1715,174 @@ function checkFeature(lat, lon, feature) {
   if (geom.type === 'Polygon')      return pointInPolygon(lat, lon, geom.coordinates[0]);
   if (geom.type === 'MultiPolygon') return geom.coordinates.some(p => pointInPolygon(lat, lon, p[0]));
   return false;
+}
+
+// ── ACTIVE WEATHER ALERTS (NWS) ─────────────────────────────────────────
+const ALERT_STYLES = {
+  // Heat
+  'Excessive Heat Warning':   { color: '#dc2626', label: 'Excessive Heat Warning' },
+  'Heat Advisory':            { color: '#ef4444', label: 'Heat Advisory' },
+  'Extreme Heat Warning':     { color: '#dc2626', label: 'Extreme Heat Warning' },
+  // Cold / Winter
+  'Winter Storm Warning':     { color: '#2563eb', label: 'Winter Storm Warning' },
+  'Winter Weather Advisory':  { color: '#3b82f6', label: 'Winter Weather Advisory' },
+  'Winter Storm Watch':       { color: '#60a5fa', label: 'Winter Storm Watch' },
+  'Wind Chill Advisory':      { color: '#3b82f6', label: 'Wind Chill Advisory' },
+  'Wind Chill Warning':       { color: '#2563eb', label: 'Wind Chill Warning' },
+  'Extreme Cold Warning':     { color: '#1d4ed8', label: 'Extreme Cold Warning' },
+  // Severe
+  'Tornado Warning':          { color: '#b91c1c', label: 'Tornado Warning' },
+  'Tornado Watch':            { color: '#dc2626', label: 'Tornado Watch' },
+  'Severe Thunderstorm Warning': { color: '#9333ea', label: 'Severe Thunderstorm Warning' },
+  'Severe Thunderstorm Watch':   { color: '#a855f7', label: 'Severe Thunderstorm Watch' },
+  // Flood
+  'Flash Flood Warning':      { color: '#15803d', label: 'Flash Flood Warning' },
+  'Flood Warning':            { color: '#16a34a', label: 'Flood Warning' },
+  'Flood Watch':              { color: '#22c55e', label: 'Flood Watch' },
+  'Flood Advisory':           { color: '#4ade80', label: 'Flood Advisory' },
+  // Wind / Fire
+  'High Wind Warning':        { color: '#ca8a04', label: 'High Wind Warning' },
+  'Wind Advisory':            { color: '#eab308', label: 'Wind Advisory' },
+  'Red Flag Warning':         { color: '#ea580c', label: 'Red Flag Warning' },
+  // Fog
+  'Dense Fog Advisory':       { color: '#64748b', label: 'Dense Fog Advisory' },
+};
+
+const SEVERITY_RANK = { 'Extreme': 4, 'Severe': 3, 'Moderate': 2, 'Minor': 1, 'Unknown': 0 };
+
+let advisoryStripeEl = null;
+
+function ensureAdvisoryStripe() {
+  if (advisoryStripeEl) return advisoryStripeEl;
+  const liveDigest = document.getElementById('live-digest');
+  if (!liveDigest) return null;
+  const stripe = document.createElement('div');
+  stripe.className = 'advisory-stripe';
+  stripe.id = 'advisory-stripe';
+  stripe.hidden = true;
+  stripe.innerHTML = `
+    <div class="advisory-stripe-top">
+      <span class="advisory-stripe-dot"></span>
+      <span class="advisory-stripe-label" id="advisory-stripe-label"></span>
+      <button class="advisory-stripe-area" id="advisory-stripe-area" type="button"></button>
+      <span class="advisory-stripe-expires" id="advisory-stripe-expires"></span>
+    </div>
+    <div class="advisory-stripe-detail" id="advisory-stripe-detail"></div>
+    <div class="advisory-stripe-areas-full" id="advisory-stripe-areas-full" hidden></div>
+  `;
+  liveDigest.parentNode.insertBefore(stripe, liveDigest);
+  advisoryStripeEl = stripe;
+
+  // Wire up the expand/collapse toggle for area list
+  const areaBtn  = stripe.querySelector('#advisory-stripe-area');
+  const areasEl  = stripe.querySelector('#advisory-stripe-areas-full');
+  areaBtn.addEventListener('click', () => {
+    if (areaBtn.disabled) return;
+    const isOpen = !areasEl.hidden;
+    areasEl.hidden = isOpen;
+    areaBtn.setAttribute('aria-expanded', String(!isOpen));
+    areaBtn.classList.toggle('is-expanded', !isOpen);
+  });
+
+  return stripe;
+}
+
+function hideAdvisoryStripe() {
+  const stripe = ensureAdvisoryStripe();
+  if (stripe) stripe.hidden = true;
+}
+
+function renderAdvisoryStripe(alert) {
+  const stripe = ensureAdvisoryStripe();
+  if (!stripe) return;
+
+  const style = ALERT_STYLES[alert.event] || { color: '#94a3b8', label: alert.event };
+  const labelEl   = document.getElementById('advisory-stripe-label');
+  const areaEl    = document.getElementById('advisory-stripe-area');
+  const expiresEl = document.getElementById('advisory-stripe-expires');
+  const detailEl  = document.getElementById('advisory-stripe-detail');
+
+  stripe.style.setProperty('--advisory-color', style.color);
+  labelEl.textContent = style.label;
+
+  const areasFullEl = document.getElementById('advisory-stripe-areas-full');
+
+  if (alert.areaDesc) {
+    const areas = alert.areaDesc.split(';').map(a => a.trim()).filter(Boolean);
+    if (areas.length > 2) {
+      const extra = areas.length - 2;
+      areaEl.innerHTML = `${areas[0]}, ${areas[1]} <span class="advisory-stripe-more">+${extra} more</span>`;
+      areaEl.disabled = false;
+      areasFullEl.textContent = areas.join(' · ');
+      areasFullEl.hidden = true; // reset to collapsed on each new render
+      areaEl.setAttribute('aria-expanded', 'false');
+    } else {
+      areaEl.textContent = areas.join(', ');
+      areaEl.disabled = true;
+      areasFullEl.hidden = true;
+      areasFullEl.textContent = '';
+    }
+  } else {
+    areaEl.textContent = '';
+    areaEl.disabled = true;
+    areasFullEl.hidden = true;
+    areasFullEl.textContent = '';
+  }
+
+  if (alert.expires) {
+    const exp = new Date(alert.expires);
+    expiresEl.textContent = 'Until ' + exp.toLocaleString('en-US', {
+      weekday: 'short', hour: 'numeric', minute: '2-digit'
+    });
+  } else {
+    expiresEl.textContent = '';
+  }
+
+  let detail = '';
+  if (alert.instruction) {
+    detail = alert.instruction.replace(/\s*\n\s*/g, ' ').trim();
+  } else if (alert.description) {
+    detail = alert.description.replace(/\s*\n\s*/g, ' ').trim();
+  }
+  if (detail.length > 280) {
+    detail = detail.slice(0, 280);
+    const lastSpace = detail.lastIndexOf(' ');
+    if (lastSpace > 200) detail = detail.slice(0, lastSpace);
+    detail = detail.trim() + '…';
+  }
+  detailEl.textContent = detail;
+
+  stripe.hidden = false;
+}
+
+async function fetchActiveAlerts(lat, lon) {
+  try {
+    const res = await fetch(`https://api.weather.gov/alerts/active?point=${lat.toFixed(4)},${lon.toFixed(4)}`, {
+      headers: { 'Accept': 'application/geo+json' }
+    });
+    if (!res.ok) { hideAdvisoryStripe(); return; }
+    const data = await res.json();
+
+    if (!data.features || !data.features.length) {
+      hideAdvisoryStripe();
+      return;
+    }
+
+    // Pick the highest severity alert we have a style for
+    const relevant = data.features
+      .map(f => f.properties)
+      .filter(p => ALERT_STYLES[p.event]);
+
+    if (!relevant.length) { hideAdvisoryStripe(); return; }
+
+    relevant.sort((a, b) =>
+      (SEVERITY_RANK[b.severity] || 0) - (SEVERITY_RANK[a.severity] || 0)
+    );
+
+    renderAdvisoryStripe(relevant[0]);
+  } catch {
+    hideAdvisoryStripe();
+  }
 }
 
 async function fetchSPCOutlook(lat, lon) {
